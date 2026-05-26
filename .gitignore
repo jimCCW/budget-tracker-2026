@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment files — never commit secrets
+.env
+.env.*
+!.env.example
+
+# Next.js build output
+.next/
+out/
+
+# Build artifacts
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# Certificates
+*.pem
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# Vercel
+.vercel
+
+# Claude Code local settings (machine-specific permissions)
+.claude/settings.local.json
