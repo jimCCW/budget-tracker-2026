@@ -1,5 +1,5 @@
 'use client';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, ResponsiveContainer } from 'recharts';
 import { SAMPLE, fmt, fmtShort } from '../data';
 
 export function CategoryDonutChart() {
@@ -7,7 +7,7 @@ export function CategoryDonutChart() {
   const data = SAMPLE.topExpenses.map((e) => ({
     name: e.name,
     value: e.value,
-    color: e.color,
+    fill: e.color,
   }));
 
   return (
@@ -36,11 +36,7 @@ export function CategoryDonutChart() {
                 dataKey='value'
                 strokeWidth={2}
                 stroke='var(--color-surface)'
-              >
-                {data.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Pie>
+              />
             </PieChart>
           </ResponsiveContainer>
           {/* Center label */}
@@ -60,7 +56,7 @@ export function CategoryDonutChart() {
             <div key={i} className='flex items-center gap-2.5 text-[12.5px]'>
               <span
                 className='w-2.5 h-2.5 rounded-sm flex-shrink-0'
-                style={{ background: item.color }}
+                style={{ background: item.fill }}
               />
               <span className='flex-1 text-text font-medium'>{item.name}</span>
               <span className='text-text-muted tabular-nums'>
