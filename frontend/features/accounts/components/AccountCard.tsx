@@ -40,7 +40,9 @@ export function AccountCard({ account, onEdit, onDelete }: Props) {
         </div>
 
         <div className='flex-1 min-w-0'>
-          <div className='text-sm font-bold text-text truncate'>{account.name}</div>
+          <div className='text-sm font-bold text-text truncate'>
+            {account.name}
+          </div>
           <div className='text-xs text-text-muted mt-0.5'>{meta.label}</div>
         </div>
 
@@ -87,7 +89,10 @@ export function AccountCard({ account, onEdit, onDelete }: Props) {
       </div>
 
       {/* Color accent bar */}
-      <div className='h-1 rounded-full opacity-30' style={{ backgroundColor: color }} />
+      <div
+        className='h-1 rounded-full opacity-30'
+        style={{ backgroundColor: color }}
+      />
     </div>
   );
 }

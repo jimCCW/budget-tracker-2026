@@ -61,7 +61,11 @@ export async function updateController(
   next: NextFunction
 ) {
   try {
-    const data = await accountService.update(req.user!.id, req.params.id, req.body);
+    const data = await accountService.update(
+      req.user!.id,
+      req.params.id,
+      req.body
+    );
     res.json({ success: true, data });
   } catch (err) {
     next(err);

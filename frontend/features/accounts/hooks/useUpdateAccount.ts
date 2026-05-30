@@ -11,10 +11,10 @@ async function updateAccountFn({
   id: string;
   values: AccountFormValues;
 }): Promise<Account> {
-  const body = await apiClient.patch<never, { success: boolean; data: Account }>(
-    `/api/accounts/${id}`,
-    values
-  );
+  const body = await apiClient.patch<
+    never,
+    { success: boolean; data: Account }
+  >(`/api/accounts/${id}`, values);
   return body.data;
 }
 

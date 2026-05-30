@@ -103,7 +103,9 @@ export function AccountFormModal({ open, onClose, account }: Props) {
       <div className='flex flex-col lg:flex-row'>
         {/* ── Preview pane ── */}
         <div className='lg:w-64 lg:shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col gap-4'>
-          <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>Preview</p>
+          <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>
+            Preview
+          </p>
 
           {/* Hero stamp */}
           <div className='flex flex-col items-center gap-3 py-2'>
@@ -118,7 +120,11 @@ export function AccountFormModal({ open, onClose, account }: Props) {
             </div>
             <div
               className='text-base font-extrabold text-center max-w-40 truncate'
-              style={{ color: watchedName ? 'var(--color-text)' : 'var(--color-text-muted)' }}
+              style={{
+                color: watchedName
+                  ? 'var(--color-text)'
+                  : 'var(--color-text-muted)',
+              }}
             >
               {displayName}
             </div>
@@ -142,19 +148,27 @@ export function AccountFormModal({ open, onClose, account }: Props) {
               <div className='text-xl font-extrabold tabular-nums text-text'>
                 {formatCurrency(isNaN(watchedBalance) ? 0 : watchedBalance)}
               </div>
-              <div className='text-xs text-text-muted mt-1'>{meta.label} account</div>
+              <div className='text-xs text-text-muted mt-1'>
+                {meta.label} account
+              </div>
             </div>
           </div>
         </div>
 
         {/* ── Form pane ── */}
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className='flex-1 p-6 flex flex-col gap-5'>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className='flex-1 p-6 flex flex-col gap-5'
+        >
           {/* Error banner */}
           {mutation.isError && (
             <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
               <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
               <p className='text-sm text-text-muted mt-0.5'>
-                {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
+                {mutation.error instanceof Error
+                  ? mutation.error.message
+                  : 'Something went wrong.'}
               </p>
             </div>
           )}
@@ -200,7 +214,9 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                       <i className={`pi ${typeMeta.icon} text-base`} />
                     </div>
                     <div>
-                      <div className='text-sm font-bold text-text'>{typeMeta.label}</div>
+                      <div className='text-sm font-bold text-text'>
+                        {typeMeta.label}
+                      </div>
                       <div className='text-xs text-text-muted mt-0.5 capitalize'>
                         {typeMeta.group}
                       </div>
@@ -225,7 +241,9 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                 className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
               />
             </div>
-            {errors.name && <p className='text-xs text-danger'>{errors.name.message}</p>}
+            {errors.name && (
+              <p className='text-xs text-danger'>{errors.name.message}</p>
+            )}
           </div>
 
           {/* Balance */}
@@ -243,12 +261,16 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                 className={`${inputBase} ${errors.balance ? 'border-danger' : 'border-border'}`}
               />
             </div>
-            {errors.balance && <p className='text-xs text-danger'>{errors.balance.message}</p>}
+            {errors.balance && (
+              <p className='text-xs text-danger'>{errors.balance.message}</p>
+            )}
           </div>
 
           {/* Color picker */}
           <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>Color</label>
+            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+              Color
+            </label>
             <div className='flex flex-wrap gap-2.5'>
               {ACCOUNT_COLORS.map((c) => {
                 const selected = watchedColor === c;
@@ -261,13 +283,17 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                     className='w-8 h-8 rounded-full flex items-center justify-center transition-all'
                     style={{
                       backgroundColor: c,
-                      border: selected ? '2.5px solid var(--color-surface)' : 'none',
+                      border: selected
+                        ? '2.5px solid var(--color-surface)'
+                        : 'none',
                       boxShadow: selected
                         ? `0 0 0 2px ${c}, 0 4px 10px ${c}55`
                         : '0 1px 3px rgba(0,0,0,.15)',
                     }}
                   >
-                    {selected && <i className='pi pi-check text-white text-xs font-bold' />}
+                    {selected && (
+                      <i className='pi pi-check text-white text-xs font-bold' />
+                    )}
                   </button>
                 );
               })}

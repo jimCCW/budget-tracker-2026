@@ -21,7 +21,10 @@ export function NetWorthHeader({
     return (
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className='bg-surface border border-border rounded-lg h-28 animate-pulse' />
+          <div
+            key={i}
+            className='bg-surface border border-border rounded-lg h-28 animate-pulse'
+          />
         ))}
       </div>
     );

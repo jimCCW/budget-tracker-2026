@@ -34,10 +34,12 @@ export function DeleteAccountModal({ open, onClose, account }: Props) {
 
         {/* Text */}
         <div className='text-center'>
-          <h2 className='text-base font-extrabold text-text'>Delete account?</h2>
+          <h2 className='text-base font-extrabold text-text'>
+            Delete account?
+          </h2>
           <p className='text-sm text-text-muted mt-1'>
-            <span className='font-semibold text-text'>{account?.name}</span> will be permanently
-            removed.
+            <span className='font-semibold text-text'>{account?.name}</span>{' '}
+            will be permanently removed.
           </p>
         </div>
 
@@ -46,7 +48,9 @@ export function DeleteAccountModal({ open, onClose, account }: Props) {
           <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
             <i className='pi pi-times-circle text-danger mt-px shrink-0 text-base' />
             <p className='text-sm text-text-muted mt-0.5'>
-              {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
+              {mutation.error instanceof Error
+                ? mutation.error.message
+                : 'Something went wrong.'}
             </p>
           </div>
         )}

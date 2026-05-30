@@ -74,7 +74,10 @@ export async function create(
  * @param userId - The newly created user's ID.
  * @param tx - Prisma transaction client to ensure atomicity with user creation.
  */
-export async function createDefault(userId: string, tx: Prisma.TransactionClient) {
+export async function createDefault(
+  userId: string,
+  tx: Prisma.TransactionClient
+) {
   return tx.account.create({
     data: {
       userId,
@@ -108,7 +111,11 @@ export async function update(
   const account = await prisma.account.findUnique({ where: { id } });
   if (!account) throw appError('NOT_FOUND', 'Account not found.', 404);
   if (account.userId !== userId)
-    throw appError('FORBIDDEN', 'You do not have permission to edit this account.', 403);
+    throw appError(
+      'FORBIDDEN',
+      'You do not have permission to edit this account.',
+      403
+    );
 
   return prisma.account.update({
     where: { id },
@@ -135,7 +142,11 @@ export async function remove(userId: string, id: string) {
   const account = await prisma.account.findUnique({ where: { id } });
   if (!account) throw appError('NOT_FOUND', 'Account not found.', 404);
   if (account.userId !== userId)
-    throw appError('FORBIDDEN', 'You do not have permission to delete this account.', 403);
+    throw appError(
+      'FORBIDDEN',
+      'You do not have permission to delete this account.',
+      403
+    );
 
   const count = await prisma.account.count({ where: { userId } });
   if (count === 1)

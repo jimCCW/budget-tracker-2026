@@ -12,7 +12,9 @@ export function AccountsPage() {
   const { data: summary, isLoading, isError } = useAccountSummary();
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<Account | undefined>(undefined);
+  const [editingAccount, setEditingAccount] = useState<Account | undefined>(
+    undefined
+  );
   const [deletingAccount, setDeletingAccount] = useState<Account | null>(null);
 
   function openCreate() {
@@ -46,7 +48,9 @@ export function AccountsPage() {
       {/* Top bar */}
       <div className='flex items-center justify-between'>
         <p className='text-sm text-text-muted'>
-          {isLoading ? '—' : `${accounts.length} account${accounts.length !== 1 ? 's' : ''}`}
+          {isLoading
+            ? '—'
+            : `${accounts.length} account${accounts.length !== 1 ? 's' : ''}`}
         </p>
         <button
           onClick={openCreate}
@@ -61,7 +65,9 @@ export function AccountsPage() {
       {isError && (
         <div className='bg-danger-tint border border-danger/30 rounded-lg p-4 flex gap-3 items-center'>
           <i className='pi pi-times-circle text-danger text-lg' />
-          <p className='text-sm text-text-muted'>Failed to load accounts. Please refresh.</p>
+          <p className='text-sm text-text-muted'>
+            Failed to load accounts. Please refresh.
+          </p>
         </div>
       )}
 
@@ -69,7 +75,10 @@ export function AccountsPage() {
       {isLoading && (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className='bg-surface border border-border rounded-xl p-4 h-28 animate-pulse' />
+            <div
+              key={i}
+              className='bg-surface border border-border rounded-xl p-4 h-28 animate-pulse'
+            />
           ))}
         </div>
       )}
@@ -84,7 +93,9 @@ export function AccountsPage() {
               <div className='w-11 h-11 rounded-xl bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
                 <i className='pi pi-plus text-xl' />
               </div>
-              <span className='text-sm font-semibold'>Add your first account</span>
+              <span className='text-sm font-semibold'>
+                Add your first account
+              </span>
             </button>
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -111,7 +122,11 @@ export function AccountsPage() {
         </>
       )}
 
-      <AccountFormModal open={formOpen} onClose={closeForm} account={editingAccount} />
+      <AccountFormModal
+        open={formOpen}
+        onClose={closeForm}
+        account={editingAccount}
+      />
 
       <DeleteAccountModal
         open={!!deletingAccount}
