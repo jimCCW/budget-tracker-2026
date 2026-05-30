@@ -56,16 +56,21 @@ Enforced in `proxy.ts` using NextAuth `getToken`. File is `proxy.ts` (Next.js 16
 frontend/
 ├── app/                      # Routing only — no logic or inline JSX
 │   ├── (auth)/               # login/, register/ — public
-│   └── (private)/            # dashboard/, income/, expenses/, categories/, summary/
+│   └── (private)/            # dashboard/, income/, expenses/, categories/, summary/, accounts/
 ├── features/
 │   ├── auth/                 # components/ hooks/ schemas/
-│   ├── income/               # components/ hooks/ schemas/ — expenses/ and categories/ follow same structure
+│   ├── income/               # components/ hooks/ schemas/
+│   ├── expenses/             # components/ hooks/ schemas/
+│   ├── categories/           # components/ hooks/ schemas/
+│   ├── dashboard/            # components/ hooks/
+│   ├── accounts/             # components/ hooks/ schemas/ constants/
 │   └── summary/              # components/ hooks/
 ├── components/
-│   ├── ui/                   # Primitives: Button, Input, Select, Modal, Badge
+│   ├── ui/                   # DataTable.tsx, Modal.tsx, StatCard.tsx, ThemeToggle.tsx
 │   └── charts/               # Generic Recharts wrappers
 ├── lib/
 │   ├── api.ts                # Typed fetch client → backend
+│   ├── formatCurrency.ts     # Currency formatting helpers
 │   └── auth.ts               # NextAuth config
 ├── types/
 └── proxy.ts             # Route guard — single source of truth
@@ -86,20 +91,20 @@ frontend/
 - IMPORTANT: Always prefer PrimeReact components over native HTML elements. Precedence: **PrimeReact component → custom wrapper in `components/ui/` → native HTML (last resort)**
 - Before writing a native `<button>`, `<input>`, `<select>`, `<table>`, or `<dialog>`/custom modal, check the mapping below first:
 
-| Native HTML                           | PrimeReact component | Import path                  |
-| ------------------------------------- | -------------------- | ---------------------------- |
-| `<button>`                            | `Button`             | `primereact/button`          |
-| `<input>` / `<input type="text">`     | `InputText`          | `primereact/inputtext`       |
-| `<input type="password">`             | `Password`           | `primereact/password`        |
-| `<select>`                            | `Dropdown`           | `primereact/dropdown`        |
-| `<textarea>`                          | `InputTextarea`      | `primereact/inputtextarea`   |
-| `<input type="checkbox">`             | `Checkbox`           | `primereact/checkbox`        |
-| `<input type="radio">`                | `RadioButton`        | `primereact/radiobutton`     |
-| Custom modal / `createPortal` overlay | `Dialog`             | `primereact/dialog`          |
+| Native HTML                           | PrimeReact component | Import path                                                                                                                                                  |
+| ------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `<button>`                            | `Button`             | `primereact/button`                                                                                                                                          |
+| `<input>` / `<input type="text">`     | `InputText`          | `primereact/inputtext`                                                                                                                                       |
+| `<input type="password">`             | `Password`           | `primereact/password`                                                                                                                                        |
+| `<select>`                            | `Dropdown`           | `primereact/dropdown`                                                                                                                                        |
+| `<textarea>`                          | `InputTextarea`      | `primereact/inputtextarea`                                                                                                                                   |
+| `<input type="checkbox">`             | `Checkbox`           | `primereact/checkbox`                                                                                                                                        |
+| `<input type="radio">`                | `RadioButton`        | `primereact/radiobutton`                                                                                                                                     |
+| Custom modal / `createPortal` overlay | `Dialog`             | `primereact/dialog`                                                                                                                                          |
 | `<table>`                             | `DataTable` (custom) | `@/components/ui/DataTable` — supports sorting, pagination, row selection via TanStack Table. **Do not use** `primereact/datatable` (React 19 incompatible). |
-| `animate-pulse` loading skeleton div  | `Skeleton`           | `primereact/skeleton`        |
-| Inline spinner icon                   | `ProgressSpinner`    | `primereact/progressspinner` |
-| Custom 3-dot/context dropdown menu    | `Menu` (popup mode)  | `primereact/menu`            |
+| `animate-pulse` loading skeleton div  | `Skeleton`           | `primereact/skeleton`                                                                                                                                        |
+| Inline spinner icon                   | `ProgressSpinner`    | `primereact/progressspinner`                                                                                                                                 |
+| Custom 3-dot/context dropdown menu    | `Menu` (popup mode)  | `primereact/menu`                                                                                                                                            |
 
 - **Unstyled mode:** `PrimeReactProvider` uses `unstyled: true` — no default styles are applied. Every PrimeReact component must have `pt` passthrough props to apply Tailwind classes. Move existing `className` from native elements into the appropriate `pt` slot (usually `pt={{ root: { className: '...' } }}`).
 - **Exception:** Use Next.js `<Link>` for navigation links (href-based). Only wrap with `Button` if the element triggers an action (no navigation intended).
@@ -151,6 +156,8 @@ backend/
 │   ├── middleware/      # authMiddleware.ts, validate.ts, errorHandler.ts
 │   ├── controllers/     # Request/response only — calls service layer
 │   ├── services/        # All business logic lives here
+│   ├── schemas/         # Zod schemas for request validation
+│   ├── utils/           # Utility functions (e.g. appError.ts)
 │   └── index.ts
 ├── prisma/              # schema.prisma, seed.ts
 └── Dockerfile
@@ -228,3 +235,5 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 - Income is recorded per month+year — multiple entries per month allowed
 - SavingsBase = user's starting bank balance; running total = SavingsBase + cumulative net savings
 - Monthly net = total income − total expenses for that month
+- Account types: `BANK`, `INVESTMENT`, `CRYPTO`, `CASH`, `CREDIT` — tracked per user with `balance`, `icon`, `color`
+- `/api/accounts` is live; income, expenses, and summary backend routes are planned but not yet implemented (commented out in `index.ts`)
