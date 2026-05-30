@@ -1,3 +1,1 @@
-export default function CategoriesPage() {
-  return <div>Categories</div>;
-}
+export { CategoriesPage as default } from '@/features/categories/components/CategoriesPage';

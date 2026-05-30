@@ -10,12 +10,13 @@ app.use(cors({ origin: process.env.FRONTEND_URL ?? 'http://localhost:3000' }));
 app.use(express.json());
 
 import authRoutes from './routes/authRoutes';
+import categoryRoutes from './routes/categoryRoutes';
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
 // app.use('/api/income', incomeRoutes);
 // app.use('/api/expenses', expenseRoutes);
-// app.use('/api/categories', categoryRoutes);
 // app.use('/api/summary', summaryRoutes);
 
 app.use(errorHandler);
