@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { Button } from 'primereact/button';
+import { Skeleton } from 'primereact/skeleton';
 import { AppShell } from '@/components/AppShell';
 import { CategoryCard } from '@/features/categories/components/CategoryCard';
 import { CategoryFormModal } from '@/features/categories/components/CategoryFormModal';
@@ -54,29 +56,37 @@ export function CategoriesPage() {
         <p className='text-sm text-text-muted'>
           {isLoading ? '—' : `${totalDefault} default · ${totalCustom} custom`}
         </p>
-        <button
+        <Button
+          label='New Category'
+          icon='pi pi-plus'
           onClick={openCreate}
-          className='flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary-strong transition-colors'
-        >
-          <i className='pi pi-plus text-sm' />
-          New category
-        </button>
+          pt={{
+            root: {
+              className:
+                'flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary-strong transition-colors',
+            },
+            icon: { className: 'text-sm' },
+          }}
+        />
       </div>
 
       {/* Expense / Income tabs */}
       <div className='flex bg-bg border border-border rounded-lg p-1 gap-1 w-full sm:w-72'>
         {TABS.map((tab) => (
-          <button
+          <Button
             key={tab.value}
+            label={tab.label}
             onClick={() => setActiveTab(tab.value)}
-            className={`flex-1 h-8 rounded-md text-sm transition-all ${
-              activeTab === tab.value
-                ? 'bg-surface text-text font-bold shadow-sm'
-                : 'text-text-muted font-medium hover:text-text'
-            }`}
-          >
-            {tab.label}
-          </button>
+            pt={{
+              root: {
+                className: `flex-1 h-8 rounded-md text-sm transition-all ${
+                  activeTab === tab.value
+                    ? 'bg-surface text-text font-bold shadow-sm'
+                    : 'text-text-muted font-medium hover:text-text'
+                }`,
+              },
+            }}
+          />
         ))}
       </div>
 
@@ -94,9 +104,12 @@ export function CategoriesPage() {
       {isLoading && (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
           {Array.from({ length: 9 }).map((_, i) => (
-            <div
+            <Skeleton
               key={i}
-              className='bg-surface border border-border rounded-xl p-4 h-22 animate-pulse'
+              height='5.5rem'
+              pt={{
+                root: { className: 'rounded-xl' },
+              }}
             />
           ))}
         </div>
@@ -133,9 +146,14 @@ export function CategoriesPage() {
               My categories
             </h3>
             {visibleCustom.length === 0 ? (
-              <button
+              <Button
                 onClick={openCreate}
-                className='w-full border-2 border-dashed border-border-strong rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-text-muted hover:border-primary hover:text-primary transition-colors group'
+                pt={{
+                  root: {
+                    className:
+                      'w-full border-2 border-dashed border-border-strong rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-text-muted hover:border-primary hover:text-primary transition-colors group',
+                  },
+                }}
               >
                 <div className='w-11 h-11 rounded-xl bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
                   <i className='pi pi-plus text-xl' />
@@ -143,7 +161,7 @@ export function CategoriesPage() {
                 <span className='text-sm font-semibold'>
                   Add your first custom {activeTab.toLowerCase()} category
                 </span>
-              </button>
+              </Button>
             ) : (
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {visibleCustom.map((cat) => (
@@ -155,9 +173,14 @@ export function CategoriesPage() {
                   />
                 ))}
                 {/* Add new card */}
-                <button
+                <Button
                   onClick={openCreate}
-                  className='border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-22 group'
+                  pt={{
+                    root: {
+                      className:
+                        'border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-22 group',
+                    },
+                  }}
                 >
                   <div className='w-9 h-9 rounded-lg bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
                     <i className='pi pi-plus text-base' />
@@ -165,7 +188,7 @@ export function CategoriesPage() {
                   <span className='text-xs font-semibold'>
                     Add custom category
                   </span>
-                </button>
+                </Button>
               </div>
             )}
           </section>

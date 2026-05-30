@@ -81,6 +81,31 @@ frontend/
 - `app/` files should only import from `features/` and `components/` — no inline JSX logic
 - `app/` page files must be minimal: a server component that resolves async data and renders ONE feature component. Simple case: `export { LoginPage as default } from '@/features/auth/components/LoginPage'`. With searchParams: an async function that awaits `searchParams` and passes as props. Never use `useSearchParams()` inside a `page.tsx` — it requires a Suspense boundary the page itself cannot provide; resolve `searchParams` server-side and pass as props instead.
 
+### PrimeReact Components
+
+- IMPORTANT: Always prefer PrimeReact components over native HTML elements. Precedence: **PrimeReact component → custom wrapper in `components/ui/` → native HTML (last resort)**
+- Before writing a native `<button>`, `<input>`, `<select>`, `<table>`, or `<dialog>`/custom modal, check the mapping below first:
+
+| Native HTML                           | PrimeReact component | Import path                  |
+| ------------------------------------- | -------------------- | ---------------------------- |
+| `<button>`                            | `Button`             | `primereact/button`          |
+| `<input>` / `<input type="text">`     | `InputText`          | `primereact/inputtext`       |
+| `<input type="password">`             | `Password`           | `primereact/password`        |
+| `<select>`                            | `Dropdown`           | `primereact/dropdown`        |
+| `<textarea>`                          | `InputTextarea`      | `primereact/inputtextarea`   |
+| `<input type="checkbox">`             | `Checkbox`           | `primereact/checkbox`        |
+| `<input type="radio">`                | `RadioButton`        | `primereact/radiobutton`     |
+| Custom modal / `createPortal` overlay | `Dialog`             | `primereact/dialog`          |
+| `<table>`                             | `DataTable` (custom) | `@/components/ui/DataTable` — supports sorting, pagination, row selection via TanStack Table. **Do not use** `primereact/datatable` (React 19 incompatible). |
+| `animate-pulse` loading skeleton div  | `Skeleton`           | `primereact/skeleton`        |
+| Inline spinner icon                   | `ProgressSpinner`    | `primereact/progressspinner` |
+| Custom 3-dot/context dropdown menu    | `Menu` (popup mode)  | `primereact/menu`            |
+
+- **Unstyled mode:** `PrimeReactProvider` uses `unstyled: true` — no default styles are applied. Every PrimeReact component must have `pt` passthrough props to apply Tailwind classes. Move existing `className` from native elements into the appropriate `pt` slot (usually `pt={{ root: { className: '...' } }}`).
+- **Exception:** Use Next.js `<Link>` for navigation links (href-based). Only wrap with `Button` if the element triggers an action (no navigation intended).
+- **Menu popup pattern:** Use `const menuRef = useRef<Menu>(null)` + `<Menu model={items} popup ref={menuRef} />` + `<Button onClick={(e) => menuRef.current?.toggle(e)} />`. Items use `{ label, icon, command }` shape (`import type { MenuItem } from 'primereact/menuitem'`).
+- **Dialog pattern:** Use `visible`, `onHide`, `closable={false}`, `dismissableMask`. Apply overlay styles via `pt.mask`, panel styles via `pt.root`, inner scroll via `pt.content`. Suppress the built-in header with `pt={{ header: { className: 'hidden' } }}` when custom header UI is rendered inside `children`.
+
 ### Forms
 
 - Every form must have a Zod schema — no unvalidated inputs

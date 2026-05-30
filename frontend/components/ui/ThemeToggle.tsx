@@ -1,6 +1,7 @@
 'use client';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { Button } from 'primereact/button';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -10,12 +11,17 @@ export function ThemeToggle() {
 
   const isDark = resolvedTheme === 'dark';
   return (
-    <button
+    <Button
+      icon={`pi ${isDark ? 'pi-sun' : 'pi-moon'}`}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label='Toggle theme'
-      className='w-9 h-9 rounded-md flex items-center justify-center text-text-muted hover:text-text hover:bg-raised transition-colors'
-    >
-      <i className={`pi ${isDark ? 'pi-sun' : 'pi-moon'} text-base`} />
-    </button>
+      pt={{
+        root: {
+          className:
+            'w-9 h-9 rounded-md flex items-center justify-center text-text-muted hover:text-text hover:bg-raised transition-colors',
+        },
+        icon: { className: 'text-base' },
+      }}
+    />
   );
 }

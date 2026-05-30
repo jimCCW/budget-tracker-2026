@@ -57,12 +57,17 @@ export function DeleteAccountModal({ open, onClose, account }: Props) {
 
         {/* Actions */}
         <div className='flex gap-3'>
-          <button
+          <Button
+            type='button'
+            label='Cancel'
             onClick={onClose}
-            className='flex-1 h-10.5 rounded-md border border-border text-sm font-semibold text-text hover:bg-raised transition-colors'
-          >
-            Cancel
-          </button>
+            pt={{
+              root: {
+                className:
+                  'flex-1 h-10.5 rounded-md border border-border text-sm font-semibold text-text hover:bg-raised transition-colors',
+              },
+            }}
+          />
           <Button
             onClick={handleDelete}
             loading={mutation.isPending}

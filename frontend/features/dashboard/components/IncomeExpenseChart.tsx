@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { Button } from 'primereact/button';
 import {
   AreaChart,
   Area,
@@ -192,16 +193,21 @@ function RangeToggle({
   return (
     <div className='flex items-center p-0.5 gap-0 bg-border rounded-md'>
       {options.map((o) => (
-        <button
+        <Button
           key={o}
+          label={o}
           onClick={() => onChange(o)}
-          className={[
-            'px-3.5 py-1.5 rounded-sm text-[12.5px] font-semibold transition-all',
-            value === o ? 'bg-surface text-text shadow-sm' : 'text-text-muted',
-          ].join(' ')}
-        >
-          {o}
-        </button>
+          pt={{
+            root: {
+              className: [
+                'px-3.5 py-1.5 rounded-sm text-[12.5px] font-semibold transition-all',
+                value === o
+                  ? 'bg-surface text-text shadow-sm'
+                  : 'text-text-muted',
+              ].join(' '),
+            },
+          }}
+        />
       ))}
     </div>
   );

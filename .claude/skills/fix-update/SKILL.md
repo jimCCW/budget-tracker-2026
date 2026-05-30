@@ -84,6 +84,8 @@ Show the plan to the user in a clear numbered list, then ask:
 - After each logical step, give a one-line status update (e.g. "Updated `authMiddleware.ts` to check token expiry.").
 - If you discover something unexpected mid-implementation that changes the plan, pause, describe the finding, and ask the user how to proceed.
 
+**Frontend reminder:** Always use PrimeReact components before native HTML — see CLAUDE.md Frontend Rules → PrimeReact Components for the full mapping and `pt` passthrough pattern. Never write a native `<button>`, `<input>`, `<select>`, custom modal portal, or `<table>` when a PrimeReact equivalent exists.
+
 ---
 
 ## Phase 4: Verify + Test

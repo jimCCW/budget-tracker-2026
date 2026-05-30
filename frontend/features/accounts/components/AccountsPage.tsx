@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { Button } from 'primereact/button';
+import { Skeleton } from 'primereact/skeleton';
 import { AppShell } from '@/components/AppShell';
 import { AccountCard } from '@/features/accounts/components/AccountCard';
 import { AccountFormModal } from '@/features/accounts/components/AccountFormModal';
@@ -52,13 +54,18 @@ export function AccountsPage() {
             ? '—'
             : `${accounts.length} account${accounts.length !== 1 ? 's' : ''}`}
         </p>
-        <button
+        <Button
+          label='Add Account'
+          icon='pi pi-plus'
           onClick={openCreate}
-          className='flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary-strong transition-colors'
-        >
-          <i className='pi pi-plus text-sm' />
-          Add account
-        </button>
+          pt={{
+            root: {
+              className:
+                'flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary-strong transition-colors',
+            },
+            icon: { className: 'text-sm' },
+          }}
+        />
       </div>
 
       {/* Error state */}
@@ -75,9 +82,12 @@ export function AccountsPage() {
       {isLoading && (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
+            <Skeleton
               key={i}
-              className='bg-surface border border-border rounded-xl p-4 h-28 animate-pulse'
+              height='7rem'
+              pt={{
+                root: { className: 'rounded-xl' },
+              }}
             />
           ))}
         </div>
@@ -86,9 +96,14 @@ export function AccountsPage() {
       {!isLoading && !isError && (
         <>
           {accounts.length === 0 ? (
-            <button
+            <Button
               onClick={openCreate}
-              className='w-full border-2 border-dashed border-border-strong rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-text-muted hover:border-primary hover:text-primary transition-colors group'
+              pt={{
+                root: {
+                  className:
+                    'w-full border-2 border-dashed border-border-strong rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-text-muted hover:border-primary hover:text-primary transition-colors group',
+                },
+              }}
             >
               <div className='w-11 h-11 rounded-xl bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
                 <i className='pi pi-plus text-xl' />
@@ -96,7 +111,7 @@ export function AccountsPage() {
               <span className='text-sm font-semibold'>
                 Add your first account
               </span>
-            </button>
+            </Button>
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
               {accounts.map((account) => (
@@ -108,15 +123,20 @@ export function AccountsPage() {
                 />
               ))}
               {/* Add new card */}
-              <button
+              <Button
                 onClick={openCreate}
-                className='border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-28 group'
+                pt={{
+                  root: {
+                    className:
+                      'border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-28 group',
+                  },
+                }}
               >
                 <div className='w-9 h-9 rounded-lg bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
                   <i className='pi pi-plus text-base' />
                 </div>
                 <span className='text-xs font-semibold'>Add account</span>
-              </button>
+              </Button>
             </div>
           )}
         </>

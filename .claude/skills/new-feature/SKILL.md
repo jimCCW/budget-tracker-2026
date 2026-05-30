@@ -48,6 +48,8 @@ Tell the user:
 
 Invoke the `feature-dev:feature-dev` skill to run the full guided development workflow (Discovery → Codebase Exploration → Clarifying Questions → Architecture Design → Implementation → Quality Review → Summary). Show the detailed instructions and plan for each step and wait for user to confirm before moving to next step.
 
+**Frontend reminder:** Always use PrimeReact components before native HTML — see CLAUDE.md Frontend Rules → PrimeReact Components for the full mapping and `pt` passthrough pattern. Never write a native `<button>`, `<input>`, `<select>`, custom modal portal, or `<table>` when a PrimeReact equivalent exists.
+
 All code changes during this phase automatically land on `feature/<kebab-name>`.
 
 ---

@@ -90,13 +90,19 @@ export function AccountFormModal({ open, onClose, account }: Props) {
         <h2 className='text-base font-extrabold text-text tracking-tight'>
           {isEdit ? 'Edit account' : 'New account'}
         </h2>
-        <button
+        <Button
+          type='button'
+          icon='pi pi-times'
           onClick={onClose}
-          className='w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors'
           aria-label='Close'
-        >
-          <i className='pi pi-times text-sm' />
-        </button>
+          pt={{
+            root: {
+              className:
+                'w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors',
+            },
+            icon: { className: 'text-sm' },
+          }}
+        />
       </div>
 
       {/* Body: 2-col on lg+, stacked on mobile */}
@@ -183,22 +189,25 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                 const typeMeta = ACCOUNT_TYPE_META[type];
                 const selected = watchedType === type;
                 return (
-                  <button
+                  <Button
                     key={type}
                     type='button'
                     onClick={() => setValue('type', type)}
-                    className='flex items-center gap-3 p-3.5 rounded-lg border transition-all text-left'
-                    style={
-                      selected
-                        ? {
-                            background: `${typeMeta.color}18`,
-                            borderColor: typeMeta.color,
-                          }
-                        : {
-                            background: 'var(--color-surface)',
-                            borderColor: 'var(--color-border)',
-                          }
-                    }
+                    pt={{
+                      root: {
+                        className:
+                          'flex items-center gap-3 p-3.5 rounded-lg border transition-all text-left',
+                        style: selected
+                          ? {
+                              background: `${typeMeta.color}18`,
+                              borderColor: typeMeta.color,
+                            }
+                          : {
+                              background: 'var(--color-surface)',
+                              borderColor: 'var(--color-border)',
+                            },
+                      },
+                    }}
                   >
                     <div
                       className='w-9 h-9 rounded-lg flex items-center justify-center shrink-0'
@@ -221,7 +230,7 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                         {typeMeta.group}
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -275,26 +284,31 @@ export function AccountFormModal({ open, onClose, account }: Props) {
               {ACCOUNT_COLORS.map((c) => {
                 const selected = watchedColor === c;
                 return (
-                  <button
+                  <Button
                     key={c}
                     type='button'
                     aria-label={c}
                     onClick={() => setValue('color', c)}
-                    className='w-8 h-8 rounded-full flex items-center justify-center transition-all'
-                    style={{
-                      backgroundColor: c,
-                      border: selected
-                        ? '2.5px solid var(--color-surface)'
-                        : 'none',
-                      boxShadow: selected
-                        ? `0 0 0 2px ${c}, 0 4px 10px ${c}55`
-                        : '0 1px 3px rgba(0,0,0,.15)',
+                    pt={{
+                      root: {
+                        className:
+                          'w-8 h-8 rounded-full flex items-center justify-center transition-all',
+                        style: {
+                          backgroundColor: c,
+                          border: selected
+                            ? '2.5px solid var(--color-surface)'
+                            : 'none',
+                          boxShadow: selected
+                            ? `0 0 0 2px ${c}, 0 4px 10px ${c}55`
+                            : '0 1px 3px rgba(0,0,0,.15)',
+                        },
+                      },
                     }}
                   >
                     {selected && (
                       <i className='pi pi-check text-white text-xs font-bold' />
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -302,13 +316,17 @@ export function AccountFormModal({ open, onClose, account }: Props) {
 
           {/* Actions */}
           <div className='flex gap-3 pt-2 mt-auto'>
-            <button
+            <Button
               type='button'
+              label='Cancel'
               onClick={onClose}
-              className='flex-1 h-11.5 rounded-md border border-border text-sm font-semibold text-text hover:bg-raised transition-colors'
-            >
-              Cancel
-            </button>
+              pt={{
+                root: {
+                  className:
+                    'flex-1 h-11.5 rounded-md border border-border text-sm font-semibold text-text hover:bg-raised transition-colors',
+                },
+              }}
+            />
             <Button
               type='submit'
               loading={mutation.isPending}
