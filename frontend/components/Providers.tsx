@@ -16,7 +16,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <PrimeReactProvider value={{ unstyled: true }}>
+    <PrimeReactProvider
+      value={{
+        unstyled: true,
+        pt: { button: { root: { className: 'cursor-pointer' } } },
+      }}
+    >
       <ThemeProvider
         attribute='class'
         defaultTheme='system'

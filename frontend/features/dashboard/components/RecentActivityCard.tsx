@@ -1,4 +1,8 @@
+'use client';
+import Link from 'next/link';
+import { DataTable } from '@/components/ui/DataTable';
 import { SAMPLE, fmt } from '../data';
+import { recentActivityColumns } from '../recentActivityColumns';
 
 export function RecentActivityCard() {
   return (
@@ -10,75 +14,17 @@ export function RecentActivityCard() {
             Latest transactions
           </div>
         </div>
-        <a
+        <Link
           href='/expenses'
           className='text-sm font-semibold text-text-muted hover:text-text flex items-center gap-1 transition-colors'
         >
           See all <i className='pi pi-arrow-right text-xs' />
-        </a>
+        </Link>
       </div>
 
       {/* Desktop table */}
-      <div className='hidden lg:block overflow-x-auto'>
-        <table className='w-full border-collapse text-[13px]'>
-          <thead>
-            <tr>
-              {['Description', 'Category', 'Date', 'Amount'].map((h, i) => (
-                <th
-                  key={h}
-                  className={[
-                    'pb-2 text-[10.5px] font-bold uppercase tracking-wider text-text-muted border-b border-border',
-                    i === 3 ? 'text-right pr-0' : 'text-left pr-4',
-                  ].join(' ')}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {SAMPLE.recent.map((tx, i) => (
-              <tr
-                key={i}
-                className={
-                  i < SAMPLE.recent.length - 1 ? 'border-b border-border' : ''
-                }
-              >
-                <td className='py-3 pr-4'>
-                  <div className='flex items-center gap-2.5'>
-                    <div
-                      className='w-8 h-8 rounded-[9px] flex items-center justify-center flex-shrink-0'
-                      style={{ background: tx.color + '22', color: tx.color }}
-                    >
-                      <i className={`pi ${tx.icon} text-sm`} />
-                    </div>
-                    <span className='font-semibold truncate max-w-[160px]'>
-                      {tx.name}
-                    </span>
-                  </div>
-                </td>
-                <td className='py-3 pr-4'>
-                  <span
-                    className='inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold'
-                    style={{ background: tx.color + '22', color: tx.color }}
-                  >
-                    {tx.cat}
-                  </span>
-                </td>
-                <td className='py-3 pr-4 text-text-muted'>{tx.when}</td>
-                <td
-                  className={[
-                    'py-3 text-right font-bold tabular-nums',
-                    tx.amt > 0 ? 'text-success' : 'text-text',
-                  ].join(' ')}
-                >
-                  {tx.amt > 0 ? '+' : ''}
-                  {fmt(tx.amt)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className='hidden lg:block'>
+        <DataTable data={SAMPLE.recent} columns={recentActivityColumns} />
       </div>
 
       {/* Mobile list */}
@@ -92,7 +38,7 @@ export function RecentActivityCard() {
             ].join(' ')}
           >
             <div
-              className='w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0'
+              className='w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0'
               style={{ background: tx.color + '22', color: tx.color }}
             >
               <i className={`pi ${tx.icon} text-sm`} />

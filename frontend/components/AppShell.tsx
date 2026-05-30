@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
+import { Button } from 'primereact/button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 type NavItem = {
@@ -65,7 +66,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
   return (
     <div className='flex h-screen overflow-hidden bg-bg text-text'>
       {/* ── Desktop sidebar ── */}
-      <aside className='hidden lg:flex w-60 flex-col flex-shrink-0 bg-surface border-r border-border'>
+      <aside className='hidden lg:flex w-60 flex-col shrink-0 bg-surface border-r border-border'>
         {/* Logo */}
         <div className='flex items-center gap-2.5 px-5 py-5'>
           <div className='w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-extrabold text-base leading-none shadow-sm'>
@@ -108,7 +109,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
             <SideNavItem key={item.key} item={item} active={false} />
           ))}
           <div className='flex items-center gap-2.5 mt-2 px-2 py-2.5 rounded-md bg-bg border border-border'>
-            <div className='w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold flex-shrink-0'>
+            <div className='w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0'>
               {initials}
             </div>
             <div className='flex-1 min-w-0'>
@@ -117,13 +118,18 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
                 {userEmail}
               </div>
             </div>
-            <button
+            <Button
+              icon='pi pi-sign-out'
               onClick={() => signOut({ callbackUrl: '/login' })}
-              className='w-7 h-7 flex items-center justify-center text-text-muted hover:text-text hover:bg-raised rounded-md transition-colors'
               aria-label='Sign out'
-            >
-              <i className='pi pi-sign-out text-sm' />
-            </button>
+              pt={{
+                root: {
+                  className:
+                    'w-7 h-7 flex items-center justify-center text-text-muted hover:text-text hover:bg-raised rounded-md transition-colors',
+                },
+                icon: { className: 'text-sm' },
+              }}
+            />
           </div>
         </div>
       </aside>
@@ -131,7 +137,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
       {/* ── Main column ── */}
       <div className='flex flex-col flex-1 min-w-0 overflow-hidden'>
         {/* Desktop topbar */}
-        <header className='hidden lg:flex items-center gap-4 h-16 px-7 flex-shrink-0 bg-surface border-b border-border'>
+        <header className='hidden lg:flex items-center gap-4 h-16 px-7 shrink-0 bg-surface border-b border-border'>
           <div className='flex-1 min-w-0'>
             {subtitle && (
               <div className='text-[11.5px] text-text-muted font-semibold tracking-wide'>
@@ -142,21 +148,35 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           </div>
           <div className='flex items-center gap-2'>
             <ThemeToggle />
-            <button className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors'>
+            <Button
+              pt={{
+                root: {
+                  className:
+                    'relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors',
+                },
+              }}
+            >
               <i className='pi pi-bell text-base' />
               <span className='absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'>
                 3
               </span>
-            </button>
-            <button className='flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary-strong transition-colors'>
-              <i className='pi pi-plus text-sm' />
-              New transaction
-            </button>
+            </Button>
+            <Button
+              label='New Transaction'
+              icon='pi pi-plus'
+              pt={{
+                root: {
+                  className:
+                    'flex items-center gap-2 h-9 px-4 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary-strong transition-colors',
+                },
+                icon: { className: 'text-sm' },
+              }}
+            />
           </div>
         </header>
 
         {/* Mobile topbar */}
-        <header className='lg:hidden flex-shrink-0 bg-surface border-b border-border px-4 py-3'>
+        <header className='lg:hidden shrink-0 bg-surface border-b border-border px-4 py-3'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
               <div className='w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-extrabold text-sm leading-none'>
@@ -167,12 +187,19 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
               </span>
             </div>
             <div className='flex items-center gap-1'>
-              <button className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text transition-colors'>
+              <Button
+                pt={{
+                  root: {
+                    className:
+                      'relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text transition-colors',
+                  },
+                }}
+              >
                 <i className='pi pi-bell text-base' />
                 <span className='absolute top-1 right-1 w-3.5 h-3.5 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center'>
                   3
                 </span>
-              </button>
+              </Button>
               <ThemeToggle />
             </div>
           </div>
@@ -190,15 +217,22 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className='lg:hidden flex-shrink-0 bg-surface border-t border-border flex items-end justify-around px-1.5 pb-4 pt-2'>
+        <nav className='lg:hidden shrink-0 bg-surface border-t border-border flex items-end justify-around px-1.5 pb-4 pt-2'>
           {MOBILE_TABS.slice(0, 2).map((tab) => (
             <MobileNavTab key={tab.key} tab={tab} active={isActive(tab)} />
           ))}
-          {/* FAB placeholder */}
+          {/* FAB */}
           <div className='flex flex-col items-center gap-1 relative -mt-5'>
-            <button className='w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg'>
+            <Button
+              pt={{
+                root: {
+                  className:
+                    'w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg',
+                },
+              }}
+            >
               <i className='pi pi-plus text-xl' />
-            </button>
+            </Button>
           </div>
           {MOBILE_TABS.slice(2).map((tab) => (
             <MobileNavTab key={tab.key} tab={tab} active={isActive(tab)} />
@@ -211,7 +245,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
 
 function SideNavItem({ item, active }: { item: NavItem; active: boolean }) {
   const cls = [
-    'flex items-center gap-2.5 px-2.5 py-2.5 rounded-md text-[13px] font-medium transition-colors w-full text-left border-none cursor-pointer',
+    'flex items-center gap-2.5 px-2.5 py-2.5 rounded-md text-[13px] font-medium transition-colors w-full text-left',
     active ? 'bg-primary-tint text-primary font-bold' : 'text-text hover:bg-bg',
   ].join(' ');
 
@@ -234,7 +268,7 @@ function SideNavItem({ item, active }: { item: NavItem; active: boolean }) {
       </Link>
     );
   }
-  return <button className={cls}>{inner}</button>;
+  return <Button pt={{ root: { className: cls } }}>{inner}</Button>;
 }
 
 function MobileNavTab({ tab, active }: { tab: NavItem; active: boolean }) {
@@ -257,5 +291,5 @@ function MobileNavTab({ tab, active }: { tab: NavItem; active: boolean }) {
       </Link>
     );
   }
-  return <button className={cls}>{inner}</button>;
+  return <Button pt={{ root: { className: cls } }}>{inner}</Button>;
 }

@@ -120,13 +120,19 @@ export function CategoryFormModal({
         <h2 className='text-base font-extrabold text-text tracking-tight'>
           {isEdit ? 'Edit category' : 'New category'}
         </h2>
-        <button
+        <Button
+          type='button'
+          icon='pi pi-times'
           onClick={onClose}
-          className='w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors'
           aria-label='Close'
-        >
-          <i className='pi pi-times text-sm' />
-        </button>
+          pt={{
+            root: {
+              className:
+                'w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors',
+            },
+            icon: { className: 'text-sm' },
+          }}
+        />
       </div>
 
       {/* Body: 2-col on lg+, stacked on mobile */}
@@ -251,22 +257,25 @@ export function CategoryFormModal({
               {TYPE_OPTIONS.map((opt) => {
                 const selected = watchedType === opt.value;
                 return (
-                  <button
+                  <Button
                     key={opt.value}
                     type='button'
                     onClick={() => setValue('type', opt.value)}
-                    className='flex items-center gap-3 p-3.5 rounded-lg border transition-all text-left'
-                    style={
-                      selected
-                        ? {
-                            background: opt.activeBg,
-                            borderColor: opt.activeBorder,
-                          }
-                        : {
-                            background: 'var(--color-surface)',
-                            borderColor: 'var(--color-border)',
-                          }
-                    }
+                    pt={{
+                      root: {
+                        className:
+                          'flex items-center gap-3 p-3.5 rounded-lg border transition-all text-left',
+                        style: selected
+                          ? {
+                              background: opt.activeBg,
+                              borderColor: opt.activeBorder,
+                            }
+                          : {
+                              background: 'var(--color-surface)',
+                              borderColor: 'var(--color-border)',
+                            },
+                      },
+                    }}
                   >
                     <div
                       className='w-9 h-9 rounded-lg flex items-center justify-center shrink-0'
@@ -289,7 +298,7 @@ export function CategoryFormModal({
                         {opt.desc}
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -323,28 +332,30 @@ export function CategoryFormModal({
               {CATEGORY_ICONS.map(({ id, label }) => {
                 const selected = watchedIcon === id;
                 return (
-                  <button
+                  <Button
                     key={id}
                     type='button'
                     title={label}
                     onClick={() => setValue('icon', id)}
-                    className={`aspect-square rounded-lg flex items-center justify-center border transition-all ${
-                      selected
-                        ? ''
-                        : 'bg-surface border-border text-text-muted hover:bg-raised'
-                    }`}
-                    style={
-                      selected
-                        ? {
-                            backgroundColor: `${watchedColor}22`,
-                            borderColor: watchedColor,
-                            color: watchedColor,
-                          }
-                        : undefined
-                    }
+                    pt={{
+                      root: {
+                        className: `aspect-square rounded-lg flex items-center justify-center border transition-all ${
+                          selected
+                            ? ''
+                            : 'bg-surface border-border text-text-muted hover:bg-raised'
+                        }`,
+                        style: selected
+                          ? {
+                              backgroundColor: `${watchedColor}22`,
+                              borderColor: watchedColor,
+                              color: watchedColor,
+                            }
+                          : undefined,
+                      },
+                    }}
                   >
                     <i className={`pi ${id} text-base`} />
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -359,26 +370,31 @@ export function CategoryFormModal({
               {CATEGORY_COLORS.map((c) => {
                 const selected = watchedColor === c;
                 return (
-                  <button
+                  <Button
                     key={c}
                     type='button'
                     aria-label={c}
                     onClick={() => setValue('color', c)}
-                    className='w-8 h-8 rounded-full flex items-center justify-center transition-all'
-                    style={{
-                      backgroundColor: c,
-                      border: selected
-                        ? `2.5px solid var(--color-surface)`
-                        : 'none',
-                      boxShadow: selected
-                        ? `0 0 0 2px ${c}, 0 4px 10px ${c}55`
-                        : `0 1px 3px rgba(0,0,0,.15)`,
+                    pt={{
+                      root: {
+                        className:
+                          'w-8 h-8 rounded-full flex items-center justify-center transition-all',
+                        style: {
+                          backgroundColor: c,
+                          border: selected
+                            ? `2.5px solid var(--color-surface)`
+                            : 'none',
+                          boxShadow: selected
+                            ? `0 0 0 2px ${c}, 0 4px 10px ${c}55`
+                            : `0 1px 3px rgba(0,0,0,.15)`,
+                        },
+                      },
                     }}
                   >
                     {selected && (
                       <i className='pi pi-check text-white text-xs font-bold' />
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -386,13 +402,17 @@ export function CategoryFormModal({
 
           {/* Actions */}
           <div className='flex gap-3 pt-2 mt-auto'>
-            <button
+            <Button
               type='button'
+              label='Cancel'
               onClick={onClose}
-              className='flex-1 h-11.5 rounded-md border border-border text-sm font-semibold text-text hover:bg-raised transition-colors'
-            >
-              Cancel
-            </button>
+              pt={{
+                root: {
+                  className:
+                    'flex-1 h-11.5 rounded-md border border-border text-sm font-semibold text-text hover:bg-raised transition-colors',
+                },
+              }}
+            />
             <Button
               type='submit'
               loading={mutation.isPending}
