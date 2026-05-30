@@ -16,7 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'pi-home', href: '/dashboard' },
   { key: 'activity', label: 'Activity', icon: 'pi-list' },
   { key: 'goals', label: 'Goals', icon: 'pi-bullseye' },
-  { key: 'accounts', label: 'Accounts', icon: 'pi-wallet' },
+  { key: 'accounts', label: 'Accounts', icon: 'pi-wallet', href: '/accounts' },
   { key: 'recurring', label: 'Recurring', icon: 'pi-refresh' },
   {
     key: 'categories',

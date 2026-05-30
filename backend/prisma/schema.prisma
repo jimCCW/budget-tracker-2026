@@ -22,6 +22,7 @@ model User {
   expenses     Expense[]
   categories   Category[]
   savingsBase  SavingsBase?
+  accounts     Account[]
 }
 
 model Income {
@@ -76,4 +77,25 @@ model SavingsBase {
 
 enum RecurrenceType {
   MONTHLY
+}
+
+enum AccountType {
+  BANK
+  INVESTMENT
+  CRYPTO
+  CASH
+  CREDIT
+}
+
+model Account {
+  id        String      @id @default(uuid())
+  userId    String
+  name      String
+  type      AccountType @default(BANK)
+  balance   Float       @default(0)
+  icon      String?
+  color     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id])
 }

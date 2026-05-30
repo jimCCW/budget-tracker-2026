@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { appError } from '../utils/appError';
+import { createDefault as createDefaultAccount } from './accountService';
 
 const prisma = new PrismaClient();
 
@@ -51,15 +52,18 @@ export async function register(data: {
   const passwordHash = await bcrypt.hash(data.password, 10);
   const code = generateCode();
 
-  await prisma.user.create({
-    data: {
-      email: data.email,
-      passwordHash,
-      name: data.name,
-      isActive: false,
-      activationCode: code,
-      activationCodeExpiry: codeExpiry(),
-    },
+  await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        email: data.email,
+        passwordHash,
+        name: data.name,
+        isActive: false,
+        activationCode: code,
+        activationCodeExpiry: codeExpiry(),
+      },
+    });
+    await createDefaultAccount(user.id, tx);
   });
 
   logActivation(data.email, code);
