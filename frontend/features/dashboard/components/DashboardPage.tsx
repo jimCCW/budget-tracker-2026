@@ -1,5 +1,5 @@
 import { AppShell } from '@/components/AppShell';
-import { StatCard } from './StatCard';
+import { StatCard } from '@/components/ui/StatCard';
 import { IncomeExpenseChart } from './IncomeExpenseChart';
 import { CategoryDonutChart } from './CategoryDonutChart';
 import { BudgetProgressSection } from './BudgetProgressSection';
