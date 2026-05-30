@@ -36,13 +36,20 @@ model Income {
 }
 
 model Category {
-  id        String    @id @default(uuid())
+  id        String       @id @default(uuid())
   userId    String?
   name      String
   icon      String?
-  isDefault Boolean   @default(false)
+  color     String?
+  type      CategoryType @default(EXPENSE)
+  isDefault Boolean      @default(false)
   expenses  Expense[]
-  user      User?     @relation(fields: [userId], references: [id])
+  user      User?        @relation(fields: [userId], references: [id])
+}
+
+enum CategoryType {
+  EXPENSE
+  INCOME
 }
 
 model Expense {

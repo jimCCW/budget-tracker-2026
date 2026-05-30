@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import { appError } from '../utils/appError';
 
 const prisma = new PrismaClient();
 
@@ -24,24 +25,6 @@ function logActivation(email: string, code: string): void {
   const url = `${process.env.FRONTEND_URL ?? 'http://localhost:3000'}/register/activate?email=${encodeURIComponent(email)}&code=${code}`;
   console.log(`[DEV] Activation code for ${email}: ${code}`);
   console.log(`[DEV] Activation URL: ${url}`);
-}
-
-/**
- * Creates a typed app error that the error handler recognises and maps to the correct HTTP status.
- * @param code - Machine-readable error code (e.g. 'CONFLICT', 'UNAUTHORIZED').
- * @param message - Human-readable message returned to the client.
- * @param status - HTTP status code to send.
- * @returns An Error instance with `code` and `status` properties attached.
- */
-function appError(
-  code: string,
-  message: string,
-  status: number
-): Error & { code: string; status: number } {
-  const err = new Error(message) as Error & { code: string; status: number };
-  err.code = code;
-  err.status = status;
-  return err;
 }
 
 /**
