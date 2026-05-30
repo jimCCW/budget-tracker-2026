@@ -54,7 +54,12 @@ const TYPE_OPTIONS = [
   },
 ] as const;
 
-export function CategoryFormModal({ open, onClose, category, defaultType }: Props) {
+export function CategoryFormModal({
+  open,
+  onClose,
+  category,
+  defaultType,
+}: Props) {
   const isEdit = !!category;
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
@@ -105,7 +110,8 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
   }
 
   const displayName = watchedName.trim() || 'Untitled category';
-  const activeType = TYPE_OPTIONS.find((o) => o.value === watchedType) ?? TYPE_OPTIONS[0];
+  const activeType =
+    TYPE_OPTIONS.find((o) => o.value === watchedType) ?? TYPE_OPTIONS[0];
 
   return (
     <Modal open={open} onClose={onClose} maxWidth='max-w-4xl'>
@@ -127,19 +133,28 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
       <div className='flex flex-col lg:flex-row'>
         {/* ── Preview pane ── */}
         <div className='lg:w-64 lg:shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col gap-4'>
-          <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>Preview</p>
+          <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>
+            Preview
+          </p>
 
           {/* Hero stamp */}
           <div className='flex flex-col items-center gap-3 py-2'>
             <div
               className='w-20 h-20 rounded-2xl flex items-center justify-center text-white'
-              style={{ backgroundColor: watchedColor, boxShadow: `0 10px 24px ${watchedColor}55` }}
+              style={{
+                backgroundColor: watchedColor,
+                boxShadow: `0 10px 24px ${watchedColor}55`,
+              }}
             >
               <i className={`pi ${watchedIcon} text-3xl`} />
             </div>
             <div
               className='text-base font-extrabold text-center max-w-40 truncate'
-              style={{ color: watchedName ? 'var(--color-text)' : 'var(--color-text-muted)' }}
+              style={{
+                color: watchedName
+                  ? 'var(--color-text)'
+                  : 'var(--color-text-muted)',
+              }}
             >
               {displayName}
             </div>
@@ -162,17 +177,29 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
             <div className='bg-bg rounded-lg p-3 flex items-center gap-2.5'>
               <div
                 className='w-8 h-8 rounded-lg flex items-center justify-center shrink-0'
-                style={{ backgroundColor: `${watchedColor}22`, color: watchedColor }}
+                style={{
+                  backgroundColor: `${watchedColor}22`,
+                  color: watchedColor,
+                }}
               >
                 <i className={`pi ${watchedIcon} text-sm`} />
               </div>
               <div className='flex-1 min-w-0'>
-                <div className='text-xs font-bold text-text truncate'>Sample merchant</div>
-                <div className='text-[10.5px] text-text-muted mt-0.5 truncate'>{displayName}</div>
+                <div className='text-xs font-bold text-text truncate'>
+                  Sample merchant
+                </div>
+                <div className='text-[10.5px] text-text-muted mt-0.5 truncate'>
+                  {displayName}
+                </div>
               </div>
               <div
                 className='text-xs font-bold'
-                style={{ color: watchedType === 'INCOME' ? 'var(--color-success)' : 'var(--color-text)' }}
+                style={{
+                  color:
+                    watchedType === 'INCOME'
+                      ? 'var(--color-success)'
+                      : 'var(--color-text)',
+                }}
               >
                 {watchedType === 'INCOME' ? '+' : '-'}$24.50
               </div>
@@ -185,28 +212,41 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
               In reports
             </p>
             <div className='bg-bg rounded-lg p-3 flex items-center gap-2 text-xs'>
-              <span className='w-2 h-2 rounded-sm shrink-0' style={{ backgroundColor: watchedColor }} />
-              <span className='flex-1 font-medium text-text truncate'>{displayName}</span>
+              <span
+                className='w-2 h-2 rounded-sm shrink-0'
+                style={{ backgroundColor: watchedColor }}
+              />
+              <span className='flex-1 font-medium text-text truncate'>
+                {displayName}
+              </span>
               <span className='text-text-muted'>12%</span>
             </div>
           </div>
         </div>
 
         {/* ── Form pane ── */}
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className='flex-1 p-6 flex flex-col gap-5'>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className='flex-1 p-6 flex flex-col gap-5'
+        >
           {/* Error banner */}
           {mutation.isError && (
             <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
               <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
               <p className='text-sm text-text-muted mt-0.5'>
-                {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
+                {mutation.error instanceof Error
+                  ? mutation.error.message
+                  : 'Something went wrong.'}
               </p>
             </div>
           )}
 
           {/* Type selector */}
           <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>Type</label>
+            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+              Type
+            </label>
             <div className='grid grid-cols-2 gap-3'>
               {TYPE_OPTIONS.map((opt) => {
                 const selected = watchedType === opt.value;
@@ -218,8 +258,14 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
                     className='flex items-center gap-3 p-3.5 rounded-lg border transition-all text-left'
                     style={
                       selected
-                        ? { background: opt.activeBg, borderColor: opt.activeBorder }
-                        : { background: 'var(--color-surface)', borderColor: 'var(--color-border)' }
+                        ? {
+                            background: opt.activeBg,
+                            borderColor: opt.activeBorder,
+                          }
+                        : {
+                            background: 'var(--color-surface)',
+                            borderColor: 'var(--color-border)',
+                          }
                     }
                   >
                     <div
@@ -227,14 +273,21 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
                       style={
                         selected
                           ? { background: opt.activeColor, color: '#fff' }
-                          : { background: `color-mix(in srgb, ${opt.activeColor} 15%, transparent)`, color: opt.activeColor }
+                          : {
+                              background: `color-mix(in srgb, ${opt.activeColor} 15%, transparent)`,
+                              color: opt.activeColor,
+                            }
                       }
                     >
                       <i className={`pi ${opt.icon} text-base`} />
                     </div>
                     <div>
-                      <div className='text-sm font-bold text-text'>{opt.label}</div>
-                      <div className='text-xs text-text-muted mt-0.5'>{opt.desc}</div>
+                      <div className='text-sm font-bold text-text'>
+                        {opt.label}
+                      </div>
+                      <div className='text-xs text-text-muted mt-0.5'>
+                        {opt.desc}
+                      </div>
                     </div>
                   </button>
                 );
@@ -256,12 +309,16 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
                 className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
               />
             </div>
-            {errors.name && <p className='text-xs text-danger'>{errors.name.message}</p>}
+            {errors.name && (
+              <p className='text-xs text-danger'>{errors.name.message}</p>
+            )}
           </div>
 
           {/* Icon picker */}
           <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>Icon</label>
+            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+              Icon
+            </label>
             <div className='grid grid-cols-6 gap-2'>
               {CATEGORY_ICONS.map(({ id, label }) => {
                 const selected = watchedIcon === id;
@@ -272,11 +329,17 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
                     title={label}
                     onClick={() => setValue('icon', id)}
                     className={`aspect-square rounded-lg flex items-center justify-center border transition-all ${
-                      selected ? '' : 'bg-surface border-border text-text-muted hover:bg-raised'
+                      selected
+                        ? ''
+                        : 'bg-surface border-border text-text-muted hover:bg-raised'
                     }`}
                     style={
                       selected
-                        ? { backgroundColor: `${watchedColor}22`, borderColor: watchedColor, color: watchedColor }
+                        ? {
+                            backgroundColor: `${watchedColor}22`,
+                            borderColor: watchedColor,
+                            color: watchedColor,
+                          }
                         : undefined
                     }
                   >
@@ -289,7 +352,9 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
 
           {/* Color picker */}
           <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>Color</label>
+            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+              Color
+            </label>
             <div className='flex flex-wrap gap-2.5'>
               {CATEGORY_COLORS.map((c) => {
                 const selected = watchedColor === c;
@@ -302,13 +367,17 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
                     className='w-8 h-8 rounded-full flex items-center justify-center transition-all'
                     style={{
                       backgroundColor: c,
-                      border: selected ? `2.5px solid var(--color-surface)` : 'none',
+                      border: selected
+                        ? `2.5px solid var(--color-surface)`
+                        : 'none',
                       boxShadow: selected
                         ? `0 0 0 2px ${c}, 0 4px 10px ${c}55`
                         : `0 1px 3px rgba(0,0,0,.15)`,
                     }}
                   >
-                    {selected && <i className='pi pi-check text-white text-xs font-bold' />}
+                    {selected && (
+                      <i className='pi pi-check text-white text-xs font-bold' />
+                    )}
                   </button>
                 );
               })}
@@ -330,8 +399,12 @@ export function CategoryFormModal({ open, onClose, category, defaultType }: Prop
               disabled={mutation.isPending}
               label={
                 mutation.isPending
-                  ? isEdit ? 'Saving…' : 'Creating…'
-                  : isEdit ? 'Save changes' : 'Create category'
+                  ? isEdit
+                    ? 'Saving…'
+                    : 'Creating…'
+                  : isEdit
+                    ? 'Save changes'
+                    : 'Create category'
               }
               pt={{
                 root: {
