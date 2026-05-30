@@ -1,0 +1,65 @@
+---
+name: new-feature
+description: >
+  Orchestrates the full lifecycle of a new feature: creates a feature branch
+  from latest main, runs the guided feature-dev workflow, then commits, pushes,
+  and opens a PR to main when done. ALWAYS invoke this skill when the user says
+  anything like: "new feature", "start feature", "create feature", "implement
+  feature", "begin feature", or "/new-feature <name>".
+---
+
+# New Feature Workflow
+
+Three phases: **branch setup → guided development → push + PR**.
+
+---
+
+## Phase 1: Branch Setup
+
+### 1a. Get the feature name
+
+If the user provided a name as an argument (e.g. `/new-feature expense-categories`), use it.
+Otherwise ask: **"What's the name of this feature? (used for the branch name, e.g. `expense-categories`)"** — wait for their answer before continuing.
+
+Convert the name to kebab-case: lowercase, spaces and underscores become hyphens, strip special characters.
+
+### 1b. Create the branch
+
+Run sequentially:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/<kebab-name>
+```
+
+- If `git checkout main` fails (e.g. main is called `master`), use the correct default branch name
+- If a branch named `feature/<kebab-name>` already exists, stop and tell the user: "Branch `feature/<kebab-name>` already exists — switch to it manually or choose a different name."
+
+### 1c. Confirm
+
+Tell the user:
+
+> Branch `feature/<kebab-name>` created from latest main. Starting feature development...
+
+---
+
+## Phase 2: Feature Development
+
+Invoke the `feature-dev:feature-dev` skill to run the full guided development workflow (Discovery → Codebase Exploration → Clarifying Questions → Architecture Design → Implementation → Quality Review → Summary). Show the detailed instructions and plan for each step and wait for user to confirm before moving to next step.
+
+All code changes during this phase automatically land on `feature/<kebab-name>`.
+
+---
+
+## Phase 3: Push + PR
+
+Once the feature-dev workflow is complete and the user confirms they are done, say:
+
+> Feature development complete. I'll now commit everything, push to `feature/<kebab-name>`, and open a PR to main.
+
+Then invoke the `commit-commands:commit-push-pr` skill, which will:
+
+1. Stage all changes
+2. Draft a Conventional Commits message and wait for your approval
+3. Commit, push to `feature/<kebab-name>`, and open a ready-for-review PR targeting `main`
