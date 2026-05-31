@@ -28,12 +28,17 @@ model User {
 model Income {
   id        String   @id @default(uuid())
   userId    String
+  accountId String
   amount    Float
+  date      DateTime
   month     Int
   year      Int
   note      String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id])
+
+  @@index([userId, year, month])
 }
 
 model Category {
@@ -57,6 +62,7 @@ model Expense {
   id          String          @id @default(uuid())
   userId      String
   categoryId  String
+  accountId   String
   amount      Float
   description String?
   date        DateTime
@@ -65,6 +71,9 @@ model Expense {
   createdAt   DateTime        @default(now())
   user        User            @relation(fields: [userId], references: [id])
   category    Category        @relation(fields: [categoryId], references: [id])
+  account     Account         @relation(fields: [accountId], references: [id])
+
+  @@index([userId, date])
 }
 
 model SavingsBase {
@@ -98,4 +107,6 @@ model Account {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   user      User        @relation(fields: [userId], references: [id])
+  incomes   Income[]
+  expenses  Expense[]
 }

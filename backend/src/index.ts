@@ -12,13 +12,15 @@ app.use(express.json());
 import authRoutes from './routes/authRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import accountRoutes from './routes/accountRoutes';
+import incomeRoutes from './routes/incomeRoutes';
+import expenseRoutes from './routes/expenseRoutes';
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/accounts', accountRoutes);
-// app.use('/api/income', incomeRoutes);
-// app.use('/api/expenses', expenseRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/expenses', expenseRoutes);
 // app.use('/api/summary', summaryRoutes);
 
 app.use(errorHandler);
