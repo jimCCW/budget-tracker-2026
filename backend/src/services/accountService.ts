@@ -21,24 +21,34 @@ export async function getAll(userId: string) {
 
 /**
  * Returns all accounts plus computed summary figures.
- * netWorth = liquidAmount + investmentAmount − creditAmount (CREDIT is a liability).
+ * Credit card balances go negative as spending is recorded (expenseService decrements them).
+ * creditDebt = sum of Math.max(-balance, 0) for each CREDIT account — always ≥ 0.
+ * liquidAmount = (BANK + CASH sum) − creditDebt, reflecting true net liquid position.
+ * netWorth = (BANK + CASH + INVESTMENT + CRYPTO sum) − creditDebt.
  * @param userId - The authenticated user's ID.
  */
 export async function getSummary(userId: string) {
   const accounts = await getAll(userId);
 
-  const liquidAmount = accounts
+  const liquidBalance = accounts
     .filter((a) => LIQUID_TYPES.includes(a.type))
     .reduce((sum, a) => sum + a.balance, 0);
   const investmentAmount = accounts
     .filter((a) => INVESTMENT_TYPES.includes(a.type))
     .reduce((sum, a) => sum + a.balance, 0);
-  const creditAmount = accounts
+  const creditDebt = accounts
     .filter((a) => CREDIT_TYPES.includes(a.type))
-    .reduce((sum, a) => sum + a.balance, 0);
-  const netWorth = liquidAmount + investmentAmount - creditAmount;
+    .reduce((sum, a) => sum + Math.max(-a.balance, 0), 0);
+  const liquidAmount = liquidBalance - creditDebt;
+  const netWorth = liquidBalance + investmentAmount - creditDebt;
 
-  return { netWorth, liquidAmount, investmentAmount, creditAmount, accounts };
+  return {
+    netWorth,
+    liquidAmount,
+    investmentAmount,
+    creditAmount: creditDebt,
+    accounts,
+  };
 }
 
 /**

@@ -42,7 +42,7 @@ export function NetWorthHeader({
       <StatCard
         label='Liquid'
         value={formatCurrency(liquidAmount)}
-        sub='Bank & cash'
+        sub='Bank & cash - credit'
         icon='pi-wallet'
         tintClass='bg-success-tint'
         iconColorClass='text-success'

@@ -1,9 +1,12 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { AddTransactionModal } from '@/features/transactions/components/AddTransactionModal';
+import { useScheduledCatchup } from '@/features/recurring/hooks/useScheduledCatchup';
 
 type NavItem = {
   key: string;
@@ -18,7 +21,12 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'activity', label: 'Activity', icon: 'pi-list' },
   { key: 'goals', label: 'Goals', icon: 'pi-bullseye' },
   { key: 'accounts', label: 'Accounts', icon: 'pi-wallet', href: '/accounts' },
-  { key: 'recurring', label: 'Recurring', icon: 'pi-refresh' },
+  {
+    key: 'recurring',
+    label: 'Recurring',
+    icon: 'pi-refresh',
+    href: '/recurring',
+  },
   {
     key: 'categories',
     label: 'Categories',
@@ -47,6 +55,8 @@ type AppShellProps = {
 };
 
 export function AppShell({ children, title, subtitle }: AppShellProps) {
+  useScheduledCatchup();
+  const [txModalOpen, setTxModalOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
   const userName = session?.user?.name ?? 'Alex';
@@ -164,6 +174,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
             <Button
               label='New Transaction'
               icon='pi pi-plus'
+              onClick={() => setTxModalOpen(true)}
               pt={{
                 root: {
                   className:
@@ -224,6 +235,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           {/* FAB */}
           <div className='flex flex-col items-center gap-1 relative -mt-5'>
             <Button
+              onClick={() => setTxModalOpen(true)}
               pt={{
                 root: {
                   className:
@@ -239,6 +251,11 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           ))}
         </nav>
       </div>
+
+      <AddTransactionModal
+        open={txModalOpen}
+        onClose={() => setTxModalOpen(false)}
+      />
     </div>
   );
 }
