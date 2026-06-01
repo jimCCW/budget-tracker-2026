@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Checkbox } from 'primereact/checkbox';
 import { Modal } from '@/components/ui/Modal';
 import {
   incomeSchema,
@@ -15,8 +16,11 @@ import {
 } from '@/features/expenses/schemas/expenseSchema';
 import { useCreateIncome } from '@/features/income/hooks/useCreateIncome';
 import { useCreateExpense } from '@/features/expenses/hooks/useCreateExpense';
+import { useCreateRule } from '@/features/recurring/hooks/useCreateRule';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { useCategories } from '@/features/categories/hooks/useCategories';
+import type { Frequency } from '@/types/recurring';
+import { FREQUENCIES as REPEAT_FREQUENCIES } from '@/features/recurring/constants/frequencies';
 
 type TxType = 'Expense' | 'Income';
 
@@ -39,16 +43,26 @@ export function AddTransactionModal({
   defaultType = 'Expense',
 }: AddTransactionModalProps) {
   const [type, setType] = useState<TxType>(defaultType);
+  const [repeat, setRepeat] = useState(false);
+  const [repeatFreq, setRepeatFreq] = useState<Frequency>('MONTHLY');
 
   const createIncome = useCreateIncome();
   const createExpense = useCreateExpense();
-  const activeMutation = type === 'Expense' ? createExpense : createIncome;
+  const createRule = useCreateRule();
+  const activeMutation = repeat
+    ? createRule
+    : type === 'Expense'
+      ? createExpense
+      : createIncome;
 
   const { data: accounts = [] } = useAccounts();
 
   const { data: allCategories } = useCategories();
   const expenseCategories = (allCategories ?? []).filter(
     (c) => c.type === 'EXPENSE'
+  );
+  const incomeCategories = (allCategories ?? []).filter(
+    (c) => c.type === 'INCOME'
   );
 
   const expenseForm = useForm<ExpenseFormValues>({
@@ -66,6 +80,7 @@ export function AddTransactionModal({
     resolver: zodResolver(incomeSchema),
     defaultValues: {
       accountId: '',
+      categoryId: '',
       amount: '' as unknown as number,
       date: todayISO(),
       note: '',
@@ -85,13 +100,17 @@ export function AddTransactionModal({
     });
     incomeForm.reset({
       accountId: defaultAccountId,
+      categoryId: incomeCategories[0]?.id ?? '',
       amount: '' as unknown as number,
       date: todayISO(),
       note: '',
     });
     setType(defaultType);
+    setRepeat(false);
+    setRepeatFreq('MONTHLY');
     createExpense.reset();
     createIncome.reset();
+    createRule.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -112,12 +131,36 @@ export function AddTransactionModal({
   }
 
   async function onExpenseSubmit(values: ExpenseFormValues) {
-    await createExpense.mutateAsync(values);
+    if (repeat) {
+      await createRule.mutateAsync({
+        kind: 'EXPENSE',
+        amount: values.amount,
+        accountId: values.accountId,
+        categoryId: values.categoryId,
+        note: values.description,
+        frequency: repeatFreq,
+        startDate: values.date,
+      });
+    } else {
+      await createExpense.mutateAsync(values);
+    }
     onClose();
   }
 
   async function onIncomeSubmit(values: IncomeFormValues) {
-    await createIncome.mutateAsync(values);
+    if (repeat) {
+      await createRule.mutateAsync({
+        kind: 'INCOME',
+        amount: values.amount,
+        accountId: values.accountId,
+        categoryId: values.categoryId,
+        note: values.note,
+        frequency: repeatFreq,
+        startDate: values.date,
+      });
+    } else {
+      await createIncome.mutateAsync(values);
+    }
     onClose();
   }
 
@@ -126,6 +169,7 @@ export function AddTransactionModal({
     ? expenseForm.watch('accountId')
     : incomeForm.watch('accountId');
   const watchedCategoryId = expenseForm.watch('categoryId');
+  const watchedIncomeCategoryId = incomeForm.watch('categoryId');
   const accentClass = isExpense
     ? 'bg-danger hover:opacity-90 text-white'
     : 'bg-success hover:opacity-90 text-white';
@@ -250,6 +294,13 @@ export function AddTransactionModal({
               error={expenseForm.formState.errors.date?.message}
             />
 
+            <RepeatSection
+              repeat={repeat}
+              onRepeatChange={setRepeat}
+              frequency={repeatFreq}
+              onFrequencyChange={setRepeatFreq}
+            />
+
             <NoteField
               registration={expenseForm.register('description')}
               placeholder='e.g. Grocery run'
@@ -278,6 +329,55 @@ export function AddTransactionModal({
               className={`${inputBase} pl-10 tabular-nums text-success`}
             />
 
+            {/* Category */}
+            <div className='flex flex-col gap-2'>
+              <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+                Category
+              </label>
+              <div className='flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1'>
+                {incomeCategories.map((cat) => {
+                  const selected = cat.id === watchedIncomeCategoryId;
+                  const color = cat.color ?? 'var(--color-success)';
+                  return (
+                    <Button
+                      key={cat.id}
+                      type='button'
+                      onClick={() =>
+                        incomeForm.setValue('categoryId', cat.id, {
+                          shouldValidate: true,
+                        })
+                      }
+                      pt={{
+                        root: {
+                          className:
+                            'flex items-center gap-1.5 px-3 h-8 rounded-full border text-xs font-semibold transition-all',
+                          style: selected
+                            ? {
+                                background: `${color}18`,
+                                borderColor: color,
+                                color,
+                              }
+                            : {
+                                background: 'var(--color-surface)',
+                                borderColor: 'var(--color-border)',
+                                color: 'var(--color-text)',
+                              },
+                        },
+                      }}
+                    >
+                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} />
+                      {cat.name}
+                    </Button>
+                  );
+                })}
+              </div>
+              {incomeForm.formState.errors.categoryId && (
+                <p className='text-xs text-danger'>
+                  {incomeForm.formState.errors.categoryId.message}
+                </p>
+              )}
+            </div>
+
             <AccountPicker
               accounts={accounts}
               selectedId={watchedAccountId}
@@ -290,6 +390,13 @@ export function AddTransactionModal({
             <DateField
               registration={incomeForm.register('date')}
               error={incomeForm.formState.errors.date?.message}
+            />
+
+            <RepeatSection
+              repeat={repeat}
+              onRepeatChange={setRepeat}
+              frequency={repeatFreq}
+              onFrequencyChange={setRepeatFreq}
             />
 
             <NoteField
@@ -457,6 +564,67 @@ function NoteField({
           className='h-[46px] w-full rounded-md bg-surface border border-border text-sm text-text pl-10 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13'
         />
       </div>
+    </div>
+  );
+}
+
+function RepeatSection({
+  repeat,
+  onRepeatChange,
+  frequency,
+  onFrequencyChange,
+}: {
+  repeat: boolean;
+  onRepeatChange: (v: boolean) => void;
+  frequency: Frequency;
+  onFrequencyChange: (v: Frequency) => void;
+}) {
+  return (
+    <div className='flex flex-col gap-3'>
+      {/* Checkbox row */}
+      <label className='flex items-center gap-2.5 cursor-pointer select-none'>
+        <Checkbox
+          checked={repeat}
+          onChange={(e) => onRepeatChange(!!e.checked)}
+          pt={{
+            box: {
+              className: `w-4 h-4 rounded border flex items-center justify-center transition-colors cursor-pointer ${
+                repeat
+                  ? 'bg-primary border-primary'
+                  : 'bg-surface border-border'
+              }`,
+            },
+            icon: { className: 'text-white text-[10px]' },
+            input: { className: 'sr-only' },
+          }}
+        />
+        <span className='text-sm font-medium text-text'>
+          Repeat this transaction
+        </span>
+      </label>
+
+      {/* Frequency pills — shown when checked */}
+      {repeat && (
+        <div className='flex gap-2 pl-6'>
+          {REPEAT_FREQUENCIES.map(({ value, label }) => (
+            <Button
+              key={value}
+              type='button'
+              label={label}
+              onClick={() => onFrequencyChange(value)}
+              pt={{
+                root: {
+                  className: `px-3 h-8 rounded-full border text-xs font-semibold transition-all ${
+                    frequency === value
+                      ? 'bg-primary-tint border-primary text-primary'
+                      : 'bg-surface border-border text-text hover:bg-raised'
+                  }`,
+                },
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

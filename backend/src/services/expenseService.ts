@@ -92,6 +92,12 @@ export async function create(
     where: { id: data.categoryId },
   });
   if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
+  if (category.userId !== null && category.userId !== userId)
+    throw appError(
+      'FORBIDDEN',
+      'You do not have permission to use this category.',
+      403
+    );
 
   const parsedDate = new Date(data.date);
 
@@ -165,6 +171,12 @@ export async function update(
       where: { id: data.categoryId },
     });
     if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
+    if (category.userId !== null && category.userId !== userId)
+      throw appError(
+        'FORBIDDEN',
+        'You do not have permission to use this category.',
+        403
+      );
   }
 
   const newAmount = data.amount ?? existing.amount;

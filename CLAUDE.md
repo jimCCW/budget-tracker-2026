@@ -1,5 +1,3 @@
-# CLAUDE.md
-
 # Budget Tracker
 
 ## Project
@@ -23,15 +21,27 @@ cd frontend && pnpm install
 pnpm dev
 pnpm tsc --noEmit    # type-check without building
 
+# Backend type-check
+cd backend && npx tsc --noEmit
+
 # Prisma (run from backend/)
 npx prisma generate        # regenerate client after schema changes
 npx prisma studio          # visual DB browser at localhost:5555
+
+# Schema changes (migrate dev requires TTY — use this pattern instead):
+npx prisma db push --accept-data-loss   # sync DB to schema
+# manually write migration SQL to backend/prisma/migrations/<name>/migration.sql
+npx prisma migrate resolve --applied <name>   # record it in the migrations table
+
+# Adding a NOT NULL column to an existing table — always backfill first:
+# 1. ADD COLUMN nullable  2. UPDATE rows  3. ALTER COLUMN SET NOT NULL  4. ADD CONSTRAINT FK
 ```
 
 ## Tech Stack
 
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS, NextAuth.js
 - **Data fetching:** Axios + TanStack Query — use `apiClient` from `lib/api.ts` inside `useQuery`/`useMutation` hooks
+  - `apiClient` auto-injects the Bearer token and unwraps `response.data` — callers receive the payload directly (e.g. `apiClient.get<never, Account[]>('/api/accounts')` returns `Account[]`, not `AxiosResponse`)
 - **Forms:** react-hook-form + Zod — always define Zod schema first, infer type, pass zodResolver to useForm
 - **Charts:** Recharts
 - **Backend:** Node.js, Express.js, TypeScript
@@ -64,6 +74,8 @@ frontend/
 │   ├── categories/           # components/ hooks/ schemas/
 │   ├── dashboard/            # components/ hooks/
 │   ├── accounts/             # components/ hooks/ schemas/ constants/
+│   ├── recurring/            # components/ hooks/ schemas/ constants/
+│   ├── transactions/         # components/  (AddTransactionModal — modal only, no page)
 │   └── summary/              # components/ hooks/
 ├── components/
 │   ├── ui/                   # DataTable.tsx, Modal.tsx, StatCard.tsx, ThemeToggle.tsx
@@ -119,6 +131,7 @@ frontend/
 - Always infer the TypeScript type from the schema: `type T = z.infer<typeof schema>`
 - Use `useForm<T>({ resolver: zodResolver(schema) })`
 - PrimeReact `Checkbox` in unstyled mode renders a native `<input>` alongside the custom `pt.box`, causing a double checkbox. Always add `input: { className: 'sr-only' }` to the `pt` prop.
+- PrimeReact `Checkbox`: `data-p-checked` is set on the root, NOT on `pt.box` — `data-[p-checked=true]:bg-primary` in `pt.box` will silently do nothing. Drive checked styles from the React boolean prop directly: `pt={{ box: { className: checked ? 'bg-primary border-primary' : 'bg-surface border-border' } }}`
 
 ### Tailwind v4 Class Patterns
 
@@ -137,11 +150,18 @@ frontend/
 - Components using `useTheme()` must guard against SSR: `const [mounted, setMounted] = useState(false); useEffect(() => setMounted(true), []); if (!mounted) return null;`
 - `ThemeToggle` primitive lives in `components/ui/ThemeToggle.tsx`
 
+### AppShell
+
+`AppShell` is a **wrapper inside each page component**, not a shared Next.js layout. It remounts on every navigation.
+
+- Hooks called inside AppShell re-run on every route change.
+- TanStack Query hooks with `staleTime: 0` will refetch on every navigation — set `staleTime` equal to `refetchInterval` to prevent this.
+
 ### General
 
 - TypeScript strict mode — no `any`
 - Never commit `.env.local`
-- pnpm: if a new package has build scripts (native binaries, Prisma, etc.), add it to `onlyBuiltDependencies` in the relevant `pnpm-workspace.yaml` or pnpm will error with `ERR_PNPM_IGNORED_BUILDS`. If the native binding is still missing after install (e.g. bcrypt `bcrypt_lib.node` not found), run `node_modules/.bin/node-pre-gyp install --fallback-to-build` from inside the package directory (e.g. `node_modules/.pnpm/bcrypt@*/node_modules/bcrypt`).
+- pnpm: packages with native build scripts need `onlyBuiltDependencies` in `pnpm-workspace.yaml` — otherwise `ERR_PNPM_IGNORED_BUILDS`. If a native binding is still missing post-install, run `node_modules/.bin/node-pre-gyp install --fallback-to-build` from inside the package dir.
 
 ---
 
@@ -195,9 +215,9 @@ Standard error codes and their HTTP status:
 ### Database
 
 - Never hard-delete default categories (`isDefault: true`) — guard in service layer
-- Recurring expenses: `isRecurring: true`, `recurrence: "MONTHLY"`
 - SavingsBase is one-to-one with User — upsert, never insert a duplicate
 - User data must always be scoped to `req.user.id` — never trust userId from request body
+- `break` / `continue` cannot cross an async callback boundary (e.g. inside `prisma.$transaction(async tx => {...})`). Hoist early-exit guards **before** the `await prisma.$transaction(...)` call.
 
 ---
 
@@ -230,10 +250,11 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 
 ## Key Domain Rules
 
-- Each expense belongs to a category — category is required
+- Each expense and income belongs to a category — `categoryId` is required on both
 - Categories are either system defaults (`userId: null`) or user-created (`userId` set)
-- Income is recorded per month+year — multiple entries per month allowed
+- Income stores `month` and `year` derived from the UTC date — used for monthly summary queries; multiple entries per month allowed
 - SavingsBase = user's starting bank balance; running total = SavingsBase + cumulative net savings
 - Monthly net = total income − total expenses for that month
 - Account types: `BANK`, `INVESTMENT`, `CRYPTO`, `CASH`, `CREDIT` — tracked per user with `balance`, `icon`, `color`
-- `/api/accounts` is live; income, expenses, and summary backend routes are planned but not yet implemented (commented out in `index.ts`)
+- Recurring transactions are managed via `RecurringRule` + the recurrence engine. The legacy `isRecurring`/`recurrence` fields on `Expense` are unused — do not write to them.
+- Shared constants (e.g. frequency config) go in `features/<name>/constants/` and may be imported cross-feature

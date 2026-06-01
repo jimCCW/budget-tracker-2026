@@ -18,39 +18,47 @@ model User {
   resetToken           String?
   resetTokenExpiry     DateTime?
   createdAt            DateTime  @default(now())
-  incomes      Income[]
-  expenses     Expense[]
-  categories   Category[]
-  savingsBase  SavingsBase?
-  accounts     Account[]
+  incomes        Income[]
+  expenses       Expense[]
+  categories     Category[]
+  savingsBase    SavingsBase?
+  accounts       Account[]
+  recurringRules RecurringRule[]
 }
 
 model Income {
-  id        String   @id @default(uuid())
-  userId    String
-  accountId String
-  amount    Float
-  date      DateTime
-  month     Int
-  year      Int
-  note      String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  account   Account  @relation(fields: [accountId], references: [id])
+  id              String         @id @default(uuid())
+  userId          String
+  accountId       String
+  categoryId      String
+  amount          Float
+  date            DateTime
+  month           Int
+  year            Int
+  note            String?
+  recurringRuleId String?
+  createdAt       DateTime       @default(now())
+  user            User           @relation(fields: [userId], references: [id])
+  account         Account        @relation(fields: [accountId], references: [id])
+  category        Category       @relation(fields: [categoryId], references: [id])
+  recurringRule   RecurringRule? @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
 
+  @@unique([recurringRuleId, date])
   @@index([userId, year, month])
 }
 
 model Category {
-  id        String       @id @default(uuid())
-  userId    String?
-  name      String
-  icon      String?
-  color     String?
-  type      CategoryType @default(EXPENSE)
-  isDefault Boolean      @default(false)
-  expenses  Expense[]
-  user      User?        @relation(fields: [userId], references: [id])
+  id             String          @id @default(uuid())
+  userId         String?
+  name           String
+  icon           String?
+  color          String?
+  type           CategoryType    @default(EXPENSE)
+  isDefault      Boolean         @default(false)
+  expenses       Expense[]
+  incomes        Income[]
+  recurringRules RecurringRule[]
+  user           User?           @relation(fields: [userId], references: [id])
 }
 
 enum CategoryType {
@@ -59,20 +67,23 @@ enum CategoryType {
 }
 
 model Expense {
-  id          String          @id @default(uuid())
-  userId      String
-  categoryId  String
-  accountId   String
-  amount      Float
-  description String?
-  date        DateTime
-  isRecurring Boolean         @default(false)
-  recurrence  RecurrenceType?
-  createdAt   DateTime        @default(now())
-  user        User            @relation(fields: [userId], references: [id])
-  category    Category        @relation(fields: [categoryId], references: [id])
-  account     Account         @relation(fields: [accountId], references: [id])
+  id              String          @id @default(uuid())
+  userId          String
+  categoryId      String
+  accountId       String
+  amount          Float
+  description     String?
+  date            DateTime
+  isRecurring     Boolean         @default(false)
+  recurrence      RecurrenceType?
+  recurringRuleId String?
+  createdAt       DateTime        @default(now())
+  user            User            @relation(fields: [userId], references: [id])
+  category        Category        @relation(fields: [categoryId], references: [id])
+  account         Account         @relation(fields: [accountId], references: [id])
+  recurringRule   RecurringRule?  @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
 
+  @@unique([recurringRuleId, date])
   @@index([userId, date])
 }
 
@@ -85,7 +96,15 @@ model SavingsBase {
 }
 
 enum RecurrenceType {
+  DAILY
+  WEEKLY
   MONTHLY
+  YEARLY
+}
+
+enum RecurringKind {
+  INCOME
+  EXPENSE
 }
 
 enum AccountType {
@@ -97,16 +116,44 @@ enum AccountType {
 }
 
 model Account {
-  id        String      @id @default(uuid())
-  userId    String
-  name      String
-  type      AccountType @default(BANK)
-  balance   Float       @default(0)
-  icon      String?
-  color     String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  user      User        @relation(fields: [userId], references: [id])
-  incomes   Income[]
-  expenses  Expense[]
+  id             String          @id @default(uuid())
+  userId         String
+  name           String
+  type           AccountType     @default(BANK)
+  balance        Float           @default(0)
+  icon           String?
+  color          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation(fields: [userId], references: [id])
+  incomes        Income[]
+  expenses       Expense[]
+  recurringRules RecurringRule[]
+}
+
+model RecurringRule {
+  id          String         @id @default(uuid())
+  userId      String
+  kind        RecurringKind
+  amount      Float
+  accountId   String
+  categoryId  String?
+  note        String?
+  frequency   RecurrenceType
+  interval    Int            @default(1)
+  startDate   DateTime
+  endDate     DateTime?
+  anchorDay   Int?
+  nextRunDate DateTime
+  lastRunDate DateTime?
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id])
+  account     Account        @relation(fields: [accountId], references: [id])
+  category    Category?      @relation(fields: [categoryId], references: [id])
+  incomes     Income[]
+  expenses    Expense[]
+
+  @@index([userId, isActive, nextRunDate])
 }

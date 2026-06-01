@@ -6,6 +6,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { AddTransactionModal } from '@/features/transactions/components/AddTransactionModal';
+import { useScheduledCatchup } from '@/features/recurring/hooks/useScheduledCatchup';
 
 type NavItem = {
   key: string;
@@ -20,7 +21,12 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'activity', label: 'Activity', icon: 'pi-list' },
   { key: 'goals', label: 'Goals', icon: 'pi-bullseye' },
   { key: 'accounts', label: 'Accounts', icon: 'pi-wallet', href: '/accounts' },
-  { key: 'recurring', label: 'Recurring', icon: 'pi-refresh' },
+  {
+    key: 'recurring',
+    label: 'Recurring',
+    icon: 'pi-refresh',
+    href: '/recurring',
+  },
   {
     key: 'categories',
     label: 'Categories',
@@ -49,6 +55,7 @@ type AppShellProps = {
 };
 
 export function AppShell({ children, title, subtitle }: AppShellProps) {
+  useScheduledCatchup();
   const [txModalOpen, setTxModalOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();

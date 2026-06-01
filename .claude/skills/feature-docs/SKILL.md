@@ -24,7 +24,7 @@ Three phases: **resolve target → explore codebase → write or update doc → 
 Extract the feature name from the user's message. Normalize to lowercase kebab-case.
 
 Recognized features in this project:
-`auth`, `accounts`, `dashboard`, `categories`, `expenses`, `income`, `summary`
+`auth`, `accounts`, `dashboard`, `categories`, `expenses`, `income`, `summary`, `transactions`, `settings`, `profile`, `notifications`, `recurring`
 
 If no feature name is clear, ask:
 

@@ -1,9 +1,11 @@
 import type { Response, NextFunction } from 'express';
 import type { AuthRequest } from '../middleware/authMiddleware';
 import * as incomeService from '../services/incomeService';
+import { runCatchupThrottled } from '../services/catchupService';
 
 /**
  * GET /api/income — Returns all income records for the authenticated user.
+ * Triggers a throttled recurring catch-up before fetching so new occurrences appear immediately.
  * Accepts optional query params: year (number), month (number).
  */
 export async function getAllController(
@@ -12,6 +14,7 @@ export async function getAllController(
   next: NextFunction
 ) {
   try {
+    await runCatchupThrottled(req.user!.id);
     const year = req.query.year ? Number(req.query.year) : undefined;
     const month = req.query.month ? Number(req.query.month) : undefined;
     const data = await incomeService.getAll(req.user!.id, { year, month });

@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
  * Returns all income records for the given user, optionally filtered by year and/or month.
  * @param userId - The authenticated user's ID.
  * @param filters - Optional year and month to filter by.
- * @returns Array of Income records with account info, newest first.
+ * @returns Array of Income records with account and category info, newest first.
  */
 export async function getAll(
   userId: string,
@@ -19,7 +19,7 @@ export async function getAll(
       ...(filters?.year !== undefined && { year: filters.year }),
       ...(filters?.month !== undefined && { month: filters.month }),
     },
-    include: { account: true },
+    include: { account: true, category: true },
     orderBy: { date: 'desc' },
   });
 }
@@ -28,14 +28,14 @@ export async function getAll(
  * Returns a single income record owned by the given user.
  * @param userId - The authenticated user's ID.
  * @param id - The income ID.
- * @returns The Income record with account info.
+ * @returns The Income record with account and category info.
  * @throws NOT_FOUND (404) if the record does not exist.
  * @throws FORBIDDEN (403) if it belongs to another user.
  */
 export async function getById(userId: string, id: string) {
   const income = await prisma.income.findUnique({
     where: { id },
-    include: { account: true },
+    include: { account: true, category: true },
   });
   if (!income) throw appError('NOT_FOUND', 'Income record not found.', 404);
   if (income.userId !== userId)
@@ -49,16 +49,22 @@ export async function getById(userId: string, id: string) {
 
 /**
  * Creates an income record and atomically increments the linked account's balance.
- * Derives month/year from the provided date.
+ * Derives month/year from the provided date. Validates category ownership.
  * @param userId - The authenticated user's ID.
- * @param data - Income fields: accountId, amount, date, optional note.
- * @returns The newly created Income record with account info.
- * @throws NOT_FOUND (404) if the account does not exist.
- * @throws FORBIDDEN (403) if the account belongs to another user.
+ * @param data - Income fields: accountId, categoryId, amount, date, optional note.
+ * @returns The newly created Income record with account and category info.
+ * @throws NOT_FOUND (404) if the account or category does not exist.
+ * @throws FORBIDDEN (403) if the account or category belongs to another user.
  */
 export async function create(
   userId: string,
-  data: { accountId: string; amount: number; date: string; note?: string }
+  data: {
+    accountId: string;
+    categoryId: string;
+    amount: number;
+    date: string;
+    note?: string;
+  }
 ) {
   const account = await prisma.account.findUnique({
     where: { id: data.accountId },
@@ -71,6 +77,17 @@ export async function create(
       403
     );
 
+  const category = await prisma.category.findUnique({
+    where: { id: data.categoryId },
+  });
+  if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
+  if (category.userId !== null && category.userId !== userId)
+    throw appError(
+      'FORBIDDEN',
+      'You do not have permission to use this category.',
+      403
+    );
+
   const parsedDate = new Date(data.date);
   const month = parsedDate.getUTCMonth() + 1;
   const year = parsedDate.getUTCFullYear();
@@ -80,13 +97,14 @@ export async function create(
       data: {
         userId,
         accountId: data.accountId,
+        categoryId: data.categoryId,
         amount: data.amount,
         date: parsedDate,
         month,
         year,
         note: data.note,
       },
-      include: { account: true },
+      include: { account: true, category: true },
     });
 
     await tx.account.update({
@@ -101,17 +119,24 @@ export async function create(
 /**
  * Updates an income record and reconciles the account balance delta atomically.
  * Handles account changes by reversing the old delta on the old account and applying the new delta.
+ * Validates category ownership if categoryId changes.
  * @param userId - The authenticated user's ID.
  * @param id - The income ID to update.
  * @param data - Fields to update (all optional).
- * @returns The updated Income record with account info.
- * @throws NOT_FOUND (404) if the income or new account does not exist.
- * @throws FORBIDDEN (403) if the income or new account belongs to another user.
+ * @returns The updated Income record with account and category info.
+ * @throws NOT_FOUND (404) if the income, new account, or new category does not exist.
+ * @throws FORBIDDEN (403) if the income, new account, or new category belongs to another user.
  */
 export async function update(
   userId: string,
   id: string,
-  data: { accountId?: string; amount?: number; date?: string; note?: string }
+  data: {
+    accountId?: string;
+    categoryId?: string;
+    amount?: number;
+    date?: string;
+    note?: string;
+  }
 ) {
   const existing = await prisma.income.findUnique({ where: { id } });
   if (!existing) throw appError('NOT_FOUND', 'Income record not found.', 404);
@@ -135,6 +160,19 @@ export async function update(
       );
   }
 
+  if (data.categoryId && data.categoryId !== existing.categoryId) {
+    const category = await prisma.category.findUnique({
+      where: { id: data.categoryId },
+    });
+    if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
+    if (category.userId !== null && category.userId !== userId)
+      throw appError(
+        'FORBIDDEN',
+        'You do not have permission to use this category.',
+        403
+      );
+  }
+
   const newAmount = data.amount ?? existing.amount;
   const newAccountId = data.accountId ?? existing.accountId;
   const accountChanged = newAccountId !== existing.accountId;
@@ -152,7 +190,6 @@ export async function update(
 
   return prisma.$transaction(async (tx) => {
     if (accountChanged) {
-      // Reverse old delta on old account, apply new delta on new account
       await tx.account.update({
         where: { id: existing.accountId },
         data: { balance: { decrement: existing.amount } },
@@ -162,7 +199,6 @@ export async function update(
         data: { balance: { increment: newAmount } },
       });
     } else if (amountChanged) {
-      // Same account — just adjust the difference
       const diff = newAmount - existing.amount;
       await tx.account.update({
         where: { id: existing.accountId },
@@ -174,13 +210,14 @@ export async function update(
       where: { id },
       data: {
         accountId: newAccountId,
+        categoryId: data.categoryId,
         amount: newAmount,
         date: parsedDate,
         month,
         year,
         note: data.note,
       },
-      include: { account: true },
+      include: { account: true, category: true },
     });
   });
 }

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const incomeSchema = z.object({
   accountId: z.string().min(1, 'Account is required'),
+  categoryId: z.string().min(1, 'Category is required'),
   amount: z
     .number({ error: 'Amount must be a number' })
     .positive('Amount must be greater than 0'),
