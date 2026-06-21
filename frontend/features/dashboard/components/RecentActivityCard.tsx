@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { DataTable } from '@/components/ui/DataTable';
-import { SAMPLE, fmt } from '../data';
+import { SAMPLE } from '../data';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { recentActivityColumns } from '../recentActivityColumns';
 
 export function RecentActivityCard() {
@@ -56,7 +57,7 @@ export function RecentActivityCard() {
               ].join(' ')}
             >
               {tx.amt > 0 ? '+' : ''}
-              {fmt(tx.amt)}
+              {formatCurrency(tx.amt)}
             </div>
           </div>
         ))}

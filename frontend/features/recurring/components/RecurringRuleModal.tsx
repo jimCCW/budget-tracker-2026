@@ -14,6 +14,7 @@ import { useUpdateRule } from '../hooks/useUpdateRule';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { useCategories } from '@/features/categories/hooks/useCategories';
 import { formatCurrency } from '@/lib/formatCurrency';
+import { todayISO } from '@/lib/dateUtils';
 import type {
   RecurringRule,
   RecurringKind,
@@ -29,10 +30,6 @@ export type RecurringRuleModalProps = {
 
 const inputBase =
   'h-[46px] w-full rounded-md bg-surface border text-sm text-text outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13';
-
-function todayISO() {
-  return new Date().toISOString().split('T')[0];
-}
 
 export function RecurringRuleModal({
   open,

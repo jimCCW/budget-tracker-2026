@@ -1,6 +1,7 @@
 'use client';
 import { PieChart, Pie, ResponsiveContainer } from 'recharts';
-import { SAMPLE, fmt, fmtShort } from '../data';
+import { SAMPLE } from '../data';
+import { formatCurrency, formatCurrencyShort } from '@/lib/formatCurrency';
 
 export function CategoryDonutChart() {
   const total = SAMPLE.monthExpense;
@@ -45,7 +46,7 @@ export function CategoryDonutChart() {
               Spent
             </div>
             <div className='text-[22px] font-extrabold tracking-tight tabular-nums'>
-              {fmtShort(total)}
+              {formatCurrencyShort(total)}
             </div>
           </div>
         </div>
@@ -60,7 +61,7 @@ export function CategoryDonutChart() {
               />
               <span className='flex-1 text-text font-medium'>{item.name}</span>
               <span className='text-text-muted tabular-nums'>
-                {fmt(item.value)}
+                {formatCurrency(item.value)}
               </span>
               <span className='text-text-dim tabular-nums w-10 text-right'>
                 {Math.round((item.value / total) * 100)}%

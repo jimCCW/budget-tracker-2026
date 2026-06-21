@@ -82,24 +82,3 @@ export const SAMPLE = {
     { name: 'New laptop', saved: 800, target: 2200, color: '#A855F7' },
   ],
 };
-
-export function fmt(n: number): string {
-  const abs = Math.abs(n);
-  const s = abs.toLocaleString('en-SG', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  return (n < 0 ? '-' : '') + 'S$' + s;
-}
-
-export function fmtShort(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1000)
-    return (
-      (n < 0 ? '-' : '') +
-      'S$' +
-      (abs / 1000).toFixed(1).replace(/\.0$/, '') +
-      'k'
-    );
-  return fmt(n);
-}

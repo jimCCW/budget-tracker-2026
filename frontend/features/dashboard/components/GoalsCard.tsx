@@ -1,4 +1,5 @@
-import { SAMPLE, fmt, fmtShort } from '../data';
+import { SAMPLE } from '../data';
+import { formatCurrency, formatCurrencyShort } from '@/lib/formatCurrency';
 
 export function GoalsCard() {
   return (
@@ -21,10 +22,10 @@ export function GoalsCard() {
                 <div className='text-[12.5px] font-semibold'>{g.name}</div>
                 <div className='text-[12px] text-text-muted tabular-nums'>
                   <span className='text-text font-bold'>
-                    {fmtShort(g.saved)}
+                    {formatCurrencyShort(g.saved)}
                   </span>
                   {' / '}
-                  {fmtShort(g.target)}
+                  {formatCurrencyShort(g.target)}
                 </div>
               </div>
               <div className='w-full h-1.5 bg-border rounded-full overflow-hidden'>
@@ -48,7 +49,7 @@ export function GoalsCard() {
             Total saved
           </div>
           <div className='text-[18px] font-extrabold text-primary tabular-nums mt-0.5'>
-            {fmt(SAMPLE.goals.reduce((acc, g) => acc + g.saved, 0))}
+            {formatCurrency(SAMPLE.goals.reduce((acc, g) => acc + g.saved, 0))}
           </div>
         </div>
         <i className='pi pi-star text-primary text-2xl' />

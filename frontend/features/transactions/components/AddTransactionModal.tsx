@@ -19,6 +19,7 @@ import { useCreateExpense } from '@/features/expenses/hooks/useCreateExpense';
 import { useCreateRule } from '@/features/recurring/hooks/useCreateRule';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { useCategories } from '@/features/categories/hooks/useCategories';
+import { todayISO } from '@/lib/dateUtils';
 import type { Frequency } from '@/types/recurring';
 import { FREQUENCIES as REPEAT_FREQUENCIES } from '@/features/recurring/constants/frequencies';
 
@@ -32,10 +33,6 @@ type AddTransactionModalProps = {
 
 const inputBase =
   'h-[46px] w-full rounded-md bg-surface border text-sm text-text outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13';
-
-function todayISO() {
-  return new Date().toISOString().split('T')[0];
-}
 
 export function AddTransactionModal({
   open,

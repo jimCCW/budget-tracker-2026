@@ -1,5 +1,9 @@
 import { PrismaClient, RecurrenceType, RecurringKind } from '@prisma/client';
 import { appError } from '../utils/appError';
+import {
+  verifyAccountOwnership,
+  verifyCategoryOwnership,
+} from '../utils/authorizationUtils';
 import { firstRunDate } from '../utils/recurrence';
 import { materializeDueTransactions } from './recurrenceEngine';
 
@@ -63,29 +67,10 @@ export async function create(
     endDate?: string;
   }
 ) {
-  const account = await prisma.account.findUnique({
-    where: { id: data.accountId },
-  });
-  if (!account) throw appError('NOT_FOUND', 'Account not found.', 404);
-  if (account.userId !== userId)
-    throw appError(
-      'FORBIDDEN',
-      'You do not have permission to use this account.',
-      403
-    );
+  await verifyAccountOwnership(prisma, userId, data.accountId);
 
   if (data.categoryId) {
-    const category = await prisma.category.findUnique({
-      where: { id: data.categoryId },
-    });
-    if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
-    // userId null = system default category, accessible by all users
-    if (category.userId !== null && category.userId !== userId)
-      throw appError(
-        'FORBIDDEN',
-        'You do not have permission to use this category.',
-        403
-      );
+    await verifyCategoryOwnership(prisma, userId, data.categoryId);
   }
 
   const parsedStart = new Date(data.startDate);
@@ -151,29 +136,11 @@ export async function update(
     );
 
   if (data.accountId && data.accountId !== rule.accountId) {
-    const account = await prisma.account.findUnique({
-      where: { id: data.accountId },
-    });
-    if (!account) throw appError('NOT_FOUND', 'Account not found.', 404);
-    if (account.userId !== userId)
-      throw appError(
-        'FORBIDDEN',
-        'You do not have permission to use this account.',
-        403
-      );
+    await verifyAccountOwnership(prisma, userId, data.accountId);
   }
 
   if (data.categoryId && data.categoryId !== rule.categoryId) {
-    const category = await prisma.category.findUnique({
-      where: { id: data.categoryId },
-    });
-    if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
-    if (category.userId !== null && category.userId !== userId)
-      throw appError(
-        'FORBIDDEN',
-        'You do not have permission to use this category.',
-        403
-      );
+    await verifyCategoryOwnership(prisma, userId, data.categoryId);
   }
 
   return prisma.recurringRule.update({

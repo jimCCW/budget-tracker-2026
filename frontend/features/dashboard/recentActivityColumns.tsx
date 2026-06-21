@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@/components/ui/DataTable';
-import { fmt } from './data';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export type TxRow = {
   name: string;
@@ -64,7 +64,7 @@ export const recentActivityColumns: ColumnDef<TxRow>[] = [
           className={`font-bold tabular-nums ${tx.amt > 0 ? 'text-success' : 'text-text'}`}
         >
           {tx.amt > 0 ? '+' : ''}
-          {fmt(tx.amt)}
+          {formatCurrency(tx.amt)}
         </span>
       );
     },

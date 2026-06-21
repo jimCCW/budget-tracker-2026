@@ -5,7 +5,8 @@ import { CategoryDonutChart } from './CategoryDonutChart';
 import { BudgetProgressSection } from './BudgetProgressSection';
 import { RecentActivityCard } from './RecentActivityCard';
 import { GoalsCard } from './GoalsCard';
-import { SAMPLE, fmt } from '../data';
+import { SAMPLE } from '../data';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export function DashboardPage() {
   const saved = SAMPLE.monthIncome - SAMPLE.monthExpense;
@@ -16,7 +17,7 @@ export function DashboardPage() {
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
         <StatCard
           label='Balance'
-          value={fmt(SAMPLE.balance)}
+          value={formatCurrency(SAMPLE.balance)}
           sub='across 4 accounts'
           icon='pi-wallet'
           tintClass='bg-primary-tint'
@@ -25,7 +26,7 @@ export function DashboardPage() {
         />
         <StatCard
           label='Income · May'
-          value={fmt(SAMPLE.monthIncome)}
+          value={formatCurrency(SAMPLE.monthIncome)}
           sub='3 sources'
           icon='pi-arrow-up-right'
           tintClass='bg-success-tint'
@@ -34,7 +35,7 @@ export function DashboardPage() {
         />
         <StatCard
           label='Expenses · May'
-          value={fmt(SAMPLE.monthExpense)}
+          value={formatCurrency(SAMPLE.monthExpense)}
           sub='12 transactions'
           icon='pi-arrow-down-right'
           tintClass='bg-danger-tint'
@@ -43,7 +44,7 @@ export function DashboardPage() {
         />
         <StatCard
           label='Saved · May'
-          value={fmt(saved)}
+          value={formatCurrency(saved)}
           sub='44% of income'
           icon='pi-star'
           tintClass='bg-warn-tint'

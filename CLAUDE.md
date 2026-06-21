@@ -44,6 +44,7 @@ npx prisma migrate resolve --applied <name>   # record it in the migrations tabl
   - `apiClient` auto-injects the Bearer token and unwraps `response.data` — callers receive the payload directly (e.g. `apiClient.get<never, Account[]>('/api/accounts')` returns `Account[]`, not `AxiosResponse`)
 - **Forms:** react-hook-form + Zod — always define Zod schema first, infer type, pass zodResolver to useForm
 - **Charts:** Recharts
+- **Dates:** `dayjs` — installed in both frontend and backend. Use it for all date formatting and arithmetic instead of native `Date` methods.
 - **Backend:** Node.js, Express.js, TypeScript
 - **ORM/DB:** Prisma + PostgreSQL
 
@@ -76,6 +77,7 @@ frontend/
 │   ├── accounts/             # components/ hooks/ schemas/ constants/
 │   ├── recurring/            # components/ hooks/ schemas/ constants/
 │   ├── transactions/         # components/  (AddTransactionModal — modal only, no page)
+│   ├── notifications/        # components/ hooks/ utils/
 │   └── summary/              # components/ hooks/
 ├── components/
 │   ├── ui/                   # DataTable.tsx, Modal.tsx, StatCard.tsx, ThemeToggle.tsx
@@ -160,6 +162,7 @@ frontend/
 ### General
 
 - TypeScript strict mode — no `any`
+- Use `||` not `??` when falling back from a string field that may be empty (`""`). `??` only catches `null`/`undefined`; `||` catches both. Example: `rule.note || rule.category?.name || 'Expense'`.
 - Never commit `.env.local`
 - pnpm: packages with native build scripts need `onlyBuiltDependencies` in `pnpm-workspace.yaml` — otherwise `ERR_PNPM_IGNORED_BUILDS`. If a native binding is still missing post-install, run `node_modules/.bin/node-pre-gyp install --fallback-to-build` from inside the package dir.
 
@@ -217,6 +220,8 @@ Standard error codes and their HTTP status:
 - Never hard-delete default categories (`isDefault: true`) — guard in service layer
 - SavingsBase is one-to-one with User — upsert, never insert a duplicate
 - User data must always be scoped to `req.user.id` — never trust userId from request body
+- Prisma `update`/`delete` only accept unique fields in `where`. For ownership checks: use `findFirst({ where: { id, userId } })` then `update({ where: { id } })`, or `deleteMany({ where: { id, userId } })` and throw 404 if `count === 0`.
+- To backdate a record with `@default(now())`, pass `createdAt` explicitly in `prisma.create()` — Prisma allows overriding the default.
 - `break` / `continue` cannot cross an async callback boundary (e.g. inside `prisma.$transaction(async tx => {...})`). Hoist early-exit guards **before** the `await prisma.$transaction(...)` call.
 
 ---

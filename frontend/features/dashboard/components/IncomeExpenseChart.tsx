@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { fmtShort } from '../data';
+import { formatCurrencyShort } from '@/lib/formatCurrency';
 
 type Range = '6M' | '1Y' | 'All';
 
@@ -108,7 +108,7 @@ export function IncomeExpenseChart() {
               interval='preserveStartEnd'
             />
             <YAxis
-              tickFormatter={(v: number) => fmtShort(v)}
+              tickFormatter={(v: number) => formatCurrencyShort(v)}
               tick={{
                 fontSize: 10,
                 fill: 'var(--color-text-muted)',
@@ -128,7 +128,7 @@ export function IncomeExpenseChart() {
               }}
               formatter={(value, name) => [
                 value != null && typeof value === 'number'
-                  ? fmtShort(value)
+                  ? formatCurrencyShort(value)
                   : String(value ?? ''),
                 name === 'income' ? 'Income' : 'Expenses',
               ]}
