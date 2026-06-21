@@ -1,5 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { appError } from '../utils/appError';
+import {
+  verifyAccountOwnership,
+  verifyCategoryOwnership,
+} from '../utils/authorizationUtils';
 
 const prisma = new PrismaClient();
 
@@ -66,27 +70,8 @@ export async function create(
     note?: string;
   }
 ) {
-  const account = await prisma.account.findUnique({
-    where: { id: data.accountId },
-  });
-  if (!account) throw appError('NOT_FOUND', 'Account not found.', 404);
-  if (account.userId !== userId)
-    throw appError(
-      'FORBIDDEN',
-      'You do not have permission to use this account.',
-      403
-    );
-
-  const category = await prisma.category.findUnique({
-    where: { id: data.categoryId },
-  });
-  if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
-  if (category.userId !== null && category.userId !== userId)
-    throw appError(
-      'FORBIDDEN',
-      'You do not have permission to use this category.',
-      403
-    );
+  await verifyAccountOwnership(prisma, userId, data.accountId);
+  await verifyCategoryOwnership(prisma, userId, data.categoryId);
 
   const parsedDate = new Date(data.date);
   const month = parsedDate.getUTCMonth() + 1;
@@ -148,29 +133,11 @@ export async function update(
     );
 
   if (data.accountId && data.accountId !== existing.accountId) {
-    const newAccount = await prisma.account.findUnique({
-      where: { id: data.accountId },
-    });
-    if (!newAccount) throw appError('NOT_FOUND', 'Account not found.', 404);
-    if (newAccount.userId !== userId)
-      throw appError(
-        'FORBIDDEN',
-        'You do not have permission to use this account.',
-        403
-      );
+    await verifyAccountOwnership(prisma, userId, data.accountId);
   }
 
   if (data.categoryId && data.categoryId !== existing.categoryId) {
-    const category = await prisma.category.findUnique({
-      where: { id: data.categoryId },
-    });
-    if (!category) throw appError('NOT_FOUND', 'Category not found.', 404);
-    if (category.userId !== null && category.userId !== userId)
-      throw appError(
-        'FORBIDDEN',
-        'You do not have permission to use this category.',
-        403
-      );
+    await verifyCategoryOwnership(prisma, userId, data.categoryId);
   }
 
   const newAmount = data.amount ?? existing.amount;

@@ -1,4 +1,5 @@
-import { SAMPLE, fmt } from '../data';
+import { SAMPLE } from '../data';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export function BudgetProgressSection() {
   return (
@@ -40,10 +41,10 @@ export function BudgetProgressSection() {
                   over ? 'text-danger' : 'text-text',
                 ].join(' ')}
               >
-                {fmt(b.spent)}
+                {formatCurrency(b.spent)}
               </div>
               <div className='text-[11px] text-text-muted mb-2'>
-                of {fmt(b.limit)} limit
+                of {formatCurrency(b.limit)} limit
               </div>
               <div className='w-full h-1.5 bg-border rounded-full overflow-hidden'>
                 <div
