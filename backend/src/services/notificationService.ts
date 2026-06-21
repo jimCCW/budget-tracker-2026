@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { appError } from '../utils/appError';
-
-const prisma = new PrismaClient();
 
 const DEFAULT_LIMIT = 100;
 
