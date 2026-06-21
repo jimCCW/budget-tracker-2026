@@ -7,6 +7,7 @@ import { Button } from 'primereact/button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { AddTransactionModal } from '@/features/transactions/components/AddTransactionModal';
 import { useScheduledCatchup } from '@/features/recurring/hooks/useScheduledCatchup';
+import { useUnreadCount } from '@/features/notifications/hooks/useUnreadCount';
 
 type NavItem = {
   key: string;
@@ -33,7 +34,12 @@ const NAV_ITEMS: NavItem[] = [
     icon: 'pi-tag',
     href: '/categories',
   },
-  { key: 'notifications', label: 'Notifications', icon: 'pi-bell', badge: 3 },
+  {
+    key: 'notifications',
+    label: 'Notifications',
+    icon: 'pi-bell',
+    href: '/notifications',
+  },
 ];
 
 const FOOTER_ITEMS: NavItem[] = [
@@ -57,6 +63,7 @@ type AppShellProps = {
 export function AppShell({ children, title, subtitle }: AppShellProps) {
   useScheduledCatchup();
   const [txModalOpen, setTxModalOpen] = useState(false);
+  const { data: unreadCount = 0 } = useUnreadCount();
   const pathname = usePathname();
   const { data: session } = useSession();
   const userName = session?.user?.name ?? 'Alex';
@@ -109,7 +116,15 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
             Menu
           </div>
           {NAV_ITEMS.map((item) => (
-            <SideNavItem key={item.key} item={item} active={isActive(item)} />
+            <SideNavItem
+              key={item.key}
+              item={
+                item.key === 'notifications'
+                  ? { ...item, badge: unreadCount || undefined }
+                  : item
+              }
+              active={isActive(item)}
+            />
           ))}
         </nav>
 
@@ -158,19 +173,17 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           </div>
           <div className='flex items-center gap-2'>
             <ThemeToggle />
-            <Button
-              pt={{
-                root: {
-                  className:
-                    'relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors',
-                },
-              }}
+            <Link
+              href='/notifications'
+              className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors'
             >
               <i className='pi pi-bell text-base' />
-              <span className='absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'>
-                3
-              </span>
-            </Button>
+              {unreadCount > 0 && (
+                <span className='absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Link>
             <Button
               label='New Transaction'
               icon='pi pi-plus'
@@ -198,19 +211,17 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
               </span>
             </div>
             <div className='flex items-center gap-1'>
-              <Button
-                pt={{
-                  root: {
-                    className:
-                      'relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text transition-colors',
-                  },
-                }}
+              <Link
+                href='/notifications'
+                className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text transition-colors'
               >
                 <i className='pi pi-bell text-base' />
-                <span className='absolute top-1 right-1 w-3.5 h-3.5 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center'>
-                  3
-                </span>
-              </Button>
+                {unreadCount > 0 && (
+                  <span className='absolute top-1 right-1 w-3.5 h-3.5 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center'>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
               <ThemeToggle />
             </div>
           </div>

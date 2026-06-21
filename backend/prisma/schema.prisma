@@ -24,6 +24,7 @@ model User {
   savingsBase    SavingsBase?
   accounts       Account[]
   recurringRules RecurringRule[]
+  notifications  Notification[]
 }
 
 model Income {
@@ -155,5 +156,28 @@ model RecurringRule {
   incomes     Income[]
   expenses    Expense[]
 
+  notifications Notification[]
+
   @@index([userId, isActive, nextRunDate])
+}
+
+enum NotificationType {
+  INCOME_CREDITED
+  EXPENSE_DEBITED
+}
+
+model Notification {
+  id              String           @id @default(uuid())
+  userId          String
+  recurringRuleId String?
+  type            NotificationType
+  title           String
+  body            String
+  isRead          Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recurringRule RecurringRule? @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead, createdAt(sort: Desc)])
 }
