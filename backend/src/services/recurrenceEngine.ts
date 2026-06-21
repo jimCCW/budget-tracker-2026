@@ -22,6 +22,7 @@ export async function materializeDueTransactions(
   const rules = await prisma.recurringRule.findMany({
     where: { userId, isActive: true, nextRunDate: { lte: now } },
     orderBy: { nextRunDate: 'asc' },
+    include: { account: true, category: true },
   });
 
   let created = 0;
@@ -101,6 +102,41 @@ export async function materializeDueTransactions(
         });
 
         created++;
+
+        // Create notification for the materialized recurring transaction.
+        // Use occurrenceDate as createdAt so the notification timestamp matches
+        // the actual transaction date (catch-up runs may process past dates).
+        try {
+          const ruleName =
+            rule.note ||
+            rule.category?.name ||
+            (rule.kind === RecurringKind.INCOME ? 'Income' : 'Expense');
+
+          await prisma.notification.create({
+            data: {
+              userId,
+              recurringRuleId: rule.id,
+              type:
+                rule.kind === RecurringKind.INCOME
+                  ? 'INCOME_CREDITED'
+                  : 'EXPENSE_DEBITED',
+              title:
+                rule.kind === RecurringKind.INCOME
+                  ? `${ruleName} credited`
+                  : `${ruleName} debited`,
+              body:
+                rule.kind === RecurringKind.INCOME
+                  ? `+${rule.amount.toFixed(2)} deposited to ${rule.account.name}.`
+                  : `-${rule.amount.toFixed(2)} debited from ${rule.account.name}.`,
+              createdAt: occurrenceDate,
+            },
+          });
+        } catch (notifErr) {
+          console.error(
+            `recurrenceEngine: notification creation failed for rule ${rule.id}:`,
+            notifErr
+          );
+        }
       } catch (err: unknown) {
         // P2002 = unique constraint violation — occurrence already exists; skip
         if (isPrismaUniqueError(err)) {
