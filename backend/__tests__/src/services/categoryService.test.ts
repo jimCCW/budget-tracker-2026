@@ -54,10 +54,18 @@ describe('getAll', () => {
 
 describe('create', () => {
   it('creates a category scoped to the user', async () => {
-    const created = { id: 'cat-new', name: 'Transport', userId: USER_ID, isDefault: false };
+    const created = {
+      id: 'cat-new',
+      name: 'Transport',
+      userId: USER_ID,
+      isDefault: false,
+    };
     db.category.create.mockResolvedValue(created);
 
-    const result = await create(USER_ID, { name: 'Transport', type: 'EXPENSE' });
+    const result = await create(USER_ID, {
+      name: 'Transport',
+      type: 'EXPENSE',
+    });
 
     expect(db.category.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -90,7 +98,11 @@ describe('remove', () => {
   });
 
   it('throws FORBIDDEN when trying to delete a default category', async () => {
-    db.category.findUnique.mockResolvedValue({ id: 'cat-1', isDefault: true, userId: null });
+    db.category.findUnique.mockResolvedValue({
+      id: 'cat-1',
+      isDefault: true,
+      userId: null,
+    });
 
     await expect(remove(USER_ID, 'cat-1')).rejects.toMatchObject({
       code: 'FORBIDDEN',
@@ -110,7 +122,11 @@ describe('remove', () => {
   });
 
   it('throws CONFLICT when category has attached expenses', async () => {
-    db.category.findUnique.mockResolvedValue({ id: 'cat-3', isDefault: false, userId: USER_ID });
+    db.category.findUnique.mockResolvedValue({
+      id: 'cat-3',
+      isDefault: false,
+      userId: USER_ID,
+    });
     db.expense.count.mockResolvedValue(3);
 
     await expect(remove(USER_ID, 'cat-3')).rejects.toMatchObject({
@@ -119,7 +135,11 @@ describe('remove', () => {
   });
 
   it('deletes category and returns { deleted: true } when valid', async () => {
-    db.category.findUnique.mockResolvedValue({ id: 'cat-4', isDefault: false, userId: USER_ID });
+    db.category.findUnique.mockResolvedValue({
+      id: 'cat-4',
+      isDefault: false,
+      userId: USER_ID,
+    });
     db.expense.count.mockResolvedValue(0);
     db.category.delete.mockResolvedValue({});
 

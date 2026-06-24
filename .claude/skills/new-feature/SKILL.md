@@ -10,7 +10,7 @@ description: >
 
 # New Feature Workflow
 
-Three phases: **branch setup → guided development → push + PR**.
+Four phases: **branch setup → guided development → tests → push + PR**.
 
 ---
 
@@ -54,7 +54,74 @@ All code changes during this phase automatically land on `feature/<kebab-name>`.
 
 ---
 
-## Phase 3: Push + PR
+## Phase 3: Tests
+
+Once feature-dev is complete, before touching git, identify what needs testing and make all tests pass.
+
+### 3a. Identify changed files
+
+```bash
+git diff --name-only main
+```
+
+Group changed paths by side:
+
+- **Frontend** — anything under `frontend/` (excluding `frontend/__tests__/`)
+- **Backend** — anything under `backend/src/` (excluding `backend/__tests__/`)
+
+### 3b. Create or update test files
+
+For each changed source file, check whether a corresponding test file exists:
+
+| Changed file                                    | Expected test location                                         |
+| ----------------------------------------------- | -------------------------------------------------------------- |
+| `frontend/features/<feat>/components/Foo.tsx`   | `frontend/__tests__/features/<feat>/components/Foo.test.tsx`   |
+| `frontend/features/<feat>/hooks/useBar.ts`      | `frontend/__tests__/features/<feat>/hooks/useBar.test.ts`      |
+| `frontend/features/<feat>/schemas/barSchema.ts` | `frontend/__tests__/features/<feat>/schemas/barSchema.test.ts` |
+| `frontend/components/ui/Widget.tsx`             | `frontend/__tests__/components/ui/Widget.test.tsx`             |
+| `backend/src/services/fooService.ts`            | `backend/__tests__/src/services/fooService.test.ts`            |
+| `backend/src/utils/bar.ts`                      | `backend/__tests__/src/utils/bar.test.ts`                      |
+
+**If the test file does not exist:** write it now, covering the key behaviours of the changed code (happy paths + important error/edge cases).
+
+**If the test file already exists:** review it against the new code and add or update tests for any new/changed behaviour.
+
+**Frontend test patterns** (Vitest + React Testing Library):
+
+- Import test utilities from `vitest`, render components with `@testing-library/react`
+- Mock PrimeReact components as plain HTML, mock `AppShell` as `<div>{children}</div>`
+- Mock hooks with `vi.mock('@/features/.../hooks/useXxx')` and `vi.mocked(...).mockReturnValue(...)`
+- Run with: `cd frontend && pnpm test:run`
+
+**Backend test patterns** (Jest):
+
+- `jest.mock('../../../src/lib/prisma', () => ({ prisma: { ... } }))` before imports
+- `$transaction`: `db.$transaction.mockImplementation((fn) => fn(mockTx))`
+- Run with: `cd backend && npx jest`
+
+### 3c. Run the full test suite(s)
+
+Run tests for every side that has changed files:
+
+```bash
+# If frontend files changed:
+cd frontend && pnpm test:run
+
+# If backend files changed:
+cd backend && npx jest
+```
+
+### 3d. Fix failures before continuing
+
+If any tests fail, fix the underlying code or tests until the full suite is green. Do **not** proceed to Phase 4 until all tests pass.
+
+Once green, tell the user:
+
+> All tests pass. Ready to commit and open a PR.
+
+---
+
+## Phase 4: Push + PR
 
 Once the feature-dev workflow is complete and the user confirms they are done, say:
 

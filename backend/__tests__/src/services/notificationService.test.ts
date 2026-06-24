@@ -67,7 +67,11 @@ describe('getNotifications', () => {
   });
 
   it('returns nextCursor when there are more results than the limit', async () => {
-    const rows = [makeNotification('n-1'), makeNotification('n-2'), makeNotification('n-3')];
+    const rows = [
+      makeNotification('n-1'),
+      makeNotification('n-2'),
+      makeNotification('n-3'),
+    ];
     db.notification.findMany.mockResolvedValue(rows);
 
     const result = await getNotifications(USER_ID, undefined, 2);
@@ -107,7 +111,9 @@ describe('markAsRead', () => {
   it('throws NOT_FOUND when notification does not exist or belongs to another user', async () => {
     db.notification.findFirst.mockResolvedValue(null);
 
-    await expect(markAsRead(USER_ID, 'n-x')).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    await expect(markAsRead(USER_ID, 'n-x')).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
   });
 
   it('marks the notification as read and returns the updated record', async () => {
@@ -147,7 +153,9 @@ describe('deleteNotification', () => {
   it('throws NOT_FOUND when notification does not exist or belongs to another user', async () => {
     db.notification.deleteMany.mockResolvedValue({ count: 0 });
 
-    await expect(deleteNotification(USER_ID, 'n-x')).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    await expect(deleteNotification(USER_ID, 'n-x')).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
   });
 
   it('deletes the notification when it belongs to the user', async () => {

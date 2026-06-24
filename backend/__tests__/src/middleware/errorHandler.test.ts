@@ -57,7 +57,10 @@ describe('errorHandler', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' },
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An unexpected error occurred',
+      },
     });
   });
 

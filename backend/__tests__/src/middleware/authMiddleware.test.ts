@@ -1,6 +1,9 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { authMiddleware, AuthRequest } from '../../../src/middleware/authMiddleware';
+import {
+  authMiddleware,
+  AuthRequest,
+} from '../../../src/middleware/authMiddleware';
 
 jest.mock('jsonwebtoken');
 const mockVerify = jwt.verify as jest.Mock;

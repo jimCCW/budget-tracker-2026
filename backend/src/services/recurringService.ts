@@ -1,4 +1,4 @@
-import { PrismaClient, RecurrenceType, RecurringKind } from '@prisma/client';
+import { RecurrenceType, RecurringKind } from '@prisma/client';
 import { appError } from '../utils/appError';
 import {
   verifyAccountOwnership,
@@ -6,8 +6,7 @@ import {
 } from '../utils/authorizationUtils';
 import { firstRunDate } from '../utils/recurrence';
 import { materializeDueTransactions } from './recurrenceEngine';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 /**
  * Returns all recurring rules for the given user, ordered by creation date.

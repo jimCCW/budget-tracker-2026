@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import { appError } from '../utils/appError';
 import {
   verifyAccountOwnership,
   verifyCategoryOwnership,
 } from '../utils/authorizationUtils';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 /**
  * Returns all expense records for the given user, optionally filtered by date range.

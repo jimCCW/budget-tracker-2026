@@ -16,6 +16,10 @@ npx prisma migrate dev
 npx prisma db seed
 pnpm dev
 
+# Backend tests (use npx jest — pnpm test fails due to bcrypt build script policy)
+cd backend && npx jest
+cd backend && npx jest --watch
+
 # Frontend
 cd frontend && pnpm install
 pnpm dev
@@ -217,12 +221,27 @@ Standard error codes and their HTTP status:
 
 ### Database
 
+- All services must import `prisma` from `'../lib/prisma'` (the shared singleton), never `new PrismaClient()` — per-file instances block mock injection in tests.
 - Never hard-delete default categories (`isDefault: true`) — guard in service layer
 - SavingsBase is one-to-one with User — upsert, never insert a duplicate
 - User data must always be scoped to `req.user.id` — never trust userId from request body
 - Prisma `update`/`delete` only accept unique fields in `where`. For ownership checks: use `findFirst({ where: { id, userId } })` then `update({ where: { id } })`, or `deleteMany({ where: { id, userId } })` and throw 404 if `count === 0`.
 - To backdate a record with `@default(now())`, pass `createdAt` explicitly in `prisma.create()` — Prisma allows overriding the default.
 - `break` / `continue` cannot cross an async callback boundary (e.g. inside `prisma.$transaction(async tx => {...})`). Hoist early-exit guards **before** the `await prisma.$transaction(...)` call.
+
+### Testing
+
+- Test runner: **Jest** (not Vitest). Tests live in `backend/__tests__/src/` mirroring the source tree.
+- Run tests with `npx jest` from `backend/` — `pnpm test` fails due to bcrypt build script policy.
+- Mock the shared prisma singleton at the top of each test file (before imports):
+  ```ts
+  jest.mock('../../../src/lib/prisma', () => ({
+    prisma: { account: { findUnique: jest.fn(), ... }, $transaction: jest.fn() },
+  }));
+  ```
+- `$transaction` mock: `db.$transaction.mockImplementation((fn) => fn(mockTx))` where `mockTx` mirrors the model methods used inside the callback.
+- Services with module-level state (e.g. `catchupService`'s throttle Map): use `jest.resetModules()` + `jest.doMock()` + synchronous `require()` inside `beforeEach` so each test gets a fresh module instance.
+- Set `process.env.JWT_SECRET = 'test-secret'` in `beforeEach` when testing `authService` — env var is undefined in test context, causing `jwt.sign` to receive `undefined` as the secret.
 
 ---
 

@@ -1,8 +1,13 @@
-import { createCategorySchema, updateCategorySchema } from '../../../src/schemas/categorySchemas';
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from '../../../src/schemas/categorySchemas';
 
 describe('createCategorySchema', () => {
   it('accepts valid category', () => {
-    expect(createCategorySchema.safeParse({ name: 'Food', type: 'EXPENSE' }).success).toBe(true);
+    expect(
+      createCategorySchema.safeParse({ name: 'Food', type: 'EXPENSE' }).success
+    ).toBe(true);
   });
 
   it('accepts without optional type', () => {
@@ -11,7 +16,11 @@ describe('createCategorySchema', () => {
 
   it('accepts optional icon and color', () => {
     expect(
-      createCategorySchema.safeParse({ name: 'Food', icon: 'pi-tag', color: '#ff0000' }).success
+      createCategorySchema.safeParse({
+        name: 'Food',
+        icon: 'pi-tag',
+        color: '#ff0000',
+      }).success
     ).toBe(true);
   });
 
@@ -28,12 +37,16 @@ describe('createCategorySchema', () => {
   });
 
   it('rejects invalid type value', () => {
-    expect(createCategorySchema.safeParse({ name: 'Food', type: 'OTHER' }).success).toBe(false);
+    expect(
+      createCategorySchema.safeParse({ name: 'Food', type: 'OTHER' }).success
+    ).toBe(false);
   });
 });
 
 describe('updateCategorySchema', () => {
   it('accepts valid update data', () => {
-    expect(updateCategorySchema.safeParse({ name: 'Transport' }).success).toBe(true);
+    expect(updateCategorySchema.safeParse({ name: 'Transport' }).success).toBe(
+      true
+    );
   });
 });

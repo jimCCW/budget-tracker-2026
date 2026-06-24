@@ -1,4 +1,7 @@
-import { createAccountSchema, updateAccountSchema } from '../../../src/schemas/accountSchemas';
+import {
+  createAccountSchema,
+  updateAccountSchema,
+} from '../../../src/schemas/accountSchemas';
 
 describe('createAccountSchema', () => {
   it('accepts minimal valid account', () => {
@@ -8,7 +11,9 @@ describe('createAccountSchema', () => {
   it('accepts all account types', () => {
     const types = ['BANK', 'INVESTMENT', 'CRYPTO', 'CASH', 'CREDIT'];
     for (const type of types) {
-      expect(createAccountSchema.safeParse({ name: 'Acc', type }).success).toBe(true);
+      expect(createAccountSchema.safeParse({ name: 'Acc', type }).success).toBe(
+        true
+      );
     }
   });
 
@@ -37,7 +42,9 @@ describe('createAccountSchema', () => {
   });
 
   it('rejects invalid account type', () => {
-    expect(createAccountSchema.safeParse({ name: 'Acc', type: 'SAVINGS' }).success).toBe(false);
+    expect(
+      createAccountSchema.safeParse({ name: 'Acc', type: 'SAVINGS' }).success
+    ).toBe(false);
   });
 });
 
