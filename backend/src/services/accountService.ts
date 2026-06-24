@@ -1,7 +1,6 @@
-import { PrismaClient, Prisma, AccountType } from '@prisma/client';
+import { Prisma, AccountType } from '@prisma/client';
 import { appError } from '../utils/appError';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 const LIQUID_TYPES: AccountType[] = ['BANK', 'CASH'];
 const INVESTMENT_TYPES: AccountType[] = ['INVESTMENT', 'CRYPTO'];

@@ -1,7 +1,6 @@
-import { PrismaClient, RecurringKind } from '@prisma/client';
+import { RecurringKind } from '@prisma/client';
 import { computeNextRunDate } from '../utils/recurrence';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 const MAX_ITERATIONS_PER_RULE = 366;
 

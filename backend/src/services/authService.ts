@@ -1,11 +1,9 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 import { appError } from '../utils/appError';
+import { prisma } from '../lib/prisma';
 import { createDefault as createDefaultAccount } from './accountService';
-
-const prisma = new PrismaClient();
 
 /** Generates a random 5-digit numeric code as a string. */
 function generateCode(): string {
