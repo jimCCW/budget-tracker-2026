@@ -2,15 +2,17 @@
 name: new-feature
 description: >
   Orchestrates the full lifecycle of a new feature: creates a feature branch
-  from latest main, runs the guided feature-dev workflow, then commits, pushes,
-  and opens a PR to main when done. ALWAYS invoke this skill when the user says
-  anything like: "new feature", "start feature", "create feature", "implement
-  feature", "begin feature", or "/new-feature <name>".
+  from latest main, runs the guided feature-dev workflow, documents the
+  feature, then commits, pushes, and opens a PR to main when done. ALWAYS
+  invoke this skill when the user says anything like: "new feature", "create
+  new feature", "create a new feature", "start feature", "create feature",
+  "implement feature", "add feature", "build feature", "begin feature", or
+  "/new-feature <name>".
 ---
 
 # New Feature Workflow
 
-Four phases: **branch setup → guided development → tests → push + PR**.
+Five phases: **branch setup → guided development → documentation → tests → push + PR**.
 
 ---
 
@@ -54,11 +56,29 @@ All code changes during this phase automatically land on `feature/<kebab-name>`.
 
 ---
 
-## Phase 3: Tests
+## Phase 3: Documentation
 
-Once feature-dev is complete, before touching git, identify what needs testing and make all tests pass.
+Once feature-dev implementation is complete, document the feature before writing tests.
 
-### 3a. Identify changed files
+### 3a. Backend JSDoc
+
+If any files under `backend/src/services/`, `backend/src/controllers/`, or `backend/src/middleware/` changed during Phase 2, invoke the `backend-jsdoc` skill to verify every new/changed function in those files has an up-to-date JSDoc block, adding or updating any that are missing. Skip if no backend files changed.
+
+### 3b. Feature docs
+
+Invoke the `feature-docs` skill for `<kebab-name>` to create or update `docs/features/<kebab-name>.md` and keep `docs/INDEX.md` in sync.
+
+Tell the user:
+
+> Documentation complete (JSDoc + docs/features/<kebab-name>.md). Moving on to tests.
+
+---
+
+## Phase 4: Tests
+
+Once documentation is complete, before touching git, identify what needs testing and make all tests pass.
+
+### 4a. Identify changed files
 
 ```bash
 git diff --name-only main
@@ -69,7 +89,7 @@ Group changed paths by side:
 - **Frontend** — anything under `frontend/` (excluding `frontend/__tests__/`)
 - **Backend** — anything under `backend/src/` (excluding `backend/__tests__/`)
 
-### 3b. Create or update test files
+### 4b. Create or update test files
 
 For each changed source file, check whether a corresponding test file exists:
 
@@ -99,7 +119,7 @@ For each changed source file, check whether a corresponding test file exists:
 - `$transaction`: `db.$transaction.mockImplementation((fn) => fn(mockTx))`
 - Run with: `cd backend && npx jest`
 
-### 3c. Run the full test suite(s)
+### 4c. Run the full test suite(s)
 
 Run tests for every side that has changed files:
 
@@ -111,9 +131,9 @@ cd frontend && pnpm test:run
 cd backend && npx jest
 ```
 
-### 3d. Fix failures before continuing
+### 4d. Fix failures before continuing
 
-If any tests fail, fix the underlying code or tests until the full suite is green. Do **not** proceed to Phase 4 until all tests pass.
+If any tests fail, fix the underlying code or tests until the full suite is green. Do **not** proceed to Phase 5 until all tests pass.
 
 Once green, tell the user:
 
@@ -121,9 +141,9 @@ Once green, tell the user:
 
 ---
 
-## Phase 4: Push + PR
+## Phase 5: Push + PR
 
-Once the feature-dev workflow is complete and the user confirms they are done, say:
+Once documentation and tests are complete and the user confirms they are done, say:
 
 > Feature development complete. I'll now commit everything, push to `feature/<kebab-name>`, and open a PR to main.
 
