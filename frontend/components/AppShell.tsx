@@ -19,7 +19,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'pi-home', href: '/dashboard' },
-  { key: 'activity', label: 'Activity', icon: 'pi-list' },
+  { key: 'activity', label: 'Activity', icon: 'pi-list', href: '/activity' },
   // { key: 'goals', label: 'Goals', icon: 'pi-bullseye' }, // Temp disabled until we implement it
   { key: 'accounts', label: 'Accounts', icon: 'pi-wallet', href: '/accounts' },
   {
@@ -49,7 +49,7 @@ const FOOTER_ITEMS: NavItem[] = [
 
 const MOBILE_TABS: NavItem[] = [
   { key: 'dashboard', label: 'Home', icon: 'pi-home', href: '/dashboard' },
-  { key: 'activity', label: 'Activity', icon: 'pi-list' },
+  { key: 'activity', label: 'Activity', icon: 'pi-list', href: '/activity' },
   { key: 'goals', label: 'Goals', icon: 'pi-bullseye' },
   { key: 'profile', label: 'Profile', icon: 'pi-user' },
 ];
