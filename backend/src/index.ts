@@ -16,6 +16,7 @@ import incomeRoutes from './routes/incomeRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import recurringRoutes from './routes/recurringRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import activityRoutes from './routes/activityRoutes';
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -25,6 +26,7 @@ app.use('/api/income', incomeRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/recurring', recurringRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/activity', activityRoutes);
 // app.use('/api/summary', summaryRoutes);
 
 app.use(errorHandler);

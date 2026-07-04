@@ -9,6 +9,7 @@ import {
   type ColumnDef,
   type SortingState,
   type RowSelectionState,
+  type PaginationState,
   type Updater,
   type RowData,
 } from '@tanstack/react-table';
@@ -38,6 +39,16 @@ type DataTableProps<T> = {
   /** Enable row checkboxes. Fires onRowSelectionChange with selected rows. */
   enableRowSelection?: boolean;
   onRowSelectionChange?: (rows: T[]) => void;
+  /** Server-side pagination: `data` is already the current page's rows. */
+  manualPagination?: boolean;
+  /** Total page count from the server. Required when manualPagination is set. */
+  pageCount?: number;
+  /** 0-based current page index. Controlled, required when manualPagination is set. */
+  pageIndex?: number;
+  /** Fired with the new 0-based page index when the user paginates. */
+  onPageChange?: (pageIndex: number) => void;
+  /** Total row count across all pages. Enables the "Showing X-Y of Z" label (manual mode only). */
+  totalCount?: number;
 };
 
 const ALIGN: Record<string, string> = {
@@ -65,9 +76,17 @@ export function DataTable<T>({
   defaultPageSize = 10,
   enableRowSelection = false,
   onRowSelectionChange,
+  manualPagination = false,
+  pageCount,
+  pageIndex = 0,
+  onPageChange,
+  totalCount,
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [internalPagination, setInternalPagination] = useState<PaginationState>(
+    { pageIndex: 0, pageSize: defaultPageSize }
+  );
 
   const selectionColumn: ColumnDef<T> = {
     id: '_select',
@@ -93,13 +112,26 @@ export function DataTable<T>({
     ? [selectionColumn, ...columns]
     : columns;
 
+  const pagination: PaginationState = manualPagination
+    ? { pageIndex, pageSize: defaultPageSize }
+    : internalPagination;
+
   const table = useReactTable({
     data,
     columns: allColumns,
-    state: { sorting, rowSelection },
+    state: { sorting, rowSelection, pagination },
+    manualPagination,
+    pageCount: manualPagination ? (pageCount ?? -1) : undefined,
     enableSorting,
     enableRowSelection,
     onSortingChange: setSorting,
+    onPaginationChange: manualPagination
+      ? (updater: Updater<PaginationState>) => {
+          const next =
+            typeof updater === 'function' ? updater(pagination) : updater;
+          onPageChange?.(next.pageIndex);
+        }
+      : setInternalPagination,
     onRowSelectionChange: (updater: Updater<RowSelectionState>) => {
       setRowSelection((prev) =>
         typeof updater === 'function' ? updater(prev) : updater
@@ -107,9 +139,10 @@ export function DataTable<T>({
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
-    getPaginationRowModel: enablePagination
-      ? getPaginationRowModel()
-      : undefined,
+    getPaginationRowModel:
+      enablePagination && !manualPagination
+        ? getPaginationRowModel()
+        : undefined,
     initialState: { pagination: { pageSize: defaultPageSize, pageIndex: 0 } },
   });
 
@@ -214,13 +247,22 @@ export function DataTable<T>({
       {enablePagination && (
         <div className='flex items-center justify-between pt-4 border-t border-border mt-4'>
           <p className='text-xs text-text-muted'>
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
+            {manualPagination && totalCount != null
+              ? totalCount === 0
+                ? 'Showing 0 of 0'
+                : `Showing ${pageIndex * defaultPageSize + 1}–${Math.min((pageIndex + 1) * defaultPageSize, totalCount)} of ${totalCount}`
+              : `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
             {enableRowSelection && selectedCount > 0
               ? ` · ${selectedCount} selected`
               : ''}
           </p>
-          <div className='flex items-center gap-1'>
+          <div className='flex items-center gap-2'>
+            {manualPagination && totalCount != null && (
+              <span className='text-xs text-text-muted'>
+                Page {table.getState().pagination.pageIndex + 1} of{' '}
+                {table.getPageCount()}
+              </span>
+            )}
             <Button
               icon='pi pi-angle-left'
               disabled={!table.getCanPreviousPage()}
