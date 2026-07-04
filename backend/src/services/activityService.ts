@@ -66,6 +66,7 @@ function encodeCursor(item: ActivityItem): string {
   return Buffer.from(JSON.stringify(cursor)).toString('base64');
 }
 
+/** Builds a Prisma date-range filter from startDate/endDate, or undefined if neither is set. */
 function buildDateRange(
   filters: ActivityFilters
 ): { gte?: Date; lte?: Date } | undefined {
@@ -93,6 +94,7 @@ function keysetCondition(cursor?: Cursor) {
   };
 }
 
+/** Builds the Expense `where` clause for the given user, filters, and optional keyset cursor. */
 function buildExpenseWhere(
   userId: string,
   filters: ActivityFilters,
@@ -110,6 +112,7 @@ function buildExpenseWhere(
   return keyset ? { AND: [base, keyset] } : base;
 }
 
+/** Builds the Income `where` clause for the given user, filters, and optional keyset cursor. */
 function buildIncomeWhere(
   userId: string,
   filters: ActivityFilters,
@@ -140,6 +143,7 @@ type IncomeRow = Prisma.IncomeGetPayload<{
   include: { category: true; account: true };
 }>;
 
+/** Maps a raw Expense or Income row (with category/account included) into the shared ActivityItem shape. */
 function toActivityRow(
   type: ActivityType,
   row: ExpenseRow | IncomeRow
@@ -165,6 +169,7 @@ function toActivityRow(
   };
 }
 
+/** Comparator for the merged feed's sort order: date desc, then createdAt desc, then id desc. */
 function compareDesc(a: ActivityItem, b: ActivityItem): number {
   if (a.date !== b.date) return a.date < b.date ? 1 : -1;
   if (a.createdAt !== b.createdAt) return a.createdAt < b.createdAt ? 1 : -1;
@@ -179,6 +184,8 @@ function compareDesc(a: ActivityItem, b: ActivityItem): number {
  * @param filters - Type/category/date-range/search filters applied to both tables.
  * @param cursorStr - Opaque cursor from a previous page's `nextCursor`, or undefined for page 1.
  * @param pageSize - Rows per page.
+ * @returns One page of items plus `nextCursor`/`hasNextPage` and the overall `total`/`totalPages`.
+ * @throws VALIDATION_ERROR (400) if `cursorStr` is malformed or has been tampered with.
  */
 export async function getActivity(
   userId: string,
@@ -236,6 +243,7 @@ export async function getActivity(
  * used for Excel export so the file always reflects every filtered row, not just one page.
  * @param userId - The authenticated user's ID.
  * @param filters - Type/category/date-range/search filters applied to both tables.
+ * @returns Every matching row across both tables, merged and sorted, with no pagination applied.
  */
 export async function getActivityForExport(
   userId: string,

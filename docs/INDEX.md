@@ -6,6 +6,7 @@
 
 ## Features
 
+- [Activity](features/activity.md) — Unified, filterable, paginated feed of expense and income transactions with Excel export
 - [Categories](features/categories.md) — Create, manage, and organise expense and income categories with icons and colours
 - [Expenses](features/expenses.md) — Record expense transactions; atomic account balance updates; date-range filtering
 - [Income](features/income.md) — Record income transactions; atomic account balance updates; month/year derived from date
