@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -267,6 +268,190 @@ describe('DataTable', () => {
       const checkboxes = screen.getAllByRole('checkbox');
       await user.click(checkboxes[1]);
       expect(screen.getByText(/1 selected/)).toBeInTheDocument();
+    });
+  });
+
+  describe('manual (server-side) pagination', () => {
+    function ControlledManualTable({
+      initialPageIndex = 0,
+      totalCount,
+    }: {
+      initialPageIndex?: number;
+      totalCount?: number;
+    }) {
+      const [pageIndex, setPageIndex] = useState(initialPageIndex);
+      return (
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          defaultPageSize={1}
+          pageIndex={pageIndex}
+          pageCount={3}
+          totalCount={totalCount}
+          onPageChange={setPageIndex}
+        />
+      );
+    }
+
+    it('renders every row passed in data, without slicing by defaultPageSize', () => {
+      // data has 2 rows; defaultPageSize is 1 — client mode would show only 1,
+      // but manual mode must treat `data` as an already-fetched page.
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          defaultPageSize={1}
+          pageIndex={0}
+          pageCount={5}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+    });
+
+    it('shows "Page X of Y" using the provided pageCount, not data.length', () => {
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={0}
+          pageCount={5}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(screen.getByText(/Page 1 of 5/)).toBeInTheDocument();
+    });
+
+    it('shows a "Showing X-Y of Z" label when totalCount is provided', () => {
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          defaultPageSize={10}
+          pageIndex={0}
+          pageCount={1}
+          totalCount={6}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(screen.getByText('Showing 1–6 of 6')).toBeInTheDocument();
+    });
+
+    it('shows "Showing 0 of 0" when totalCount is 0', () => {
+      render(
+        <DataTable
+          data={[]}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={0}
+          pageCount={0}
+          totalCount={0}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(screen.getByText('Showing 0 of 0')).toBeInTheDocument();
+    });
+
+    it('falls back to "Page X of Y" (no "Showing" label) when totalCount is omitted', () => {
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={0}
+          pageCount={2}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+      expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument();
+    });
+
+    it('disables the previous button on the first page', () => {
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={0}
+          pageCount={3}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(
+        screen.getByRole('button', { name: 'Previous page' })
+      ).toBeDisabled();
+    });
+
+    it('disables the next button on the last page (per the provided pageCount)', () => {
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={2}
+          pageCount={3}
+          onPageChange={vi.fn()}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    });
+
+    it('calls onPageChange with pageIndex + 1 when next is clicked, without mutating pageIndex itself', async () => {
+      const user = userEvent.setup();
+      const onPageChange = vi.fn();
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={0}
+          pageCount={3}
+          onPageChange={onPageChange}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(onPageChange).toHaveBeenCalledWith(1);
+    });
+
+    it('calls onPageChange with pageIndex - 1 when previous is clicked', async () => {
+      const user = userEvent.setup();
+      const onPageChange = vi.fn();
+      render(
+        <DataTable
+          data={rows}
+          columns={columns}
+          enablePagination
+          manualPagination
+          pageIndex={1}
+          pageCount={3}
+          onPageChange={onPageChange}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: 'Previous page' }));
+      expect(onPageChange).toHaveBeenCalledWith(0);
+    });
+
+    it('advances the displayed page when the parent updates the controlled pageIndex prop', async () => {
+      const user = userEvent.setup();
+      render(<ControlledManualTable />);
+      expect(screen.getByText(/Page 1 of 3/)).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(screen.getByText(/Page 2 of 3/)).toBeInTheDocument();
     });
   });
 });

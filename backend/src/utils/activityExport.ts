@@ -5,6 +5,7 @@ import type { ActivityItem } from '../services/activityService';
  * Builds an .xlsx workbook buffer for a set of activity rows.
  * Expense amounts are rendered negative so signed totals sum correctly in Excel.
  * @param rows - Activity items to export (already filtered/sorted by the caller).
+ * @returns The generated workbook as a Buffer, ready to stream in an HTTP response.
  */
 export async function buildActivityWorkbook(
   rows: ActivityItem[]

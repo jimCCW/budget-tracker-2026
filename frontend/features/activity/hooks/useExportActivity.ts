@@ -6,13 +6,14 @@ import type { ActivityFilters } from '../types/activity';
 async function parseBlobError(err: unknown): Promise<never> {
   const response = (err as { response?: { data?: unknown } })?.response;
   if (response?.data instanceof Blob) {
+    let message = 'Export failed.';
     try {
       const text = await response.data.text();
-      const parsed = JSON.parse(text);
-      throw new Error(parsed?.error?.message ?? 'Export failed.');
+      message = JSON.parse(text)?.error?.message ?? message;
     } catch {
-      throw new Error('Export failed.');
+      // response body wasn't valid JSON — fall back to the generic message
     }
+    throw new Error(message);
   }
   throw err;
 }
