@@ -6,7 +6,9 @@ declare module 'next-auth' {
     accessToken: string;
     user: {
       id: string;
-      name?: string | null;
+      name: string;
+      firstName: string;
+      lastName: string;
       email?: string | null;
       image?: string | null;
     };
@@ -14,6 +16,9 @@ declare module 'next-auth' {
 
   interface User {
     token: string;
+    name: string;
+    firstName: string;
+    lastName: string;
   }
 }
 
@@ -21,5 +26,8 @@ declare module 'next-auth/jwt' {
   interface JWT {
     accessToken: string;
     id: string;
+    name: string;
+    firstName: string;
+    lastName: string;
   }
 }

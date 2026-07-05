@@ -12,6 +12,8 @@ model User {
   email                String    @unique
   passwordHash         String
   name                 String?
+  firstName            String
+  lastName             String
   isActive             Boolean   @default(false)
   activationCode       String?
   activationCodeExpiry DateTime?

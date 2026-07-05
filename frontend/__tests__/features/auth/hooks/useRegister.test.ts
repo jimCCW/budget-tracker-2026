@@ -12,6 +12,8 @@ const mockPost = vi.mocked(apiClient.post);
 
 const validInput = {
   name: 'Jane Doe',
+  firstName: 'Jane',
+  lastName: 'Doe',
   email: 'jane@example.com',
   password: 'Secure1!',
 };
@@ -37,6 +39,8 @@ describe('useRegister', () => {
 
     expect(mockPost).toHaveBeenCalledWith('/api/auth/register', {
       name: validInput.name,
+      firstName: validInput.firstName,
+      lastName: validInput.lastName,
       email: validInput.email,
       password: validInput.password,
     });

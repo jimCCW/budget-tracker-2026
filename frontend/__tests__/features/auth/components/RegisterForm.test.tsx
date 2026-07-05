@@ -112,6 +112,8 @@ describe('RegisterForm', () => {
   it('renders all form fields', () => {
     render(<RegisterForm />, { wrapper: createWrapper() });
     expect(screen.getByPlaceholderText('Full name')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('First name')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Last name')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Email address')).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText('Password (8+ characters)')
@@ -130,11 +132,35 @@ describe('RegisterForm', () => {
     });
   });
 
+  it('shows required error for empty firstName on submit', async () => {
+    const user = userEvent.setup();
+    render(<RegisterForm />, { wrapper: createWrapper() });
+
+    await user.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('First name is required')).toBeInTheDocument();
+    });
+  });
+
+  it('shows required error for empty lastName on submit', async () => {
+    const user = userEvent.setup();
+    render(<RegisterForm />, { wrapper: createWrapper() });
+
+    await user.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Last name is required')).toBeInTheDocument();
+    });
+  });
+
   it('shows password mismatch error', async () => {
     const user = userEvent.setup();
     render(<RegisterForm />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('Full name'), 'Alice');
+    await user.type(screen.getByPlaceholderText('First name'), 'Alice');
+    await user.type(screen.getByPlaceholderText('Last name'), 'Anderson');
     await user.type(
       screen.getByPlaceholderText('Email address'),
       'alice@example.com'
@@ -161,6 +187,8 @@ describe('RegisterForm', () => {
     render(<RegisterForm />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText('Full name'), 'Alice');
+    await user.type(screen.getByPlaceholderText('First name'), 'Alice');
+    await user.type(screen.getByPlaceholderText('Last name'), 'Anderson');
     await user.type(
       screen.getByPlaceholderText('Email address'),
       'alice@example.com'

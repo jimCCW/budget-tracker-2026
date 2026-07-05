@@ -3,6 +3,8 @@ import { registerSchema } from '@/features/auth/schemas/registerSchema';
 
 const valid = {
   name: 'Alice',
+  firstName: 'Alice',
+  lastName: 'Anderson',
   email: 'alice@example.com',
   password: 'Pass1word!',
   confirmPassword: 'Pass1word!',
@@ -19,6 +21,22 @@ describe('registerSchema', () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0].message).toBe('Full name is required');
+    }
+  });
+
+  it('rejects empty firstName', () => {
+    const result = registerSchema.safeParse({ ...valid, firstName: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe('First name is required');
+    }
+  });
+
+  it('rejects empty lastName', () => {
+    const result = registerSchema.safeParse({ ...valid, lastName: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe('Last name is required');
     }
   });
 
