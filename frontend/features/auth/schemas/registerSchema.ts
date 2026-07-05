@@ -4,6 +4,8 @@ import { passwordSchema } from './passwordSchema';
 export const registerSchema = z
   .object({
     name: z.string().min(1, 'Full name is required'),
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
     email: z
       .string()
       .min(1, 'Email is required')

@@ -11,6 +11,8 @@ describe('registerSchema', () => {
     email: 'user@example.com',
     password: 'Pass1word!',
     name: 'Alice',
+    firstName: 'Alice',
+    lastName: 'Anderson',
   };
 
   it('accepts valid registration data', () => {
@@ -45,6 +47,20 @@ describe('registerSchema', () => {
     expect(r.success).toBe(false);
     if (!r.success)
       expect(r.error.errors[0].message).toBe('Full name is required');
+  });
+
+  it('rejects empty firstName', () => {
+    const r = registerSchema.safeParse({ ...valid, firstName: '' });
+    expect(r.success).toBe(false);
+    if (!r.success)
+      expect(r.error.errors[0].message).toBe('First name is required');
+  });
+
+  it('rejects empty lastName', () => {
+    const r = registerSchema.safeParse({ ...valid, lastName: '' });
+    expect(r.success).toBe(false);
+    if (!r.success)
+      expect(r.error.errors[0].message).toBe('Last name is required');
   });
 });
 

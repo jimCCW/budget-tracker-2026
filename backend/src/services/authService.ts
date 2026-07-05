@@ -28,7 +28,7 @@ function logActivation(email: string, code: string): void {
 
 /**
  * Creates a new inactive user account, hashes the password, and sends a 5-digit activation code.
- * @param data - Registration payload containing email, plain-text password, and full name.
+ * @param data - Registration payload containing email, plain-text password, full name, first name, and last name.
  * @returns The email address of the newly created account.
  * @throws CONFLICT (409) if the email is already registered.
  */
@@ -36,6 +36,8 @@ export async function register(data: {
   email: string;
   password: string;
   name: string;
+  firstName: string;
+  lastName: string;
 }) {
   const existing = await prisma.user.findUnique({
     where: { email: data.email },
@@ -56,6 +58,8 @@ export async function register(data: {
         email: data.email,
         passwordHash,
         name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
         isActive: false,
         activationCode: code,
         activationCodeExpiry: codeExpiry(),
@@ -121,7 +125,7 @@ export async function resendActivation(data: { email: string }) {
 /**
  * Verifies credentials and returns a signed 7-day JWT along with basic user info.
  * @param data - Object containing the user's email and plain-text password.
- * @returns JWT token, user id, email, and display name.
+ * @returns JWT token, user id, email, full name, first name, and last name.
  * @throws UNAUTHORIZED (401) if the email is not found or the password is incorrect.
  * @throws FORBIDDEN (403) if the account has not been activated yet.
  */
@@ -146,7 +150,14 @@ export async function login(data: { email: string; password: string }) {
     { expiresIn: '7d' }
   );
 
-  return { token, id: user.id, email: user.email, name: user.name };
+  return {
+    token,
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  };
 }
 
 /**
