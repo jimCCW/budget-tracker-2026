@@ -11,6 +11,8 @@ async function registerFn(
     { success: boolean; data: { email: string } }
   >('/api/auth/register', {
     name: values.name,
+    firstName: values.firstName,
+    lastName: values.lastName,
     email: values.email,
     password: values.password,
   });

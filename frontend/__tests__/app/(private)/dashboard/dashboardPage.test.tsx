@@ -72,14 +72,16 @@ const stubSummary = {
 function setupMocks({
   isLoading = false,
   summary = stubSummary,
-  userName = 'Alex Tan',
+  firstName = 'Alex',
 }: {
   isLoading?: boolean;
   summary?: typeof stubSummary | undefined;
-  userName?: string | null;
+  firstName?: string | null;
 } = {}) {
   mockUseSession.mockReturnValue({
-    data: userName ? { user: { name: userName } } : null,
+    data: firstName
+      ? { user: { firstName, lastName: 'Tan', name: `${firstName} Tan` } }
+      : null,
     status: 'authenticated',
   } as never);
   mockUseDashboardSummary.mockReturnValue({
@@ -90,13 +92,13 @@ function setupMocks({
 
 describe('DashboardPage', () => {
   it("renders a greeting using the session user's first name", () => {
-    setupMocks({ userName: 'Alex Tan' });
+    setupMocks({ firstName: 'Alex' });
     render(<DashboardPage />);
     expect(screen.getByText('Hi, Alex')).toBeInTheDocument();
   });
 
   it('falls back to a generic greeting when there is no session name', () => {
-    setupMocks({ userName: null });
+    setupMocks({ firstName: null });
     render(<DashboardPage />);
     expect(screen.getByText('Hi, there')).toBeInTheDocument();
   });

@@ -52,6 +52,8 @@ const makeUser = (overrides: Record<string, unknown> = {}) => ({
   id: USER_ID,
   email: EMAIL,
   name: 'Test User',
+  firstName: 'Test',
+  lastName: 'User',
   passwordHash: 'hashed-pw',
   isActive: true,
   activationCode: null,
@@ -68,7 +70,13 @@ describe('register', () => {
     db.user.findUnique.mockResolvedValue(makeUser());
 
     await expect(
-      register({ email: EMAIL, password: 'pass', name: 'Test' })
+      register({
+        email: EMAIL,
+        password: 'pass',
+        name: 'Test',
+        firstName: 'Test',
+        lastName: 'User',
+      })
     ).rejects.toMatchObject({ code: 'CONFLICT' });
   });
 
@@ -85,7 +93,13 @@ describe('register', () => {
       (fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
     );
 
-    await register({ email: EMAIL, password: 'secret', name: 'Test User' });
+    await register({
+      email: EMAIL,
+      password: 'secret',
+      name: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
+    });
 
     expect(mockBcrypt.hash).toHaveBeenCalledWith('secret', 10);
     expect(mockTx.user.create).toHaveBeenCalledWith(
@@ -95,6 +109,8 @@ describe('register', () => {
           passwordHash: 'hashed-pw',
           isActive: false,
           name: 'Test User',
+          firstName: 'Test',
+          lastName: 'User',
         }),
       })
     );
@@ -115,6 +131,8 @@ describe('register', () => {
       email: EMAIL,
       password: 'pass',
       name: 'Test',
+      firstName: 'Test',
+      lastName: 'User',
     });
     expect(result).toEqual({ email: EMAIL });
   });
@@ -264,7 +282,12 @@ describe('login', () => {
   });
 
   it('returns token and user info on success', async () => {
-    const user = makeUser({ isActive: true, name: 'Test User' });
+    const user = makeUser({
+      isActive: true,
+      name: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
+    });
     db.user.findUnique.mockResolvedValue(user);
 
     const result = await login({ email: EMAIL, password: 'correct' });
@@ -279,6 +302,8 @@ describe('login', () => {
       id: USER_ID,
       email: EMAIL,
       name: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
     });
   });
 });

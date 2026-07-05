@@ -80,6 +80,40 @@ export function RegisterForm() {
         )}
       </div>
 
+      {/* First / Last name */}
+      <div className='flex gap-3'>
+        <div className='flex flex-col gap-1 flex-1'>
+          <div className='relative'>
+            <i className={`${iconBase} pi-user`} />
+            <InputText
+              {...register('firstName')}
+              type='text'
+              placeholder='First name'
+              autoComplete='given-name'
+              className={`${inputBase} ${errors.firstName ? 'border-danger' : 'border-border'}`}
+            />
+          </div>
+          {errors.firstName && (
+            <p className='text-xs text-danger'>{errors.firstName.message}</p>
+          )}
+        </div>
+        <div className='flex flex-col gap-1 flex-1'>
+          <div className='relative'>
+            <i className={`${iconBase} pi-user`} />
+            <InputText
+              {...register('lastName')}
+              type='text'
+              placeholder='Last name'
+              autoComplete='family-name'
+              className={`${inputBase} ${errors.lastName ? 'border-danger' : 'border-border'}`}
+            />
+          </div>
+          {errors.lastName && (
+            <p className='text-xs text-danger'>{errors.lastName.message}</p>
+          )}
+        </div>
+      </div>
+
       {/* Email */}
       <div className='flex flex-col gap-1'>
         <div className='relative'>

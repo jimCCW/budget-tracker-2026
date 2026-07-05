@@ -66,14 +66,11 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
   const { data: unreadCount = 0 } = useUnreadCount();
   const pathname = usePathname();
   const { data: session } = useSession();
-  const userName = session?.user?.name ?? 'Alex';
+  const firstName = session?.user?.firstName ?? 'Anonymous';
+  const lastName = session?.user?.lastName ?? '';
+  const displayName = session?.user?.name ?? 'Anonymous';
   const userEmail = session?.user?.email ?? '';
-  const initials = userName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase();
 
   const isActive = (item: NavItem) =>
     item.href
@@ -138,7 +135,9 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
               {initials}
             </div>
             <div className='flex-1 min-w-0'>
-              <div className='text-[12.5px] font-bold truncate'>{userName}</div>
+              <div className='text-[12.5px] font-bold truncate'>
+                {displayName}
+              </div>
               <div className='text-[10.5px] text-text-muted truncate'>
                 {userEmail}
               </div>

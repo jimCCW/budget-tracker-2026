@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/formatCurrency';
 
 export function DashboardPage() {
   const { data: session } = useSession();
-  const firstName = session?.user?.name?.split(' ')[0] || 'there';
+  const firstName = session?.user?.firstName || 'there';
   const monthLabel = dayjs().format('MMMM YYYY');
 
   const { data: summary, isLoading } = useDashboardSummary();
