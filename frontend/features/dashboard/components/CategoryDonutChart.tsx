@@ -1,11 +1,18 @@
 'use client';
+import Link from 'next/link';
 import { PieChart, Pie, ResponsiveContainer } from 'recharts';
-import { SAMPLE } from '../data';
 import { formatCurrency, formatCurrencyShort } from '@/lib/formatCurrency';
 
-export function CategoryDonutChart() {
-  const total = SAMPLE.monthExpense;
-  const data = SAMPLE.topExpenses.map((e) => ({
+type CategoryDonutChartProps = {
+  categories: { name: string; icon: string; color: string; value: number }[];
+  total: number;
+};
+
+export function CategoryDonutChart({
+  categories,
+  total,
+}: CategoryDonutChartProps) {
+  const data = categories.map((e) => ({
     name: e.name,
     value: e.value,
     fill: e.color,
@@ -15,12 +22,12 @@ export function CategoryDonutChart() {
     <div className='bg-surface rounded-lg border border-border shadow-sm p-5'>
       <div className='flex items-center justify-between mb-4'>
         <div className='text-[15px] font-bold'>Spending by category</div>
-        <a
+        <Link
           href='/categories'
           className='text-xs text-primary font-semibold cursor-pointer hover:underline'
         >
           Details
-        </a>
+        </Link>
       </div>
 
       <div className='flex flex-col items-center gap-4'>
@@ -64,10 +71,15 @@ export function CategoryDonutChart() {
                 {formatCurrency(item.value)}
               </span>
               <span className='text-text-dim tabular-nums w-10 text-right'>
-                {Math.round((item.value / total) * 100)}%
+                {total > 0 ? Math.round((item.value / total) * 100) : 0}%
               </span>
             </div>
           ))}
+          {data.length === 0 && (
+            <div className='text-xs text-text-muted text-center py-2'>
+              No expenses yet this month
+            </div>
+          )}
         </div>
       </div>
     </div>

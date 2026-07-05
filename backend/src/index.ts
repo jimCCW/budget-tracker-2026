@@ -17,6 +17,7 @@ import expenseRoutes from './routes/expenseRoutes';
 import recurringRoutes from './routes/recurringRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import activityRoutes from './routes/activityRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -27,6 +28,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/recurring', recurringRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 // app.use('/api/summary', summaryRoutes);
 
 app.use(errorHandler);
