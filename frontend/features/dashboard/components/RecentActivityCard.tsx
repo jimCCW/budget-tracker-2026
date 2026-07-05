@@ -33,7 +33,7 @@ export function RecentActivityCard() {
           </div>
         </div>
         <Link
-          href='/expenses'
+          href='/activity'
           className='text-sm font-semibold text-text-muted hover:text-text flex items-center gap-1 transition-colors'
         >
           See all <i className='pi pi-arrow-right text-xs' />

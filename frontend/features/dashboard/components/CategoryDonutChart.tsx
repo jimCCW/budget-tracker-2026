@@ -23,7 +23,7 @@ export function CategoryDonutChart({
       <div className='flex items-center justify-between mb-4'>
         <div className='text-[15px] font-bold'>Spending by category</div>
         <Link
-          href='/categories'
+          href='/activity?type=EXPENSE'
           className='text-xs text-primary font-semibold cursor-pointer hover:underline'
         >
           Details

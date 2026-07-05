@@ -13,9 +13,19 @@ import {
 } from '../utils/dateRangePresets';
 import type { ActivityFilters } from '../types/activity';
 
-export function ActivityPage() {
-  const [type, setType] = useState<ActivityFilters['type']>('ALL');
-  const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+type ActivityPageProps = {
+  initialType?: ActivityFilters['type'];
+  initialCategoryId?: string;
+};
+
+export function ActivityPage({
+  initialType = 'ALL',
+  initialCategoryId,
+}: ActivityPageProps = {}) {
+  const [type, setType] = useState<ActivityFilters['type']>(initialType);
+  const [categoryId, setCategoryId] = useState<string | undefined>(
+    initialCategoryId
+  );
   const [datePreset, setDatePreset] = useState<DateRangePreset>('month');
   const [search, setSearch] = useState<string | undefined>(undefined);
 
