@@ -51,5 +51,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: { signIn: '/login' },
-  session: { strategy: 'jwt' },
+  // Matches the backend JWT's `expiresIn: '7d'` so the route guard rejects an
+  // expired session instead of letting the user into a UI that only 401s.
+  session: { strategy: 'jwt', maxAge: 7 * 24 * 60 * 60 },
 };
