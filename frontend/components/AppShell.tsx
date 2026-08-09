@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { AddTransactionModal } from '@/features/transactions/components/AddTransactionModal';
 import { useScheduledCatchup } from '@/features/recurring/hooks/useScheduledCatchup';
 import { useUnreadCount } from '@/features/notifications/hooks/useUnreadCount';
+import { logout } from '@/lib/logout';
 
 type NavItem = {
   key: string;
@@ -43,15 +44,14 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const FOOTER_ITEMS: NavItem[] = [
-  { key: 'profile', label: 'Profile', icon: 'pi-user' },
-  { key: 'settings', label: 'Settings', icon: 'pi-cog' },
+  { key: 'settings', label: 'Settings', icon: 'pi-cog', href: '/settings' },
 ];
 
 const MOBILE_TABS: NavItem[] = [
   { key: 'dashboard', label: 'Home', icon: 'pi-home', href: '/dashboard' },
   { key: 'activity', label: 'Activity', icon: 'pi-list', href: '/activity' },
   { key: 'goals', label: 'Goals', icon: 'pi-bullseye' },
-  { key: 'profile', label: 'Profile', icon: 'pi-user' },
+  { key: 'settings', label: 'Settings', icon: 'pi-cog', href: '/settings' },
 ];
 
 type AppShellProps = {
@@ -144,7 +144,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
             </div>
             <Button
               icon='pi pi-sign-out'
-              onClick={() => signOut({ callbackUrl: '/login' })}
+              onClick={() => logout()}
               aria-label='Sign out'
               pt={{
                 root: {

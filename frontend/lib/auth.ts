@@ -31,13 +31,20 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.accessToken = user.token;
         token.id = user.id;
         token.name = user.name;
         token.firstName = user.firstName;
         token.lastName = user.lastName;
+      }
+      // Fired by useSession().update(...) after a profile edit — merges the
+      // fresh name/firstName/lastName into the token without a re-login.
+      if (trigger === 'update' && session) {
+        token.name = session.name ?? token.name;
+        token.firstName = session.firstName ?? token.firstName;
+        token.lastName = session.lastName ?? token.lastName;
       }
       return token;
     },

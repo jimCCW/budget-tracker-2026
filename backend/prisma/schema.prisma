@@ -19,6 +19,8 @@ model User {
   activationCodeExpiry DateTime?
   resetToken           String?
   resetTokenExpiry     DateTime?
+  currency             String    @default("SGD")
+  language             String    @default("English")
   createdAt            DateTime  @default(now())
   incomes        Income[]
   expenses       Expense[]
@@ -27,6 +29,18 @@ model User {
   accounts       Account[]
   recurringRules RecurringRule[]
   notifications  Notification[]
+  sessions       UserSession[]
+}
+
+model UserSession {
+  id        String    @id @default(uuid())
+  userId    String
+  userAgent String?
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
 }
 
 model Income {
