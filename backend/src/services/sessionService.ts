@@ -50,7 +50,8 @@ export async function revokeSession(
     where: { id: sessionId, userId, revokedAt: null },
     data: { revokedAt: new Date() },
   });
-  if (result.count === 0) throw appError('NOT_FOUND', 'Session not found.', 404);
+  if (result.count === 0)
+    throw appError('NOT_FOUND', 'Session not found.', 404);
 
   return { revoked: true };
 }

@@ -115,9 +115,7 @@ describe('DeleteAccountModal', () => {
     const user = userEvent.setup();
     render(<DeleteAccountModal open={true} onClose={vi.fn()} />);
 
-    await user.click(
-      screen.getByRole('button', { name: 'Delete my account' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Delete my account' }));
 
     await waitFor(() => {
       expect(screen.getByText('Password is required')).toBeInTheDocument();
@@ -135,9 +133,7 @@ describe('DeleteAccountModal', () => {
       screen.getByPlaceholderText('Current password'),
       'MyPassw0rd!'
     );
-    await user.click(
-      screen.getByRole('button', { name: 'Delete my account' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Delete my account' }));
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledWith({ password: 'MyPassw0rd!' });

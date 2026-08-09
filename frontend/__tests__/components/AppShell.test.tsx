@@ -80,9 +80,9 @@ describe('AppShell', () => {
     );
 
     const settingsLinks = screen.getAllByRole('link', { name: /settings/i });
-    expect(settingsLinks.some((el) => el.getAttribute('href') === '/settings')).toBe(
-      true
-    );
+    expect(
+      settingsLinks.some((el) => el.getAttribute('href') === '/settings')
+    ).toBe(true);
   });
 
   it('points the mobile bottom-nav tab to /settings', () => {
@@ -97,9 +97,9 @@ describe('AppShell', () => {
     });
     // desktop sidebar + mobile tab both point to /settings
     const hrefs = settingsLinks.map((el) => el.getAttribute('href'));
-    expect(hrefs.filter((h) => h === '/settings').length).toBeGreaterThanOrEqual(
-      2
-    );
+    expect(
+      hrefs.filter((h) => h === '/settings').length
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it('does not render a "Profile" nav item', () => {

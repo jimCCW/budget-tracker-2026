@@ -8,7 +8,10 @@ jest.mock('../../../src/lib/prisma', () => ({
 }));
 
 import { prisma } from '../../../src/lib/prisma';
-import { listSessions, revokeSession } from '../../../src/services/sessionService';
+import {
+  listSessions,
+  revokeSession,
+} from '../../../src/services/sessionService';
 
 const db = prisma as unknown as {
   userSession: { findMany: jest.Mock; updateMany: jest.Mock };
@@ -70,7 +73,7 @@ describe('listSessions', () => {
 });
 
 describe('revokeSession', () => {
-  it('throws CONFLICT when revoking the caller\'s own current session', async () => {
+  it("throws CONFLICT when revoking the caller's own current session", async () => {
     await expect(
       revokeSession(USER_ID, CURRENT_SID, CURRENT_SID)
     ).rejects.toMatchObject({ code: 'CONFLICT' });

@@ -48,11 +48,23 @@ export function PersonalInfoCard() {
       <div className='bg-surface rounded-xl border border-border p-6 flex flex-col gap-4'>
         <Skeleton height='1.25rem' width='10rem' />
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <Skeleton height='2.875rem' pt={{ root: { className: 'rounded-md' } }} />
-          <Skeleton height='2.875rem' pt={{ root: { className: 'rounded-md' } }} />
+          <Skeleton
+            height='2.875rem'
+            pt={{ root: { className: 'rounded-md' } }}
+          />
+          <Skeleton
+            height='2.875rem'
+            pt={{ root: { className: 'rounded-md' } }}
+          />
         </div>
-        <Skeleton height='2.875rem' pt={{ root: { className: 'rounded-md' } }} />
-        <Skeleton height='2.875rem' pt={{ root: { className: 'rounded-md' } }} />
+        <Skeleton
+          height='2.875rem'
+          pt={{ root: { className: 'rounded-md' } }}
+        />
+        <Skeleton
+          height='2.875rem'
+          pt={{ root: { className: 'rounded-md' } }}
+        />
       </div>
     );
   }

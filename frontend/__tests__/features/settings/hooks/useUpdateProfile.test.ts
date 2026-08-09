@@ -97,10 +97,10 @@ describe('useUpdateProfile', () => {
     await act(async () => {
       try {
         await result.current.mutateAsync({
-        firstName: 'Jane',
-        lastName: 'Q. Doe',
-        name: 'Jane Q. Doe',
-      });
+          firstName: 'Jane',
+          lastName: 'Q. Doe',
+          name: 'Jane Q. Doe',
+        });
       } catch {
         // expected
       }

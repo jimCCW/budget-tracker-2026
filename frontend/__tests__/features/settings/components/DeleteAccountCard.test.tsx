@@ -20,13 +20,9 @@ vi.mock('@/features/settings/components/DeleteAccountModal', () => ({
 }));
 
 vi.mock('primereact/button', () => ({
-  Button: ({
-    label,
-    onClick,
-  }: {
-    label?: string;
-    onClick?: () => void;
-  }) => <button onClick={onClick}>{label}</button>,
+  Button: ({ label, onClick }: { label?: string; onClick?: () => void }) => (
+    <button onClick={onClick}>{label}</button>
+  ),
 }));
 
 describe('DeleteAccountCard', () => {

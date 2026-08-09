@@ -16,8 +16,14 @@ export function CurrencyRegionSection() {
 
       {isLoading ? (
         <div className='flex flex-col gap-3'>
-          <Skeleton height='2.5rem' pt={{ root: { className: 'rounded-md' } }} />
-          <Skeleton height='2.5rem' pt={{ root: { className: 'rounded-md' } }} />
+          <Skeleton
+            height='2.5rem'
+            pt={{ root: { className: 'rounded-md' } }}
+          />
+          <Skeleton
+            height='2.5rem'
+            pt={{ root: { className: 'rounded-md' } }}
+          />
         </div>
       ) : (
         <div className='flex flex-col'>

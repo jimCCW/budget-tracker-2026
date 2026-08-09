@@ -11,10 +11,7 @@ export async function listSessionsController(
   next: NextFunction
 ) {
   try {
-    const data = await sessionService.listSessions(
-      req.user!.id,
-      req.user!.sid
-    );
+    const data = await sessionService.listSessions(req.user!.id, req.user!.sid);
     res.json({ success: true, data });
   } catch (err) {
     next(err);

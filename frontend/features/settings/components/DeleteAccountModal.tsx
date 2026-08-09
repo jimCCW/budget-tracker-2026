@@ -79,8 +79,8 @@ export function DeleteAccountModal({ open, onClose }: Props) {
       >
         <p className='text-sm text-text-muted'>
           This permanently deletes your account and all associated data —
-          accounts, transactions, categories, and recurring rules. This
-          cannot be undone.
+          accounts, transactions, categories, and recurring rules. This cannot
+          be undone.
         </p>
 
         {mutation.isError && (

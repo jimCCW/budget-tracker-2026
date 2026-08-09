@@ -26,7 +26,10 @@ export function DeleteAccountCard() {
         }}
       />
 
-      <DeleteAccountModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <DeleteAccountModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }

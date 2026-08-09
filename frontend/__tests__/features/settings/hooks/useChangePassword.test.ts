@@ -35,10 +35,7 @@ describe('useChangePassword', () => {
       await result.current.mutateAsync(values);
     });
 
-    expect(mockPost).toHaveBeenCalledWith(
-      '/api/users/change-password',
-      values
-    );
+    expect(mockPost).toHaveBeenCalledWith('/api/users/change-password', values);
   });
 
   it('is in error state when the current password is wrong', async () => {
