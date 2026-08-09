@@ -39,6 +39,8 @@ npx prisma migrate resolve --applied <name>   # record it in the migrations tabl
 
 # Adding a NOT NULL column to an existing table — always backfill first:
 # 1. ADD COLUMN nullable  2. UPDATE rows  3. ALTER COLUMN SET NOT NULL  4. ADD CONSTRAINT FK
+# Exception: a literal constant default (e.g. DEFAULT 'SGD') needs none of this —
+# `ADD COLUMN x TEXT NOT NULL DEFAULT '...'` in one step is safe and sufficient.
 ```
 
 ## Tech Stack
@@ -47,6 +49,8 @@ npx prisma migrate resolve --applied <name>   # record it in the migrations tabl
 - **Data fetching:** Axios + TanStack Query — use `apiClient` from `lib/api.ts` inside `useQuery`/`useMutation` hooks
   - `apiClient` auto-injects the Bearer token and unwraps `response.data` — callers receive the payload directly (e.g. `apiClient.get<never, Account[]>('/api/accounts')` returns `Account[]`, not `AxiosResponse`)
   - IMPORTANT: the token comes from the module store in `lib/authToken.ts`, fed by `SessionTokenSync` inside `SessionProvider`. Never call `getSession()` in the request interceptor — it always hits `/api/auth/session` over the network, so it fires one session request per API call.
+  - The response interceptor rejects with `err.response?.data?.error ?? err` — a plain `{ code, message }` object, **not** an `Error` instance. Always guard: `error instanceof Error ? error.message : 'Something went wrong.'` (the pattern used in every mutation's error banner).
+  - Any `401` response auto-signs the user out (dead-token detection). Endpoints that re-verify a secondary credential (e.g. confirming the current password) must respond `403 FORBIDDEN` on mismatch, never `401` — see Backend Rules → Response Format.
 - **Forms:** react-hook-form + Zod — always define Zod schema first, infer type, pass zodResolver to useForm
 - **Charts:** Recharts
 - **Dates:** `dayjs` — installed in both frontend and backend. Use it for all date formatting and arithmetic instead of native `Date` methods.
@@ -72,7 +76,7 @@ Enforced in `proxy.ts` using NextAuth `getToken`. File is `proxy.ts` (Next.js 16
 frontend/
 ├── app/                      # Routing only — no logic or inline JSX
 │   ├── (auth)/               # login/, register/ — public
-│   └── (private)/            # dashboard/, activity/, income/, expenses/, categories/, accounts/, recurring/, notifications/
+│   └── (private)/            # dashboard/, activity/, income/, expenses/, categories/, accounts/, recurring/, notifications/, settings/
 ├── features/
 │   ├── auth/                 # components/ hooks/ schemas/
 │   ├── income/               # components/ hooks/ schemas/
@@ -83,14 +87,17 @@ frontend/
 │   ├── recurring/            # components/ hooks/ schemas/ constants/
 │   ├── transactions/         # components/  (AddTransactionModal — modal only, no page)
 │   ├── notifications/        # components/ hooks/ utils/
-│   └── activity/             # components/ hooks/
+│   ├── activity/             # components/ hooks/
+│   └── settings/             # components/ hooks/ schemas/
 ├── components/
 │   ├── ui/                   # DataTable.tsx, Modal.tsx, StatCard.tsx, ThemeToggle.tsx
 │   └── charts/               # Generic Recharts wrappers
 ├── lib/
-│   ├── api.ts                # Typed fetch client → backend
+│   ├── api.ts                # Axios client → backend (see Data fetching above)
 │   ├── authToken.ts          # Access-token store read by api.ts (see Data fetching)
 │   ├── formatCurrency.ts     # Currency formatting helpers
+│   ├── dateUtils.ts          # dayjs-based date helpers
+│   ├── logout.ts             # Shared sign-out: revokes the session server-side, then NextAuth signOut()
 │   └── auth.ts               # NextAuth config
 ├── types/
 └── proxy.ts             # Route guard — single source of truth
@@ -209,7 +216,8 @@ Every protected route must follow this order:
 authMiddleware → validate(zodSchema) → controller
 ```
 
-- `authMiddleware` — validates JWT, sets `req.user`. All routes except `/api/auth/*` must use this
+- `authMiddleware` — validates the JWT, checks its session hasn't been revoked (see Auth Flow), and sets `req.user`. All routes except the public `/api/auth/*` endpoints (register/activate/resend/login/forgot-password/reset-password) must use this — note `/api/auth/logout` **does** use it, since it needs `req.user.sid` to know which session to revoke.
+  - IMPORTANT: it's `async`. Express 4 does not catch rejections thrown by async middleware — an uncaught error here crashes the whole process, not just the one request. Wrap the entire body in try/catch (see `authMiddleware.ts`).
 - `validate(schema)` — validates request body against a Zod schema before the controller runs. Returns `VALIDATION_ERROR` immediately if invalid. Controllers must never receive unvalidated input. **Only reads `req.body`** — for GET endpoints needing query param validation, call `schema.safeParse(req.query)` directly in the controller
 - Controllers call the service layer and return the response — no business logic in controllers
 
@@ -224,21 +232,24 @@ IMPORTANT: All API responses must follow this exact format — no exceptions.
 Standard error codes and their HTTP status:
 
 - `VALIDATION_ERROR` 400 — bad request body / query params
-- `UNAUTHORIZED` 401 — missing or invalid JWT
+- `UNAUTHORIZED` 401 — missing or invalid JWT, or its session was revoked
 - `FORBIDDEN` 403 — authenticated but not allowed
 - `NOT_FOUND` 404 — resource does not exist
 - `CONFLICT` 409 — duplicate resource (e.g. email already registered)
 - `INTERNAL_ERROR` 500 — unexpected server error
 
+IMPORTANT: Use `401` only for actual JWT/session problems. A route that re-verifies a secondary credential (e.g. "confirm your current password" before a password change or account deletion) must respond `403 FORBIDDEN` on mismatch, never `401` — the frontend's `apiClient` interceptor treats _any_ `401` as a dead session and force-signs the user out, which would turn a simple wrong-password attempt into an unwanted logout.
+
 ### Database
 
-- All services must import `prisma` from `'../lib/prisma'` (the shared singleton), never `new PrismaClient()` — per-file instances block mock injection in tests.
+- All services must import `{ prisma }` from `'../lib/prisma'` (a named export, the shared singleton) — never `new PrismaClient()`; per-file instances block mock injection in tests.
 - Never hard-delete default categories (`isDefault: true`) — guard in service layer
 - SavingsBase is one-to-one with User — upsert, never insert a duplicate
 - User data must always be scoped to `req.user.id` — never trust userId from request body
 - Prisma `update`/`delete` only accept unique fields in `where`. For ownership checks: use `findFirst({ where: { id, userId } })` then `update({ where: { id } })`, or `deleteMany({ where: { id, userId } })` and throw 404 if `count === 0`.
 - To backdate a record with `@default(now())`, pass `createdAt` explicitly in `prisma.create()` — Prisma allows overriding the default.
 - `break` / `continue` cannot cross an async callback boundary (e.g. inside `prisma.$transaction(async tx => {...})`). Hoist early-exit guards **before** the `await prisma.$transaction(...)` call.
+- Prisma defaults required (non-optional) relations to `RESTRICT` on delete, not `CASCADE`, unless `onDelete` is set explicitly in the schema. When hard-deleting a row with dependents (e.g. deleting a `User`), delete the referencing rows first, in FK-safe order, inside one `$transaction` — see `userService.deleteAccount` for the pattern (Income/Expense/RecurringRule → Account/Category → the row itself).
 
 ### Testing
 
@@ -258,7 +269,11 @@ Standard error codes and their HTTP status:
 
 ## Auth Flow
 
-NextAuth credentials provider calls `POST /api/auth/login` → backend bcrypt-verifies and returns JWT → NextAuth stores in HTTP-only cookie → frontend sends `Authorization: Bearer <token>` → Express `authMiddleware` validates and sets `req.user`.
+NextAuth credentials provider calls `POST /api/auth/login` → backend bcrypt-verifies, opens a `UserSession` row (recording the login's `User-Agent`), and returns a JWT carrying that session's id as `sid` → NextAuth stores it in an HTTP-only cookie → frontend sends `Authorization: Bearer <token>` → Express `authMiddleware` (async) verifies the JWT, looks up the `UserSession` by `sid`, and rejects with `401` if it's missing or revoked, before setting `req.user`.
+
+Sign-out (`lib/logout.ts`, used by `AppShell` and Settings) calls `POST /api/auth/logout` to revoke the current session server-side, then NextAuth `signOut()`. `POST /api/sessions/:id/revoke` lets a user kill _other_ devices' sessions from Settings — it refuses to revoke the caller's own current session (409); sign-out is the equivalent for that one.
+
+To refresh the client-side session after a profile field changes, without forcing re-login, call `useSession().update({...})` — this fires `lib/auth.ts`'s `jwt` callback with `trigger === 'update'`, which merges the passed fields into the token (see `features/settings/hooks/useUpdateProfile.ts`). See `docs/features/settings.md` for the full session-tracking design.
 
 ---
 
@@ -290,6 +305,6 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 - Income stores `month` and `year` derived from the UTC date — used for monthly summary queries; multiple entries per month allowed
 - SavingsBase = user's starting bank balance; running total = SavingsBase + cumulative net savings
 - Monthly net = total income − total expenses for that month
-- Account types: `BANK`, `INVESTMENT`, `CRYPTO`, `CASH`, `CREDIT` — tracked per user with `balance`, `icon`, `color`
+- Account types: `BANK`, `INVESTMENT`, `CRYPTO`, `CASH`, `CREDIT` — tracked per user with `balance`, `icon`, `color`. `CREDIT` balances go negative as spending is recorded; `creditDebt = Σ max(-balance, 0)` across CREDIT accounts (see `accountService.getSummary`).
 - Recurring transactions are managed via `RecurringRule` + the recurrence engine. The legacy `isRecurring`/`recurrence` fields on `Expense` are unused — do not write to them.
 - Shared constants (e.g. frequency config) go in `features/<name>/constants/` and may be imported cross-feature
