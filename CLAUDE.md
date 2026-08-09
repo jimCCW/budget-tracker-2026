@@ -46,6 +46,7 @@ npx prisma migrate resolve --applied <name>   # record it in the migrations tabl
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS, NextAuth.js
 - **Data fetching:** Axios + TanStack Query — use `apiClient` from `lib/api.ts` inside `useQuery`/`useMutation` hooks
   - `apiClient` auto-injects the Bearer token and unwraps `response.data` — callers receive the payload directly (e.g. `apiClient.get<never, Account[]>('/api/accounts')` returns `Account[]`, not `AxiosResponse`)
+  - IMPORTANT: the token comes from the module store in `lib/authToken.ts`, fed by `SessionTokenSync` inside `SessionProvider`. Never call `getSession()` in the request interceptor — it always hits `/api/auth/session` over the network, so it fires one session request per API call.
 - **Forms:** react-hook-form + Zod — always define Zod schema first, infer type, pass zodResolver to useForm
 - **Charts:** Recharts
 - **Dates:** `dayjs` — installed in both frontend and backend. Use it for all date formatting and arithmetic instead of native `Date` methods.
@@ -71,7 +72,7 @@ Enforced in `proxy.ts` using NextAuth `getToken`. File is `proxy.ts` (Next.js 16
 frontend/
 ├── app/                      # Routing only — no logic or inline JSX
 │   ├── (auth)/               # login/, register/ — public
-│   └── (private)/            # dashboard/, income/, expenses/, categories/, summary/, accounts/
+│   └── (private)/            # dashboard/, activity/, income/, expenses/, categories/, accounts/, recurring/, notifications/
 ├── features/
 │   ├── auth/                 # components/ hooks/ schemas/
 │   ├── income/               # components/ hooks/ schemas/
@@ -82,12 +83,13 @@ frontend/
 │   ├── recurring/            # components/ hooks/ schemas/ constants/
 │   ├── transactions/         # components/  (AddTransactionModal — modal only, no page)
 │   ├── notifications/        # components/ hooks/ utils/
-│   └── summary/              # components/ hooks/
+│   └── activity/             # components/ hooks/
 ├── components/
 │   ├── ui/                   # DataTable.tsx, Modal.tsx, StatCard.tsx, ThemeToggle.tsx
 │   └── charts/               # Generic Recharts wrappers
 ├── lib/
 │   ├── api.ts                # Typed fetch client → backend
+│   ├── authToken.ts          # Access-token store read by api.ts (see Data fetching)
 │   ├── formatCurrency.ts     # Currency formatting helpers
 │   └── auth.ts               # NextAuth config
 ├── types/
@@ -162,6 +164,15 @@ frontend/
 
 - Hooks called inside AppShell re-run on every route change.
 - TanStack Query hooks with `staleTime: 0` will refetch on every navigation — set `staleTime` equal to `refetchInterval` to prevent this.
+
+### Testing
+
+- Test runner: **Vitest** (not Jest — the backend uses Jest). Tests live in `frontend/__tests__/` mirroring the source tree (`app/`, `components/`, `features/`, `lib/`, plus shared `helpers/`).
+- Run with `pnpm test:run` (or `pnpm test` to watch). If pnpm's dependency check stalls, call the binary directly: `./node_modules/.bin/vitest run`.
+- Environment is `jsdom` with `globals: true`; `@` resolves to the frontend root.
+- Mock the API client wholesale rather than stubbing axios — `vi.mock('@/lib/api', ...)`, the pattern used by 38 of the test files.
+- For modules with singleton state (e.g. `lib/authToken.ts`), use `vi.resetModules()` plus a dynamic `await import()` inside `beforeEach` so each test gets a fresh instance.
+- `pnpm tsc --noEmit` currently reports pre-existing errors in `__tests__/` (partial mocks cast to `UseMutationResult`, and stale fixtures). These are not caused by your change — check whether the failing file is one you touched before investigating.
 
 ### General
 
