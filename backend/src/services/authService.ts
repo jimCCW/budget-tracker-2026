@@ -123,13 +123,18 @@ export async function resendActivation(data: { email: string }) {
 }
 
 /**
- * Verifies credentials and returns a signed 7-day JWT along with basic user info.
+ * Verifies credentials, opens a new UserSession for this login, and returns a
+ * signed 7-day JWT (carrying that session's id as `sid`) along with basic user info.
  * @param data - Object containing the user's email and plain-text password.
+ * @param meta - Request metadata to record on the session; `userAgent` is used to label the device in Settings > Security.
  * @returns JWT token, user id, email, full name, first name, and last name.
  * @throws UNAUTHORIZED (401) if the email is not found or the password is incorrect.
  * @throws FORBIDDEN (403) if the account has not been activated yet.
  */
-export async function login(data: { email: string; password: string }) {
+export async function login(
+  data: { email: string; password: string },
+  meta: { userAgent?: string } = {}
+) {
   const user = await prisma.user.findUnique({ where: { email: data.email } });
   if (!user) throw appError('UNAUTHORIZED', 'Invalid email or password.', 401);
 
@@ -144,8 +149,12 @@ export async function login(data: { email: string; password: string }) {
   const valid = await bcrypt.compare(data.password, user.passwordHash);
   if (!valid) throw appError('UNAUTHORIZED', 'Invalid email or password.', 401);
 
+  const session = await prisma.userSession.create({
+    data: { userId: user.id, userAgent: meta.userAgent },
+  });
+
   const token = jwt.sign(
-    { id: user.id, email: user.email },
+    { id: user.id, email: user.email, sid: session.id },
     process.env.JWT_SECRET!,
     { expiresIn: '7d' }
   );
@@ -158,6 +167,18 @@ export async function login(data: { email: string; password: string }) {
     firstName: user.firstName,
     lastName: user.lastName,
   };
+}
+
+/**
+ * Revokes the session the current request's JWT was issued for, so it fails
+ * `authMiddleware`'s revocation check on any subsequent request. Idempotent.
+ * @param sessionId - The `sid` claim from the caller's own JWT (`req.user.sid`).
+ */
+export async function logout(sessionId: string): Promise<void> {
+  await prisma.userSession.updateMany({
+    where: { id: sessionId, revokedAt: null },
+    data: { revokedAt: new Date() },
+  });
 }
 
 /**

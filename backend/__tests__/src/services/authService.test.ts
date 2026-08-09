@@ -5,6 +5,10 @@ jest.mock('../../../src/lib/prisma', () => ({
       create: jest.fn(),
       update: jest.fn(),
     },
+    userSession: {
+      create: jest.fn(),
+      updateMany: jest.fn(),
+    },
     $transaction: jest.fn(),
   },
 }));
@@ -20,6 +24,7 @@ import {
   activateAccount,
   resendActivation,
   login,
+  logout,
   forgotPassword,
   verifyResetToken,
   resetPassword,
@@ -30,6 +35,10 @@ const db = prisma as unknown as {
     findUnique: jest.Mock;
     create: jest.Mock;
     update: jest.Mock;
+  };
+  userSession: {
+    create: jest.Mock;
+    updateMany: jest.Mock;
   };
   $transaction: jest.Mock;
 };
@@ -281,7 +290,7 @@ describe('login', () => {
     });
   });
 
-  it('returns token and user info on success', async () => {
+  it('opens a UserSession and signs a JWT carrying its id as sid', async () => {
     const user = makeUser({
       isActive: true,
       name: 'Test User',
@@ -289,11 +298,18 @@ describe('login', () => {
       lastName: 'User',
     });
     db.user.findUnique.mockResolvedValue(user);
+    db.userSession.create.mockResolvedValue({ id: 'session-1' });
 
-    const result = await login({ email: EMAIL, password: 'correct' });
+    const result = await login(
+      { email: EMAIL, password: 'correct' },
+      { userAgent: 'Chrome/120.0 Windows' }
+    );
 
+    expect(db.userSession.create).toHaveBeenCalledWith({
+      data: { userId: USER_ID, userAgent: 'Chrome/120.0 Windows' },
+    });
     expect(mockJwt.sign).toHaveBeenCalledWith(
-      { id: USER_ID, email: EMAIL },
+      { id: USER_ID, email: EMAIL, sid: 'session-1' },
       'test-secret',
       { expiresIn: '7d' }
     );
@@ -305,6 +321,25 @@ describe('login', () => {
       firstName: 'Test',
       lastName: 'User',
     });
+  });
+});
+
+describe('logout', () => {
+  it('revokes only the matching, not-already-revoked session', async () => {
+    db.userSession.updateMany.mockResolvedValue({ count: 1 });
+
+    await logout('session-1');
+
+    expect(db.userSession.updateMany).toHaveBeenCalledWith({
+      where: { id: 'session-1', revokedAt: null },
+      data: { revokedAt: expect.any(Date) },
+    });
+  });
+
+  it('does not throw when the session is already revoked (idempotent)', async () => {
+    db.userSession.updateMany.mockResolvedValue({ count: 0 });
+
+    await expect(logout('session-1')).resolves.toBeUndefined();
   });
 });
 

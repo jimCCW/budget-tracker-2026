@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/authService';
 import { verifyResetTokenSchema } from '../schemas/authSchemas';
+import type { AuthRequest } from '../middleware/authMiddleware';
 
 /**
  * POST /api/auth/register — Creates a new user account and sends an activation code.
@@ -63,8 +64,27 @@ export async function loginController(
   next: NextFunction
 ) {
   try {
-    const data = await authService.login(req.body);
+    const data = await authService.login(req.body, {
+      userAgent: req.headers['user-agent'],
+    });
     res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/auth/logout — Revokes the session the caller's JWT was issued for.
+ * Responds 200 with `{ message }` regardless of prior state (idempotent).
+ */
+export async function logoutController(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    await authService.logout(req.user!.sid);
+    res.json({ success: true, data: { message: 'Signed out.' } });
   } catch (err) {
     next(err);
   }

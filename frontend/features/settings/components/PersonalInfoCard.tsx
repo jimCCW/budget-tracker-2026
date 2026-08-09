@@ -1,0 +1,191 @@
+'use client';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { Skeleton } from 'primereact/skeleton';
+import {
+  updateProfileSchema,
+  type UpdateProfileFormValues,
+} from '@/features/settings/schemas/updateProfileSchema';
+import { useProfile } from '@/features/settings/hooks/useProfile';
+import { useUpdateProfile } from '@/features/settings/hooks/useUpdateProfile';
+
+const inputBase =
+  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+
+export function PersonalInfoCard() {
+  const { data: profile, isLoading } = useProfile();
+  const mutation = useUpdateProfile();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<UpdateProfileFormValues>({
+    resolver: zodResolver(updateProfileSchema),
+    defaultValues: { firstName: '', lastName: '', name: '' },
+  });
+
+  useEffect(() => {
+    if (profile) {
+      reset({
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        name: profile.name ?? '',
+      });
+    }
+  }, [profile, reset]);
+
+  async function onSubmit(values: UpdateProfileFormValues) {
+    await mutation.mutateAsync(values);
+  }
+
+  if (isLoading) {
+    return (
+      <div className='bg-surface rounded-xl border border-border p-6 flex flex-col gap-4'>
+        <Skeleton height='1.25rem' width='10rem' />
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <Skeleton
+            height='2.875rem'
+            pt={{ root: { className: 'rounded-md' } }}
+          />
+          <Skeleton
+            height='2.875rem'
+            pt={{ root: { className: 'rounded-md' } }}
+          />
+        </div>
+        <Skeleton
+          height='2.875rem'
+          pt={{ root: { className: 'rounded-md' } }}
+        />
+        <Skeleton
+          height='2.875rem'
+          pt={{ root: { className: 'rounded-md' } }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className='bg-surface rounded-xl border border-border p-6'>
+      <h2 className='text-base font-extrabold text-text tracking-tight mb-1'>
+        Personal info
+      </h2>
+      <p className='text-sm text-text-muted mb-5'>
+        Update your name and view your account email.
+      </p>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className='flex flex-col gap-4'
+      >
+        {mutation.isError && (
+          <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
+            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+            <p className='text-sm text-text-muted mt-0.5'>
+              {mutation.error instanceof Error
+                ? mutation.error.message
+                : 'Something went wrong.'}
+            </p>
+          </div>
+        )}
+
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+              First name
+            </label>
+            <div className='relative'>
+              <i className='pi pi-user absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <InputText
+                {...register('firstName')}
+                placeholder='First name'
+                autoComplete='given-name'
+                className={`${inputBase} ${errors.firstName ? 'border-danger' : 'border-border'}`}
+              />
+            </div>
+            {errors.firstName && (
+              <p className='text-xs text-danger'>{errors.firstName.message}</p>
+            )}
+          </div>
+
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+              Last name
+            </label>
+            <div className='relative'>
+              <i className='pi pi-user absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <InputText
+                {...register('lastName')}
+                placeholder='Last name'
+                autoComplete='family-name'
+                className={`${inputBase} ${errors.lastName ? 'border-danger' : 'border-border'}`}
+              />
+            </div>
+            {errors.lastName && (
+              <p className='text-xs text-danger'>{errors.lastName.message}</p>
+            )}
+          </div>
+        </div>
+
+        <div className='flex flex-col gap-1'>
+          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            Full name
+          </label>
+          <div className='relative'>
+            <i className='pi pi-id-card absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+            <InputText
+              {...register('name')}
+              placeholder='Full name'
+              autoComplete='name'
+              className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
+            />
+          </div>
+          {errors.name && (
+            <p className='text-xs text-danger'>{errors.name.message}</p>
+          )}
+        </div>
+
+        <div className='flex flex-col gap-1'>
+          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            Email
+          </label>
+          <div className='relative'>
+            <i className='pi pi-envelope absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+            <InputText
+              value={profile?.email ?? ''}
+              disabled
+              className={`${inputBase} border-border opacity-60 cursor-not-allowed`}
+            />
+          </div>
+        </div>
+
+        <div>
+          <Button
+            type='submit'
+            loading={mutation.isPending}
+            disabled={mutation.isPending}
+            label={
+              mutation.isPending
+                ? 'Saving…'
+                : mutation.isSuccess
+                  ? 'Saved!'
+                  : 'Save changes'
+            }
+            pt={{
+              root: {
+                className:
+                  'h-11 px-5 bg-primary hover:bg-primary-strong text-white text-sm font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2',
+              },
+              loadingIcon: { className: 'animate-spin text-sm' },
+            }}
+          />
+        </div>
+      </form>
+    </div>
+  );
+}

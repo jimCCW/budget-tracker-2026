@@ -12,6 +12,7 @@
 - [Expenses](features/expenses.md) — Record expense transactions; atomic account balance updates; date-range filtering
 - [Income](features/income.md) — Record income transactions; atomic account balance updates; month/year derived from date
 - [Recurring](features/recurring.md) — Scheduled income and expense rules; lazy catch-up engine; pause/resume; manual trigger
+- [Settings](features/settings.md) — Profile editing, password change, real session tracking with per-request revocation, currency/region display
 - [Transactions](features/transactions.md) — Unified modal for creating one-off or recurring income/expense entries
 
 ## API Reference

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authMiddleware } from '../middleware/authMiddleware';
 import { validate } from '../middleware/validate';
 import {
   registerSchema,
@@ -13,6 +14,7 @@ import {
   activateController,
   resendController,
   loginController,
+  logoutController,
   forgotPasswordController,
   verifyResetTokenController,
   resetPasswordController,
@@ -24,6 +26,7 @@ router.post('/register', validate(registerSchema), registerController);
 router.post('/activate', validate(activateSchema), activateController);
 router.post('/resend', validate(resendSchema), resendController);
 router.post('/login', validate(loginSchema), loginController);
+router.post('/logout', authMiddleware, logoutController);
 router.post(
   '/forgot-password',
   validate(forgotPasswordSchema),

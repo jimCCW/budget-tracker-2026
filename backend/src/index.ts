@@ -18,6 +18,8 @@ import recurringRoutes from './routes/recurringRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import activityRoutes from './routes/activityRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
+import userRoutes from './routes/userRoutes';
+import sessionRoutes from './routes/sessionRoutes';
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -29,6 +31,8 @@ app.use('/api/recurring', recurringRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/sessions', sessionRoutes);
 // app.use('/api/summary', summaryRoutes);
 
 app.use(errorHandler);
