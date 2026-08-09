@@ -102,9 +102,36 @@ cd backend && pnpm tsc --noEmit
 
 Also run any test suite that exists for the affected area.
 
+Once type-checks and tests are green, run a code review in an isolated context rather than self-reviewing — a session reviewing its own work in its own context tends to confirm its decisions rather than test them:
+
+1. Write the diff to a file the reviewer can read — it has no Bash tool and cannot produce this itself:
+
+   ```bash
+   git diff main > /tmp/review-diff.patch
+   git diff --name-only main
+   ```
+
+2. Launch the reviewer in a fresh context via the Agent tool with
+   `subagent_type: "feature-dev:code-reviewer"` and `run_in_background: false`
+   (the result is needed before continuing). In the prompt, give it:
+   - the path `/tmp/review-diff.patch` and an instruction to read it first
+   - the list of changed file paths, so it can open the full files for context
+   - an explicit pointer to `CLAUDE.md` at the repo root as the project guidelines
+   - the reminder: report only findings with confidence >= 80
+
+3. The agent's report is not shown to the user — relay it. Present findings as a
+   numbered list with file paths and line references, then ask:
+   **"Which of these would you like me to fix?"**
+   Wait for the answer. Do not apply fixes or proceed until the user responds.
+
+4. If the agent reports no high-confidence issues, say so in one line and continue.
+
+5. If the user approves fixes, apply them, then re-run the type-checks from the top of this phase.
+
+Use `/tmp/review-diff.patch` — never a path inside the repo, so the patch never lands in a commit.
+
 Then:
 
-- Re-read every file you changed and do a self-review — flag anything that looks wrong, incomplete, or risky.
 - Report: what was changed, what was tested, any caveats or follow-up items.
 
 Finally, ask:

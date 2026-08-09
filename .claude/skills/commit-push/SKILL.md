@@ -13,7 +13,7 @@ description: >
 
 # Commit and Push to GitHub
 
-Analyze changes → propose Conventional Commits message → wait for user approval → commit → pull → push.
+Analyze changes → code review (isolated subagent) → propose Conventional Commits message → wait for user approval → commit → pull → push.
 
 ---
 
@@ -34,6 +34,43 @@ Use the results to understand:
 - Which files are already staged vs unstaged
 - The current branch name
 - Whether the repo already follows a commit convention (adapt if so)
+
+---
+
+## Step 1.5: Code Review (isolated context)
+
+Skip this step and go straight to Step 2 when either applies:
+
+- The diff from Step 1 touches only `*.md`, `docs/`, or config/lockfiles (docs-only change) — say "Docs-only change, skipping code review."
+- The user's phrasing was explicitly just-commit ("commit this", "wip") — offer the review instead of forcing it: ask if they want one before proceeding.
+
+Otherwise:
+
+1. Write the diff to a file the reviewer can read — it has no Bash tool and cannot produce this itself:
+
+   ```bash
+   git diff HEAD > /tmp/review-diff.patch
+   git diff --name-only HEAD
+   ```
+
+2. Launch the reviewer in a fresh context via the Agent tool with
+   `subagent_type: "feature-dev:code-reviewer"` and `run_in_background: false`
+   (the result is needed before continuing). In the prompt, give it:
+   - the path `/tmp/review-diff.patch` and an instruction to read it first
+   - the list of changed file paths, so it can open the full files for context
+   - an explicit pointer to `CLAUDE.md` at the repo root as the project guidelines
+   - the reminder: report only findings with confidence >= 80
+
+3. The agent's report is not shown to the user — relay it. Present findings as a
+   numbered list with file paths and line references, then ask:
+   **"Which of these would you like me to fix?"**
+   Wait for the answer. Do not apply fixes or proceed until the user responds.
+
+4. If the agent reports no high-confidence issues, say so in one line and continue.
+
+5. If the user approves fixes, apply them, then re-run `git diff HEAD` (Step 1) before drafting the commit message — the message must describe the final code, not the pre-review version.
+
+Use `/tmp/review-diff.patch` — never a path inside the repo, so the patch never lands in a commit.
 
 ---
 
@@ -161,10 +198,11 @@ Report success with the branch name and commit SHA.
 
 ## Edge Cases
 
-| Situation                   | Action                                                                                                                                         |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Nothing staged or changed   | Tell the user there's nothing to commit                                                                                                        |
-| On `main` or `master`       | Warn: "You're on `main` — are you sure you want to push directly? Consider creating a feature branch." Wait for confirmation before proceeding |
-| Remote branch doesn't exist | Use `git push -u origin HEAD` instead of the standard push                                                                                     |
-| Merge conflicts after pull  | Stop, show conflicting files, ask user to resolve manually                                                                                     |
-| Sensitive files detected    | Warn and exclude from staging                                                                                                                  |
+| Situation                    | Action                                                                                                                                         |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nothing staged or changed    | Tell the user there's nothing to commit                                                                                                        |
+| On `main` or `master`        | Warn: "You're on `main` — are you sure you want to push directly? Consider creating a feature branch." Wait for confirmation before proceeding |
+| Remote branch doesn't exist  | Use `git push -u origin HEAD` instead of the standard push                                                                                     |
+| Merge conflicts after pull   | Stop, show conflicting files, ask user to resolve manually                                                                                     |
+| Sensitive files detected     | Warn and exclude from staging                                                                                                                  |
+| Code review returns findings | Present findings and wait for user response. Never auto-commit over unreviewed findings.                                                       |

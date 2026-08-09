@@ -12,7 +12,7 @@ description: >
 
 # New Feature Workflow
 
-Five phases: **branch setup → guided development → documentation → tests → push + PR**.
+Six phases: **branch setup → guided development → documentation → tests → code review → push + PR**.
 
 ---
 
@@ -137,13 +137,49 @@ If any tests fail, fix the underlying code or tests until the full suite is gree
 
 Once green, tell the user:
 
-> All tests pass. Ready to commit and open a PR.
+> All tests pass. Moving on to code review.
 
 ---
 
-## Phase 5: Push + PR
+## Phase 5: Code Review
 
-Once documentation and tests are complete and the user confirms they are done, say:
+Once tests are green, review the branch in an isolated context rather than self-reviewing — a session reviewing its own work in its own context tends to confirm its decisions rather than test them.
+
+1. Write the diff to a file the reviewer can read — it has no Bash tool and cannot produce this itself:
+
+   ```bash
+   git diff main > /tmp/review-diff.patch
+   git diff --name-only main
+   ```
+
+2. Launch the reviewer in a fresh context via the Agent tool with
+   `subagent_type: "feature-dev:code-reviewer"` and `run_in_background: false`
+   (the result is needed before continuing). In the prompt, give it:
+   - the path `/tmp/review-diff.patch` and an instruction to read it first
+   - the list of changed file paths, so it can open the full files for context
+   - an explicit pointer to `CLAUDE.md` at the repo root as the project guidelines
+   - the reminder: report only findings with confidence >= 80
+
+3. The agent's report is not shown to the user — relay it. Present findings as a
+   numbered list with file paths and line references, then ask:
+   **"Which of these would you like me to fix?"**
+   Wait for the answer. Do not apply fixes or proceed until the user responds.
+
+4. If the agent reports no high-confidence issues, say so in one line and continue.
+
+5. If the user approves fixes, apply them, then re-run the test suites from Phase 4c before moving on.
+
+Use `/tmp/review-diff.patch` — never a path inside the repo, so the patch never lands in a commit.
+
+Once review is resolved, tell the user:
+
+> Code review complete. Ready to commit and open a PR.
+
+---
+
+## Phase 6: Push + PR
+
+Once documentation, tests, and code review are complete and the user confirms they are done, say:
 
 > Feature development complete. I'll now commit everything, push to `feature/<kebab-name>`, and open a PR to main.
 
