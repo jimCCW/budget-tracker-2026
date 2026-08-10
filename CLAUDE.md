@@ -4,6 +4,8 @@
 
 `claude-budget-tracking` is a full-stack budgeting and expense tracking app. Separate frontend and backend — each can be developed and deployed independently.
 
+New to this repo? Start with `docs/ONBOARDING.md` (guided reading path, domain rules, how to work with the skills below) and `docs/ARCHITECTURE.md` (full folder trees, API reference, DB schema). `README.md` has the human-facing quick start.
+
 ## Dev Commands
 
 ```bash
@@ -72,36 +74,7 @@ Enforced in `proxy.ts` using NextAuth `getToken`. File is `proxy.ts` (Next.js 16
 
 ### Folder Structure (Feature-based)
 
-```
-frontend/
-├── app/                      # Routing only — no logic or inline JSX
-│   ├── (auth)/               # login/, register/ — public
-│   └── (private)/            # dashboard/, activity/, income/, expenses/, categories/, accounts/, recurring/, notifications/, settings/
-├── features/
-│   ├── auth/                 # components/ hooks/ schemas/
-│   ├── income/               # components/ hooks/ schemas/
-│   ├── expenses/             # components/ hooks/ schemas/
-│   ├── categories/           # components/ hooks/ schemas/
-│   ├── dashboard/            # components/ hooks/
-│   ├── accounts/             # components/ hooks/ schemas/ constants/
-│   ├── recurring/            # components/ hooks/ schemas/ constants/
-│   ├── transactions/         # components/  (AddTransactionModal — modal only, no page)
-│   ├── notifications/        # components/ hooks/ utils/
-│   ├── activity/             # components/ hooks/
-│   └── settings/             # components/ hooks/ schemas/
-├── components/
-│   ├── ui/                   # DataTable.tsx, Modal.tsx, StatCard.tsx, ThemeToggle.tsx
-│   └── charts/               # Generic Recharts wrappers
-├── lib/
-│   ├── api.ts                # Axios client → backend (see Data fetching above)
-│   ├── authToken.ts          # Access-token store read by api.ts (see Data fetching)
-│   ├── formatCurrency.ts     # Currency formatting helpers
-│   ├── dateUtils.ts          # dayjs-based date helpers
-│   ├── logout.ts             # Shared sign-out: revokes the session server-side, then NextAuth signOut()
-│   └── auth.ts               # NextAuth config
-├── types/
-└── proxy.ts             # Route guard — single source of truth
-```
+Full tree lives in `docs/ARCHITECTURE.md` under "Frontend — Feature-based Structure" — update that file, not this one, when the tree changes. Shape: `app/` (routing only, `(auth)`/`(private)` groups) → `features/<name>/{components,hooks,schemas}/` → shared `components/{ui,charts}/` and `lib/` → `types/` → `proxy.ts` (route guard).
 
 ### Component Rules
 
@@ -194,19 +167,7 @@ frontend/
 
 ### Folder Structure
 
-```
-backend/
-├── src/
-│   ├── routes/          # Express routers — wire path to middleware chain + controller
-│   ├── middleware/      # authMiddleware.ts, validate.ts, errorHandler.ts
-│   ├── controllers/     # Request/response only — calls service layer
-│   ├── services/        # All business logic lives here
-│   ├── schemas/         # Zod schemas for request validation
-│   ├── utils/           # Utility functions (e.g. appError.ts)
-│   └── index.ts
-├── prisma/              # schema.prisma, seed.ts
-└── Dockerfile
-```
+Full tree lives in `docs/ARCHITECTURE.md` under "Backend — Layer Structure" — update that file, not this one, when the tree changes. Shape: `src/{routes,middleware,controllers,services,schemas,utils,lib}/` → `prisma/` → `Dockerfile`.
 
 ### Middleware Chain
 

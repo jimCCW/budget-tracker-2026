@@ -21,10 +21,12 @@ Three phases: **resolve target → explore codebase → write or update doc → 
 
 ### 1a. Determine the feature name
 
-Extract the feature name from the user's message. Normalize to lowercase kebab-case.
+If another skill or workflow invoked you with an explicit feature name (e.g. "document the `<name>` feature" as a direct argument, not phrased as free-form human text), treat that name as authoritative — normalize to lowercase kebab-case and move on. Don't require it to appear in the recognized list below or ask for confirmation; a brand-new feature is by definition not yet recognized, and stalling to ask would block an otherwise-autonomous workflow.
+
+Otherwise, extract the feature name from the user's message. Normalize to lowercase kebab-case.
 
 Recognized features in this project:
-`auth`, `accounts`, `dashboard`, `categories`, `expenses`, `income`, `summary`, `transactions`, `settings`, `profile`, `notifications`, `recurring`
+`auth`, `accounts`, `activity`, `categories`, `dashboard`, `expenses`, `income`, `notifications`, `recurring`, `settings`, `transactions`
 
 If no feature name is clear, ask:
 

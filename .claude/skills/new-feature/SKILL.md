@@ -44,11 +44,17 @@ Tell the user:
 
 > Branch `feature/<kebab-name>` created from latest main. Starting feature development...
 
+### 1d. Seed the workflow todo list
+
+Before invoking `feature-dev`, call `TodoWrite` with this skill's own six phases: Branch setup (mark complete — you just did it), Feature development, Documentation, Tests, Code review, Push+PR.
+
+This matters because `feature-dev` runs its own internal todo list for its own 7 phases during Phase 2, and marks that list "complete" at its own Summary phase — which reads as workflow-terminal ("mark all todos complete", "suggested next steps") right at the exact point where _this_ skill's remaining four phases still need to happen. That's a false-completion signal, especially after a Phase 2 that involved several rounds of clarifying questions or architecture back-and-forth. Your own todo list, tracked separately, is what survives that — don't let `feature-dev` finishing its list read as the whole workflow finishing.
+
 ---
 
 ## Phase 2: Feature Development
 
-Invoke the `feature-dev:feature-dev` skill to run the full guided development workflow (Discovery → Codebase Exploration → Clarifying Questions → Architecture Design → Implementation → Quality Review → Summary). Show the detailed instructions and plan for each step and wait for user to confirm before moving to next step.
+Invoke the `feature-dev:feature-dev` skill to run the guided development workflow (Discovery → Codebase Exploration → Clarifying Questions → Architecture Design → Implementation → Summary) — **tell it explicitly to skip its own Phase 6 (Quality Review)**. This workflow's own Phase 5 already runs a complete, diff-based code review with a confidence threshold, after Documentation and Tests are done (Phase 4 can still touch source files) — reviewing here too would mean two passes over a mostly-identical, and by Phase 5 stale, diff. Show the detailed instructions and plan for each step and wait for user to confirm before moving to next step.
 
 **Frontend reminder:** Always use PrimeReact components before native HTML — see CLAUDE.md Frontend Rules → PrimeReact Components for the full mapping and `pt` passthrough pattern. Never write a native `<button>`, `<input>`, `<select>`, custom modal portal, or `<table>` when a PrimeReact equivalent exists.
 
@@ -58,19 +64,43 @@ All code changes during this phase automatically land on `feature/<kebab-name>`.
 
 ## Phase 3: Documentation
 
-Once feature-dev implementation is complete, document the feature before writing tests.
+Once feature-dev implementation is complete, get a mechanical answer for what actually changed before deciding what to document — Phase 2 may have run long or involved several rounds of replanning, and memory of exactly which files changed is not reliable after that.
 
-### 3a. Backend JSDoc
+### 3a. Identify changed files
 
-If any files under `backend/src/services/`, `backend/src/controllers/`, or `backend/src/middleware/` changed during Phase 2, invoke the `backend-jsdoc` skill to verify every new/changed function in those files has an up-to-date JSDoc block, adding or updating any that are missing. Skip if no backend files changed.
+```bash
+git diff --name-only main
+git ls-files --others --exclude-standard
+```
 
-### 3b. Feature docs
+Run both — `git diff --name-only` only reports changes to files git already tracks, so a feature implemented as entirely new files (no edits to any existing file) would otherwise produce an empty list here, and every check downstream in 3b/3c/3d would then silently see nothing to do. The second command catches new, untracked files. Combine both into one deduplicated list and keep it — Phase 4a reuses it, no need to re-run.
 
-Invoke the `feature-docs` skill for `<kebab-name>` to create or update `docs/features/<kebab-name>.md` and keep `docs/INDEX.md` in sync.
+### 3b. Backend JSDoc
+
+If 3a's list contains any files under `backend/src/services/`, `backend/src/controllers/`, or `backend/src/middleware/`, invoke the `backend-jsdoc` skill to verify every new/changed function in those files has an up-to-date JSDoc block, adding or updating any that are missing. Skip only if the list contains none — this is now a lookup against 3a's output, not a recollection of Phase 2.
+
+### 3c. Feature docs
+
+A change can touch more than one existing feature area, not just the one the branch is named after. From 3a's changed-file list, collect **every** distinct feature name implicated:
+
+- Any `frontend/features/<name>/` path that changed → `<name>`
+- Any `backend/src/{routes,controllers,services,schemas}/<name>...` path that changed, mapped to its feature (e.g. `accountRoutes.ts` → `accounts`, `activitySchemas.ts` → `activity`) → `<name>`
+
+This is usually just `<kebab-name>`, but not always. Invoke the `feature-docs` skill once for **every** distinct feature name collected — not only `<kebab-name>` — passing each name as an explicit argument (e.g. "document the `<name>` feature") rather than leaving it to be inferred from conversation. For a brand-new feature not yet in `feature-docs`' recognized list, the explicit name still takes priority — see `feature-docs`' own Phase 1a.
+
+### 3d. Verify before moving on
+
+Do not proceed to Phase 4 until you've confirmed the documentation actually landed, not just that you reported it did:
+
+```bash
+git status --porcelain docs/
+```
+
+This must show a change for every feature name collected in 3c, and `docs/INDEX.md` must be among the modified files. If nothing shows up, the documentation step did not actually happen — go back and do it before continuing.
 
 Tell the user:
 
-> Documentation complete (JSDoc + docs/features/<kebab-name>.md). Moving on to tests.
+> Documentation complete (JSDoc + docs/features/<name(s)>.md). Moving on to tests.
 
 ---
 
@@ -80,9 +110,7 @@ Once documentation is complete, before touching git, identify what needs testing
 
 ### 4a. Identify changed files
 
-```bash
-git diff --name-only main
-```
+Reuse the list from Phase 3a (same two commands — re-run them only if meaningful time has passed since 3a).
 
 Group changed paths by side:
 
