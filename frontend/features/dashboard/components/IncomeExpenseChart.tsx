@@ -22,17 +22,26 @@ export function IncomeExpenseChart() {
   const { data = [], isLoading } = useDashboardTrend(range);
 
   return (
-    <div className='bg-surface rounded-lg border border-border shadow-sm p-6'>
+    <section
+      aria-labelledby='cashflow-heading'
+      className='bg-surface rounded-lg border border-border shadow-sm p-6'
+    >
       <div className='flex items-center justify-between mb-4'>
         <div>
-          <div className='text-[15px] font-bold'>Cashflow</div>
-          <div className='text-xs text-text-muted mt-0.5'>
-            Income vs expenses
-          </div>
+          <h2 id='cashflow-heading' className='text-[15px] font-bold'>
+            Cashflow
+          </h2>
+          <p className='text-xs text-text-muted mt-0.5'>Income vs expenses</p>
         </div>
         <RangeToggle value={range} onChange={setRange} />
       </div>
-      <div className='h-64'>
+      <div
+        className='h-64'
+        role={isLoading ? undefined : 'img'}
+        aria-label={
+          isLoading ? undefined : 'Chart of monthly income vs expenses'
+        }
+      >
         {isLoading ? (
           <Skeleton
             width='100%'
@@ -129,21 +138,27 @@ export function IncomeExpenseChart() {
           </ResponsiveContainer>
         )}
       </div>
-      <div className='flex items-center gap-4 mt-3'>
-        <div className='flex items-center gap-1.5'>
-          <div className='w-3 h-0.5 rounded-full bg-[#10B981]' />
+      <ul className='flex items-center gap-4 mt-3'>
+        <li className='flex items-center gap-1.5'>
+          <span
+            aria-hidden='true'
+            className='w-3 h-0.5 rounded-full bg-success'
+          />
           <span className='text-[11px] text-text-muted font-medium'>
             Income
           </span>
-        </div>
-        <div className='flex items-center gap-1.5'>
-          <div className='w-3 h-0.5 rounded-full bg-[#EF4444]' />
+        </li>
+        <li className='flex items-center gap-1.5'>
+          <span
+            aria-hidden='true'
+            className='w-3 h-0.5 rounded-full bg-danger'
+          />
           <span className='text-[11px] text-text-muted font-medium'>
             Expenses
           </span>
-        </div>
-      </div>
-    </div>
+        </li>
+      </ul>
+    </section>
   );
 }
 

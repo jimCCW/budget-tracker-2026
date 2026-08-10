@@ -21,12 +21,11 @@ export const recentActivityColumns: ColumnDef<TxRow>[] = [
           <div
             className='w-8 h-8 rounded-[9px] flex items-center justify-center shrink-0'
             style={{ background: tx.color + '22', color: tx.color }}
+            aria-hidden='true'
           >
             <i className={`pi ${tx.icon} text-sm`} />
           </div>
-          <span className='font-semibold truncate max-w-[160px]'>
-            {tx.name}
-          </span>
+          <span className='font-semibold truncate max-w-40'>{tx.name}</span>
         </div>
       );
     },
@@ -63,6 +62,7 @@ export const recentActivityColumns: ColumnDef<TxRow>[] = [
         <span
           className={`font-bold tabular-nums ${tx.amt > 0 ? 'text-success' : 'text-text'}`}
         >
+          <span className='sr-only'>{tx.amt > 0 ? 'Income ' : 'Expense '}</span>
           {tx.amt > 0 ? '+' : ''}
           {formatCurrency(tx.amt)}
         </span>

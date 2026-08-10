@@ -1,4 +1,5 @@
 'use client';
+import { Children } from 'react';
 import { Button } from 'primereact/button';
 import { useCategories } from '@/features/categories/hooks/useCategories';
 import {
@@ -57,10 +58,14 @@ function FilterSection({
 }) {
   return (
     <div>
-      <div className='text-[10px] text-text-dim font-bold uppercase tracking-widest px-1 pb-2'>
+      <h3 className='text-[10px] text-text-dim font-bold uppercase tracking-widest px-1 pb-2'>
         {title}
-      </div>
-      <div className='flex flex-col gap-0.5'>{children}</div>
+      </h3>
+      <ul className='flex flex-col gap-0.5'>
+        {Children.map(children, (child) => (
+          <li>{child}</li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -75,7 +80,10 @@ export function ActivityFilterPanel({
   const { data: categories = [] } = useCategories();
 
   return (
-    <div className='bg-surface border border-border rounded-lg p-4 flex flex-col gap-5 h-fit'>
+    <aside
+      aria-label='Filters'
+      className='bg-surface border border-border rounded-lg p-4 flex flex-col gap-5 h-fit'
+    >
       <FilterSection title='Type'>
         {TYPE_OPTIONS.map((opt) => (
           <FilterRow
@@ -113,6 +121,6 @@ export function ActivityFilterPanel({
           />
         ))}
       </FilterSection>
-    </div>
+    </aside>
   );
 }

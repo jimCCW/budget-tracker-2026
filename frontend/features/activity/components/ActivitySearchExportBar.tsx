@@ -24,15 +24,23 @@ export function ActivitySearchExportBar({
 
   return (
     <div className='flex items-center gap-3'>
-      <div className='relative flex-1'>
-        <i className='pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm' />
+      <form
+        role='search'
+        onSubmit={(e) => e.preventDefault()}
+        className='relative flex-1'
+      >
+        <i
+          className='pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm'
+          aria-hidden='true'
+        />
         <InputText
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder='Search transactions...'
-          className='h-9 w-full rounded-md bg-bg border border-border pl-9 pr-3 text-sm outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]'
+          aria-label='Search transactions'
+          className='h-9 w-full rounded-md bg-bg border border-border pl-9 pr-3 text-sm outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13'
         />
-      </div>
+      </form>
       <Button
         label='Export'
         icon='pi pi-chevron-down'

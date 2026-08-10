@@ -92,8 +92,14 @@ export function CategoriesPage() {
 
       {/* Error state */}
       {isError && (
-        <div className='bg-danger-tint border border-danger/30 rounded-lg p-4 flex gap-3 items-center'>
-          <i className='pi pi-times-circle text-danger text-lg' />
+        <div
+          role='alert'
+          className='bg-danger-tint border border-danger/30 rounded-lg p-4 flex gap-3 items-center'
+        >
+          <i
+            className='pi pi-times-circle text-danger text-lg'
+            aria-hidden='true'
+          />
           <p className='text-sm text-text-muted'>
             Failed to load categories. Please refresh.
           </p>
@@ -118,33 +124,40 @@ export function CategoriesPage() {
       {!isLoading && !isError && (
         <>
           {/* Default categories */}
-          <section>
-            <h3 className='text-[11px] font-bold text-text-dim uppercase tracking-widest mb-3'>
+          <section aria-labelledby='default-categories-heading'>
+            <h2
+              id='default-categories-heading'
+              className='text-[11px] font-bold text-text-dim uppercase tracking-widest mb-3'
+            >
               Default categories
-            </h3>
+            </h2>
             {visibleDefault.length === 0 ? (
               <p className='text-sm text-text-muted py-4'>
                 No default {activeTab.toLowerCase()} categories.
               </p>
             ) : (
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+              <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {visibleDefault.map((cat) => (
-                  <CategoryCard
-                    key={cat.id}
-                    category={cat}
-                    onEdit={openEdit}
-                    onDelete={setDeletingCategory}
-                  />
+                  <li key={cat.id}>
+                    <CategoryCard
+                      category={cat}
+                      onEdit={openEdit}
+                      onDelete={setDeletingCategory}
+                    />
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </section>
 
           {/* Custom categories */}
-          <section>
-            <h3 className='text-[11px] font-bold text-text-dim uppercase tracking-widest mb-3'>
+          <section aria-labelledby='custom-categories-heading'>
+            <h2
+              id='custom-categories-heading'
+              className='text-[11px] font-bold text-text-dim uppercase tracking-widest mb-3'
+            >
               My categories
-            </h3>
+            </h2>
             {visibleCustom.length === 0 ? (
               <Button
                 onClick={openCreate}
@@ -156,40 +169,43 @@ export function CategoriesPage() {
                 }}
               >
                 <div className='w-11 h-11 rounded-xl bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
-                  <i className='pi pi-plus text-xl' />
+                  <i className='pi pi-plus text-xl' aria-hidden='true' />
                 </div>
                 <span className='text-sm font-semibold'>
                   Add your first custom {activeTab.toLowerCase()} category
                 </span>
               </Button>
             ) : (
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+              <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {visibleCustom.map((cat) => (
-                  <CategoryCard
-                    key={cat.id}
-                    category={cat}
-                    onEdit={openEdit}
-                    onDelete={setDeletingCategory}
-                  />
+                  <li key={cat.id}>
+                    <CategoryCard
+                      category={cat}
+                      onEdit={openEdit}
+                      onDelete={setDeletingCategory}
+                    />
+                  </li>
                 ))}
                 {/* Add new card */}
-                <Button
-                  onClick={openCreate}
-                  pt={{
-                    root: {
-                      className:
-                        'border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-22 group',
-                    },
-                  }}
-                >
-                  <div className='w-9 h-9 rounded-lg bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
-                    <i className='pi pi-plus text-base' />
-                  </div>
-                  <span className='text-xs font-semibold'>
-                    Add custom category
-                  </span>
-                </Button>
-              </div>
+                <li>
+                  <Button
+                    onClick={openCreate}
+                    pt={{
+                      root: {
+                        className:
+                          'w-full border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-22 group',
+                      },
+                    }}
+                  >
+                    <div className='w-9 h-9 rounded-lg bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
+                      <i className='pi pi-plus text-base' aria-hidden='true' />
+                    </div>
+                    <span className='text-xs font-semibold'>
+                      Add custom category
+                    </span>
+                  </Button>
+                </li>
+              </ul>
             )}
           </section>
         </>

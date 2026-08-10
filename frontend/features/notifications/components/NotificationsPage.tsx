@@ -36,6 +36,7 @@ function NotificationCard({
           style={
             cfg.useStyle ? { ...cfg.bgStyle, ...cfg.textStyle } : undefined
           }
+          aria-hidden='true'
         >
           <i className={`pi ${cfg.icon} text-lg`} />
         </div>
@@ -47,15 +48,22 @@ function NotificationCard({
               {notification.title}
             </span>
             {!notification.isRead && (
-              <span className='w-2 h-2 rounded-full bg-primary shrink-0' />
+              <span
+                aria-hidden='true'
+                className='w-2 h-2 rounded-full bg-primary shrink-0'
+              />
             )}
+            {!notification.isRead && <span className='sr-only'>Unread</span>}
           </div>
           <p className='text-xs text-text-muted mt-1 leading-relaxed line-clamp-2'>
             {notification.body}
           </p>
-          <span className='text-[11px] text-text-dim mt-1.5 block'>
+          <time
+            dateTime={notification.createdAt}
+            className='text-[11px] text-text-dim mt-1.5 block'
+          >
             {formatRelativeTime(notification.createdAt)}
-          </span>
+          </time>
         </div>
       </div>
     </button>
@@ -99,7 +107,7 @@ export function NotificationsPage() {
     >
       {/* Toolbar */}
       {allNotifications.length > 0 && (
-        <div className='flex justify-end mb-4'>
+        <div role='toolbar' className='flex justify-end mb-4'>
           <Button
             onClick={() => markAllAsRead()}
             disabled={unreadCount === 0 || isMarkingAll}
@@ -110,7 +118,7 @@ export function NotificationsPage() {
               },
             }}
           >
-            <i className='pi pi-check text-sm' />
+            <i className='pi pi-check text-sm' aria-hidden='true' />
             Mark all read
           </Button>
         </div>
@@ -118,7 +126,7 @@ export function NotificationsPage() {
 
       {/* Loading skeletons */}
       {isLoading && (
-        <div className='flex flex-col gap-3'>
+        <div role='status' aria-busy='true' className='flex flex-col gap-3'>
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -138,7 +146,7 @@ export function NotificationsPage() {
       {/* Empty state */}
       {!isLoading && allNotifications.length === 0 && (
         <div className='flex flex-col items-center justify-center py-20 text-text-dim'>
-          <i className='pi pi-bell-slash text-4xl mb-4' />
+          <i className='pi pi-bell-slash text-4xl mb-4' aria-hidden='true' />
           <p className='text-sm font-semibold text-text-muted'>
             You&apos;re all caught up
           </p>
@@ -152,34 +160,51 @@ export function NotificationsPage() {
       {/* Grouped notification list */}
       {!isLoading && allNotifications.length > 0 && (
         <div className='flex flex-col gap-6'>
-          {GROUP_ORDER.filter((g) => grouped.has(g)).map((group) => (
-            <section key={group}>
-              <h3 className='text-[11px] font-bold uppercase tracking-widest text-text-muted mb-3 px-0.5'>
-                {group}
-              </h3>
-              <div className='flex flex-col gap-2'>
-                {grouped.get(group)!.map((n) => (
-                  <NotificationCard
-                    key={n.id}
-                    notification={n}
-                    onClick={() => setSelected(n)}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+          {GROUP_ORDER.filter((g) => grouped.has(g)).map((group) => {
+            const groupId = `notif-group-${group.toLowerCase().replace(/\s+/g, '-')}`;
+            return (
+              <section key={group} aria-labelledby={groupId}>
+                <h2
+                  id={groupId}
+                  className='text-[11px] font-bold uppercase tracking-widest text-text-muted mb-3 px-0.5'
+                >
+                  {group}
+                </h2>
+                <ul className='flex flex-col gap-2'>
+                  {grouped.get(group)!.map((n) => (
+                    <li key={n.id}>
+                      <NotificationCard
+                        notification={n}
+                        onClick={() => setSelected(n)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
 
           {/* Infinite scroll sentinel */}
-          <div ref={sentinelRef} className='h-1' />
+          <div ref={sentinelRef} aria-hidden='true' className='h-1' />
 
           {isFetchingNextPage && (
-            <div className='flex justify-center py-4'>
-              <i className='pi pi-spin pi-spinner text-text-muted text-xl' />
+            <div
+              role='status'
+              aria-label='Loading more notifications'
+              className='flex justify-center py-4'
+            >
+              <i
+                className='pi pi-spin pi-spinner text-text-muted text-xl'
+                aria-hidden='true'
+              />
             </div>
           )}
 
           {!hasNextPage && allNotifications.length >= 100 && (
-            <p className='text-center text-xs text-text-dim py-4'>
+            <p
+              aria-live='polite'
+              className='text-center text-xs text-text-dim py-4'
+            >
               All notifications loaded
             </p>
           )}

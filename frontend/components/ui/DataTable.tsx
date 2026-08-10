@@ -30,6 +30,8 @@ type DataTableProps<T> = {
   data: T[];
   columns: ColumnDef<T>[];
   className?: string;
+  /** Accessible table name, visually hidden. Recommended when a table has no visible heading nearby. */
+  caption?: string;
   /** Enable column sorting by clicking headers. */
   enableSorting?: boolean;
   /** Enable built-in pagination controls. */
@@ -71,6 +73,7 @@ export function DataTable<T>({
   data,
   columns,
   className,
+  caption,
   enableSorting = false,
   enablePagination = false,
   defaultPageSize = 10,
@@ -95,6 +98,7 @@ export function DataTable<T>({
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
         onChange={(e) => table.toggleAllPageRowsSelected(e.checked ?? false)}
+        aria-label='Select all rows'
         pt={checkboxPt}
       />
     ),
@@ -103,6 +107,7 @@ export function DataTable<T>({
         checked={row.getIsSelected()}
         disabled={!row.getCanSelect()}
         onChange={(e) => row.toggleSelected(e.checked ?? false)}
+        aria-label='Select row'
         pt={checkboxPt}
       />
     ),
@@ -161,6 +166,7 @@ export function DataTable<T>({
     <div className={className}>
       <div className='overflow-x-auto'>
         <table className='w-full border-collapse text-[13px]'>
+          {caption && <caption className='sr-only'>{caption}</caption>}
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -168,35 +174,53 @@ export function DataTable<T>({
                   const align = header.column.columnDef.meta?.align ?? 'left';
                   const canSort = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
+                  const headerContent = header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      );
+                  const sortIcon = canSort && (
+                    <i
+                      aria-hidden='true'
+                      className={`pi text-[9px] transition-opacity ${
+                        sorted === 'asc'
+                          ? 'pi-sort-up-fill opacity-100'
+                          : sorted === 'desc'
+                            ? 'pi-sort-down-fill opacity-100'
+                            : 'pi-sort-alt opacity-30'
+                      }`}
+                    />
+                  );
                   return (
                     <th
                       key={header.id}
-                      className={`pb-2 text-[10.5px] font-bold uppercase tracking-wider text-text-muted border-b border-border pr-4 last:pr-0 ${ALIGN[align]} ${canSort ? 'cursor-pointer select-none hover:text-text transition-colors' : ''}`}
-                      onClick={
-                        canSort
-                          ? header.column.getToggleSortingHandler()
-                          : undefined
+                      scope='col'
+                      aria-sort={
+                        sorted === 'asc'
+                          ? 'ascending'
+                          : sorted === 'desc'
+                            ? 'descending'
+                            : canSort
+                              ? 'none'
+                              : undefined
                       }
+                      className={`pb-2 text-[10.5px] font-bold uppercase tracking-wider text-text-muted border-b border-border pr-4 last:pr-0 ${ALIGN[align]}`}
                     >
-                      <span className='inline-flex items-center gap-1'>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                        {canSort && (
-                          <i
-                            className={`pi text-[9px] transition-opacity ${
-                              sorted === 'asc'
-                                ? 'pi-sort-up-fill opacity-100'
-                                : sorted === 'desc'
-                                  ? 'pi-sort-down-fill opacity-100'
-                                  : 'pi-sort-alt opacity-30'
-                            }`}
-                          />
-                        )}
-                      </span>
+                      {canSort ? (
+                        <button
+                          type='button'
+                          onClick={header.column.getToggleSortingHandler()}
+                          className='inline-flex items-center gap-1 cursor-pointer select-none hover:text-text transition-colors'
+                        >
+                          {headerContent}
+                          {sortIcon}
+                        </button>
+                      ) : (
+                        <span className='inline-flex items-center gap-1'>
+                          {headerContent}
+                        </span>
+                      )}
                     </th>
                   );
                 })}
@@ -245,7 +269,10 @@ export function DataTable<T>({
       </div>
 
       {enablePagination && (
-        <div className='flex items-center justify-between pt-4 border-t border-border mt-4'>
+        <nav
+          aria-label='Pagination'
+          className='flex items-center justify-between pt-4 border-t border-border mt-4'
+        >
           <p className='text-xs text-text-muted'>
             {manualPagination && totalCount != null
               ? totalCount === 0
@@ -290,7 +317,7 @@ export function DataTable<T>({
               }}
             />
           </div>
-        </div>
+        </nav>
       )}
     </div>
   );

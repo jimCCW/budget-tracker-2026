@@ -13,7 +13,7 @@ import {
 import { useDeleteAccount } from '@/features/settings/hooks/useDeleteAccount';
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 const iconBase =
   'pi absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm';
@@ -52,9 +52,16 @@ export function DeleteAccountModal({ open, onClose }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy='settings-delete-account-heading'
+    >
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 className='text-base font-extrabold text-danger tracking-tight'>
+        <h2
+          id='settings-delete-account-heading'
+          className='text-base font-extrabold text-danger tracking-tight'
+        >
           Delete account
         </h2>
         <Button
@@ -84,8 +91,14 @@ export function DeleteAccountModal({ open, onClose }: Props) {
         </p>
 
         {mutation.isError && (
-          <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+          <div
+            role='alert'
+            className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+          >
+            <i
+              className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+              aria-hidden='true'
+            />
             <p className='text-sm text-text-muted mt-0.5'>
               {mutation.error instanceof Error
                 ? mutation.error.message
@@ -95,16 +108,20 @@ export function DeleteAccountModal({ open, onClose }: Props) {
         )}
 
         <div className='flex flex-col gap-1'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='delete-account-password'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             Confirm your password
           </label>
           <div className='relative'>
-            <i className={`${iconBase} pi-lock`} />
+            <i className={`${iconBase} pi-lock`} aria-hidden='true' />
             <Controller
               name='password'
               control={control}
               render={({ field }) => (
                 <Password
+                  inputId='delete-account-password'
                   value={field.value ?? ''}
                   onChange={(e) => field.onChange(e.target.value)}
                   onBlur={field.onBlur}

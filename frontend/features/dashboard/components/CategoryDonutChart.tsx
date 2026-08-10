@@ -19,9 +19,14 @@ export function CategoryDonutChart({
   }));
 
   return (
-    <div className='bg-surface rounded-lg border border-border shadow-sm p-5'>
+    <section
+      aria-labelledby='category-donut-heading'
+      className='bg-surface rounded-lg border border-border shadow-sm p-5'
+    >
       <div className='flex items-center justify-between mb-4'>
-        <div className='text-[15px] font-bold'>Spending by category</div>
+        <h2 id='category-donut-heading' className='text-[15px] font-bold'>
+          Spending by category
+        </h2>
         <Link
           href='/activity?type=EXPENSE'
           className='text-xs text-primary font-semibold cursor-pointer hover:underline'
@@ -32,7 +37,11 @@ export function CategoryDonutChart({
 
       <div className='flex flex-col items-center gap-4'>
         {/* Donut */}
-        <div className='relative w-44 h-44'>
+        <div
+          className='relative w-44 h-44'
+          role='img'
+          aria-label={`Total spent this month: ${formatCurrencyShort(total)}`}
+        >
           <ResponsiveContainer width='100%' height='100%'>
             <PieChart>
               <Pie
@@ -48,22 +57,26 @@ export function CategoryDonutChart({
             </PieChart>
           </ResponsiveContainer>
           {/* Center label */}
-          <div className='absolute inset-0 flex flex-col items-center justify-center pointer-events-none'>
-            <div className='text-[10.5px] text-text-muted font-semibold uppercase tracking-wider'>
+          <div
+            aria-hidden='true'
+            className='absolute inset-0 flex flex-col items-center justify-center pointer-events-none'
+          >
+            <span className='text-[10.5px] text-text-muted font-semibold uppercase tracking-wider'>
               Spent
-            </div>
-            <div className='text-[22px] font-extrabold tracking-tight tabular-nums'>
+            </span>
+            <span className='text-[22px] font-extrabold tracking-tight tabular-nums'>
               {formatCurrencyShort(total)}
-            </div>
+            </span>
           </div>
         </div>
 
         {/* Legend */}
-        <div className='w-full flex flex-col gap-2'>
+        <ul className='w-full flex flex-col gap-2'>
           {data.map((item, i) => (
-            <div key={i} className='flex items-center gap-2.5 text-[12.5px]'>
+            <li key={i} className='flex items-center gap-2.5 text-[12.5px]'>
               <span
-                className='w-2.5 h-2.5 rounded-sm flex-shrink-0'
+                aria-hidden='true'
+                className='w-2.5 h-2.5 rounded-sm shrink-0'
                 style={{ background: item.fill }}
               />
               <span className='flex-1 text-text font-medium'>{item.name}</span>
@@ -73,15 +86,15 @@ export function CategoryDonutChart({
               <span className='text-text-dim tabular-nums w-10 text-right'>
                 {total > 0 ? Math.round((item.value / total) * 100) : 0}%
               </span>
-            </div>
+            </li>
           ))}
           {data.length === 0 && (
-            <div className='text-xs text-text-muted text-center py-2'>
+            <li className='text-xs text-text-muted text-center py-2 list-none'>
               No expenses yet this month
-            </div>
+            </li>
           )}
-        </div>
+        </ul>
       </div>
-    </div>
+    </section>
   );
 }

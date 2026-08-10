@@ -71,6 +71,8 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
   const displayName = session?.user?.name ?? 'Anonymous';
   const userEmail = session?.user?.email ?? '';
   const initials = `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase();
+  const notificationsLabel =
+    unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications';
 
   const isActive = (item: NavItem) =>
     item.href
@@ -87,18 +89,21 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
             B
           </div>
           <div>
-            <div className='text-base font-extrabold tracking-tight'>
+            <p className='text-base font-extrabold tracking-tight'>
               Budget Tracker
-            </div>
-            <div className='text-[11px] text-text-muted font-medium'>
+            </p>
+            <p className='text-[11px] text-text-muted font-medium'>
               Budget tracker
-            </div>
+            </p>
           </div>
         </div>
 
         {/* Search */}
         <div className='px-3.5 pb-3'>
-          <div className='flex items-center gap-2 h-9 px-2.5 rounded-md bg-bg border border-border'>
+          <div
+            className='flex items-center gap-2 h-9 px-2.5 rounded-md bg-bg border border-border'
+            aria-hidden='true'
+          >
             <i className='pi pi-search text-text-muted text-sm' />
             <span className='text-xs text-text-muted flex-1'>Search…</span>
             <kbd className='text-[10px] px-1.5 py-0.5 rounded bg-border text-text-muted font-mono'>
@@ -108,25 +113,34 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
         </div>
 
         {/* Nav */}
-        <nav className='flex-1 px-2.5 flex flex-col gap-0.5 overflow-y-auto'>
-          <div className='text-[10px] text-text-dim font-bold uppercase tracking-widest px-2 py-1.5 mt-1'>
+        <nav
+          aria-labelledby='sidebar-nav-heading'
+          className='flex-1 px-2.5 overflow-y-auto'
+        >
+          <p
+            id='sidebar-nav-heading'
+            className='text-[10px] text-text-dim font-bold uppercase tracking-widest px-2 py-1.5 mt-1'
+          >
             Menu
-          </div>
-          {NAV_ITEMS.map((item) => (
-            <SideNavItem
-              key={item.key}
-              item={
-                item.key === 'notifications'
-                  ? { ...item, badge: unreadCount || undefined }
-                  : item
-              }
-              active={isActive(item)}
-            />
-          ))}
+          </p>
+          <ul className='flex flex-col gap-0.5'>
+            {NAV_ITEMS.map((item) => (
+              <li key={item.key}>
+                <SideNavItem
+                  item={
+                    item.key === 'notifications'
+                      ? { ...item, badge: unreadCount || undefined }
+                      : item
+                  }
+                  active={isActive(item)}
+                />
+              </li>
+            ))}
+          </ul>
         </nav>
 
         {/* Footer */}
-        <div className='px-2.5 pb-3 pt-2.5 border-t border-border'>
+        <footer className='px-2.5 pb-3 pt-2.5 border-t border-border'>
           {FOOTER_ITEMS.map((item) => (
             <SideNavItem key={item.key} item={item} active={false} />
           ))}
@@ -135,12 +149,10 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
               {initials}
             </div>
             <div className='flex-1 min-w-0'>
-              <div className='text-[12.5px] font-bold truncate'>
-                {displayName}
-              </div>
-              <div className='text-[10.5px] text-text-muted truncate'>
+              <p className='text-[12.5px] font-bold truncate'>{displayName}</p>
+              <p className='text-[10.5px] text-text-muted truncate'>
                 {userEmail}
-              </div>
+              </p>
             </div>
             <Button
               icon='pi pi-sign-out'
@@ -155,30 +167,67 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
               }}
             />
           </div>
-        </div>
+        </footer>
       </aside>
 
       {/* ── Main column ── */}
       <div className='flex flex-col flex-1 min-w-0 overflow-hidden'>
-        {/* Desktop topbar */}
-        <header className='hidden lg:flex items-center gap-4 h-16 px-7 shrink-0 bg-surface border-b border-border'>
-          <div className='flex-1 min-w-0'>
-            {subtitle && (
-              <div className='text-[11.5px] text-text-muted font-semibold tracking-wide'>
-                {subtitle}
+        {/* Topbar — single header landmark, layout switches at lg */}
+        <header className='shrink-0 bg-surface border-b border-border px-4 py-3 lg:flex lg:items-center lg:gap-4 lg:h-16 lg:px-7 lg:py-0'>
+          {/* Mobile-only brand row */}
+          <div className='flex items-center justify-between lg:hidden'>
+            <div className='flex items-center gap-2'>
+              <div className='w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-extrabold text-sm leading-none'>
+                B
               </div>
-            )}
-            <div className='text-lg font-extrabold tracking-tight'>{title}</div>
+              <span className='font-extrabold tracking-tight'>
+                Budget Tracker
+              </span>
+            </div>
+            <div className='flex items-center gap-1'>
+              <Link
+                href='/notifications'
+                aria-label={notificationsLabel}
+                className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text transition-colors'
+              >
+                <i className='pi pi-bell text-base' aria-hidden='true' />
+                {unreadCount > 0 && (
+                  <span
+                    aria-hidden='true'
+                    className='absolute top-1 right-1 w-3.5 h-3.5 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center'
+                  >
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
-          <div className='flex items-center gap-2'>
+
+          {/* Title block — shared at every breakpoint */}
+          <div className='mt-2 lg:mt-0 flex-1 min-w-0'>
+            {subtitle && (
+              <p className='text-[11.5px] text-text-muted font-semibold tracking-wide'>
+                {subtitle}
+              </p>
+            )}
+            <h1 className='text-lg font-extrabold tracking-tight'>{title}</h1>
+          </div>
+
+          {/* Desktop-only actions */}
+          <div className='hidden lg:flex items-center gap-2'>
             <ThemeToggle />
             <Link
               href='/notifications'
+              aria-label={notificationsLabel}
               className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-raised transition-colors'
             >
-              <i className='pi pi-bell text-base' />
+              <i className='pi pi-bell text-base' aria-hidden='true' />
               {unreadCount > 0 && (
-                <span className='absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'>
+                <span
+                  aria-hidden='true'
+                  className='absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'
+                >
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -198,67 +247,43 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           </div>
         </header>
 
-        {/* Mobile topbar */}
-        <header className='lg:hidden shrink-0 bg-surface border-b border-border px-4 py-3'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <div className='w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-extrabold text-sm leading-none'>
-                B
-              </div>
-              <span className='font-extrabold tracking-tight'>
-                Budget Tracker
-              </span>
-            </div>
-            <div className='flex items-center gap-1'>
-              <Link
-                href='/notifications'
-                className='relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-text transition-colors'
-              >
-                <i className='pi pi-bell text-base' />
-                {unreadCount > 0 && (
-                  <span className='absolute top-1 right-1 w-3.5 h-3.5 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center'>
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </Link>
-              <ThemeToggle />
-            </div>
-          </div>
-          <div className='mt-2'>
-            <div className='text-[11px] text-text-muted font-semibold'>
-              {subtitle}
-            </div>
-            <div className='text-lg font-extrabold tracking-tight'>{title}</div>
-          </div>
-        </header>
-
         {/* Scrollable content */}
         <main className='flex-1 overflow-y-auto overflow-x-hidden bg-bg p-4 lg:p-7 pb-24 lg:pb-7'>
           <div className='flex flex-col gap-4'>{children}</div>
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className='lg:hidden shrink-0 bg-surface border-t border-border flex items-end justify-around px-1.5 pb-4 pt-2'>
-          {MOBILE_TABS.slice(0, 2).map((tab) => (
-            <MobileNavTab key={tab.key} tab={tab} active={isActive(tab)} />
-          ))}
-          {/* FAB */}
-          <div className='flex flex-col items-center gap-1 relative -mt-5'>
-            <Button
-              onClick={() => setTxModalOpen(true)}
-              pt={{
-                root: {
-                  className:
-                    'w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg',
-                },
-              }}
-            >
-              <i className='pi pi-plus text-xl' />
-            </Button>
-          </div>
-          {MOBILE_TABS.slice(2).map((tab) => (
-            <MobileNavTab key={tab.key} tab={tab} active={isActive(tab)} />
-          ))}
+        <nav
+          aria-label='Primary'
+          className='lg:hidden shrink-0 bg-surface border-t border-border'
+        >
+          <ul className='flex items-end justify-around px-1.5 pb-4 pt-2'>
+            {MOBILE_TABS.slice(0, 2).map((tab) => (
+              <li key={tab.key}>
+                <MobileNavTab tab={tab} active={isActive(tab)} />
+              </li>
+            ))}
+            {/* FAB */}
+            <li className='flex flex-col items-center gap-1 relative -mt-5'>
+              <Button
+                onClick={() => setTxModalOpen(true)}
+                aria-label='New transaction'
+                pt={{
+                  root: {
+                    className:
+                      'w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg',
+                  },
+                }}
+              >
+                <i className='pi pi-plus text-xl' aria-hidden='true' />
+              </Button>
+            </li>
+            {MOBILE_TABS.slice(2).map((tab) => (
+              <li key={tab.key}>
+                <MobileNavTab tab={tab} active={isActive(tab)} />
+              </li>
+            ))}
+          </ul>
         </nav>
       </div>
 
@@ -278,10 +303,13 @@ function SideNavItem({ item, active }: { item: NavItem; active: boolean }) {
 
   const inner = (
     <>
-      <i className={`pi ${item.icon} text-[17px]`} />
+      <i className={`pi ${item.icon} text-[17px]`} aria-hidden='true' />
       <span className='flex-1'>{item.label}</span>
       {item.badge != null && (
-        <span className='min-w-[18px] h-[18px] px-1 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'>
+        <span
+          aria-label={`${item.badge} unread`}
+          className='min-w-4.5 h-4.5 px-1 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center'
+        >
           {item.badge}
         </span>
       )}
@@ -290,7 +318,11 @@ function SideNavItem({ item, active }: { item: NavItem; active: boolean }) {
 
   if (item.href) {
     return (
-      <Link href={item.href} className={cls}>
+      <Link
+        href={item.href}
+        className={cls}
+        aria-current={active ? 'page' : undefined}
+      >
         {inner}
       </Link>
     );
@@ -306,14 +338,18 @@ function MobileNavTab({ tab, active }: { tab: NavItem; active: boolean }) {
 
   const inner = (
     <>
-      <i className={`pi ${tab.icon} text-[22px]`} />
+      <i className={`pi ${tab.icon} text-[22px]`} aria-hidden='true' />
       <span>{tab.label}</span>
     </>
   );
 
   if (tab.href) {
     return (
-      <Link href={tab.href} className={cls}>
+      <Link
+        href={tab.href}
+        className={cls}
+        aria-current={active ? 'page' : undefined}
+      >
         {inner}
       </Link>
     );

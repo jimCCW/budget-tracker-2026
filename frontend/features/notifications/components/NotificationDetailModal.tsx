@@ -25,7 +25,12 @@ export function NotificationDetailModal({ notification, onClose }: Props) {
   const cfg = resolveIcon(notification);
 
   return (
-    <Modal open={!!notification} onClose={onClose} maxWidth='max-w-md'>
+    <Modal
+      open={!!notification}
+      onClose={onClose}
+      maxWidth='max-w-md'
+      ariaLabelledBy='notification-detail-heading'
+    >
       <div className='p-6'>
         {/* Header */}
         <div className='flex items-start justify-between gap-4 mb-5'>
@@ -34,11 +39,13 @@ export function NotificationDetailModal({ notification, onClose }: Props) {
             style={
               cfg.useStyle ? { ...cfg.bgStyle, ...cfg.textStyle } : undefined
             }
+            aria-hidden='true'
           >
             <i className={`pi ${cfg.icon} text-xl`} />
           </div>
           <Button
             onClick={onClose}
+            aria-label='Close'
             pt={{
               root: {
                 className:
@@ -46,19 +53,24 @@ export function NotificationDetailModal({ notification, onClose }: Props) {
               },
             }}
           >
-            <i className='pi pi-times text-sm' />
+            <i className='pi pi-times text-sm' aria-hidden='true' />
           </Button>
         </div>
 
         {/* Content */}
-        <h2 className='text-base font-bold text-text mb-2'>
+        <h2
+          id='notification-detail-heading'
+          className='text-base font-bold text-text mb-2'
+        >
           {notification.title}
         </h2>
         <p className='text-sm text-text-muted leading-relaxed mb-4'>
           {notification.body}
         </p>
         <p className='text-xs text-text-dim'>
-          {formatDateTime(notification.createdAt)}
+          <time dateTime={notification.createdAt}>
+            {formatDateTime(notification.createdAt)}
+          </time>
         </p>
 
         {/* Footer */}

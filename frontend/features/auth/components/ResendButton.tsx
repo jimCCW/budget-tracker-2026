@@ -25,13 +25,13 @@ export function ResendButton({ email }: Props) {
         pt={{
           root: {
             className:
-              'w-full h-[50px] border border-border text-text-muted hover:text-text hover:border-border-strong text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2',
+              'w-full h-12.5 border border-border text-text-muted hover:text-text hover:border-border-strong text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2',
           },
           loadingIcon: { className: 'animate-spin text-base' },
         }}
       />
       {mutation.isError && (
-        <p className='text-xs text-danger'>
+        <p role='alert' className='text-xs text-danger'>
           {mutation.error instanceof Error
             ? mutation.error.message
             : 'Failed to resend. Try again.'}

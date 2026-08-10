@@ -31,7 +31,7 @@ type Props = {
 };
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 const TYPE_OPTIONS = [
   {
@@ -114,10 +114,18 @@ export function CategoryFormModal({
     TYPE_OPTIONS.find((o) => o.value === watchedType) ?? TYPE_OPTIONS[0];
 
   return (
-    <Modal open={open} onClose={onClose} maxWidth='max-w-4xl'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      maxWidth='max-w-4xl'
+      ariaLabelledBy='category-form-heading'
+    >
       {/* Header */}
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 className='text-base font-extrabold text-text tracking-tight'>
+        <h2
+          id='category-form-heading'
+          className='text-base font-extrabold text-text tracking-tight'
+        >
           {isEdit ? 'Edit category' : 'New category'}
         </h2>
         <Button
@@ -138,10 +146,13 @@ export function CategoryFormModal({
       {/* Body: 2-col on lg+, stacked on mobile */}
       <div className='flex flex-col lg:flex-row'>
         {/* ── Preview pane ── */}
-        <div className='lg:w-64 lg:shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col gap-4'>
-          <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>
+        <aside
+          aria-label='Preview'
+          className='lg:w-64 lg:shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col gap-4'
+        >
+          <h3 className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>
             Preview
-          </p>
+          </h3>
 
           {/* Hero stamp */}
           <div className='flex flex-col items-center gap-3 py-2'>
@@ -151,10 +162,11 @@ export function CategoryFormModal({
                 backgroundColor: watchedColor,
                 boxShadow: `0 10px 24px ${watchedColor}55`,
               }}
+              aria-hidden='true'
             >
               <i className={`pi ${watchedIcon} text-3xl`} />
             </div>
-            <div
+            <p
               className='text-base font-extrabold text-center max-w-40 truncate'
               style={{
                 color: watchedName
@@ -163,7 +175,7 @@ export function CategoryFormModal({
               }}
             >
               {displayName}
-            </div>
+            </p>
             <span
               className='text-[10.5px] font-bold px-2 py-0.5 rounded-full'
               style={{
@@ -177,9 +189,9 @@ export function CategoryFormModal({
 
           {/* In activity */}
           <div>
-            <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2'>
+            <h3 className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2'>
               In your activity
-            </p>
+            </h3>
             <div className='bg-bg rounded-lg p-3 flex items-center gap-2.5'>
               <div
                 className='w-8 h-8 rounded-lg flex items-center justify-center shrink-0'
@@ -187,18 +199,19 @@ export function CategoryFormModal({
                   backgroundColor: `${watchedColor}22`,
                   color: watchedColor,
                 }}
+                aria-hidden='true'
               >
                 <i className={`pi ${watchedIcon} text-sm`} />
               </div>
               <div className='flex-1 min-w-0'>
-                <div className='text-xs font-bold text-text truncate'>
+                <p className='text-xs font-bold text-text truncate'>
                   Sample merchant
-                </div>
-                <div className='text-[10.5px] text-text-muted mt-0.5 truncate'>
+                </p>
+                <p className='text-[10.5px] text-text-muted mt-0.5 truncate'>
                   {displayName}
-                </div>
+                </p>
               </div>
-              <div
+              <p
                 className='text-xs font-bold'
                 style={{
                   color:
@@ -208,17 +221,18 @@ export function CategoryFormModal({
                 }}
               >
                 {watchedType === 'INCOME' ? '+' : '-'}$24.50
-              </div>
+              </p>
             </div>
           </div>
 
           {/* In reports */}
           <div>
-            <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2'>
+            <h3 className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2'>
               In reports
-            </p>
+            </h3>
             <div className='bg-bg rounded-lg p-3 flex items-center gap-2 text-xs'>
               <span
+                aria-hidden='true'
                 className='w-2 h-2 rounded-sm shrink-0'
                 style={{ backgroundColor: watchedColor }}
               />
@@ -228,7 +242,7 @@ export function CategoryFormModal({
               <span className='text-text-muted'>12%</span>
             </div>
           </div>
-        </div>
+        </aside>
 
         {/* ── Form pane ── */}
         <form
@@ -238,8 +252,14 @@ export function CategoryFormModal({
         >
           {/* Error banner */}
           {mutation.isError && (
-            <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-              <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+            <div
+              role='alert'
+              className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+            >
+              <i
+                className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+                aria-hidden='true'
+              />
               <p className='text-sm text-text-muted mt-0.5'>
                 {mutation.error instanceof Error
                   ? mutation.error.message
@@ -249,10 +269,10 @@ export function CategoryFormModal({
           )}
 
           {/* Type selector */}
-          <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <fieldset className='flex flex-col gap-2'>
+            <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
               Type
-            </label>
+            </legend>
             <div className='grid grid-cols-2 gap-3'>
               {TYPE_OPTIONS.map((opt) => {
                 const selected = watchedType === opt.value;
@@ -287,47 +307,61 @@ export function CategoryFormModal({
                               color: opt.activeColor,
                             }
                       }
+                      aria-hidden='true'
                     >
                       <i className={`pi ${opt.icon} text-base`} />
                     </div>
-                    <div>
-                      <div className='text-sm font-bold text-text'>
+                    <span>
+                      <span className='block text-sm font-bold text-text'>
                         {opt.label}
-                      </div>
-                      <div className='text-xs text-text-muted mt-0.5'>
+                      </span>
+                      <span className='block text-xs text-text-muted mt-0.5'>
                         {opt.desc}
-                      </div>
-                    </div>
+                      </span>
+                    </span>
                   </Button>
                 );
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Name */}
           <div className='flex flex-col gap-1'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <label
+              htmlFor='category-name'
+              className='text-xs font-bold text-text-muted uppercase tracking-wide'
+            >
               Category name
             </label>
             <div className='relative'>
-              <i className='pi pi-tag absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <i
+                className='pi pi-tag absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+                aria-hidden='true'
+              />
               <InputText
+                id='category-name'
                 {...register('name')}
                 placeholder='e.g. Coffee & cafés'
                 autoComplete='off'
+                aria-invalid={!!errors.name}
+                aria-describedby={
+                  errors.name ? 'category-name-error' : undefined
+                }
                 className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
               />
             </div>
             {errors.name && (
-              <p className='text-xs text-danger'>{errors.name.message}</p>
+              <p id='category-name-error' className='text-xs text-danger'>
+                {errors.name.message}
+              </p>
             )}
           </div>
 
           {/* Icon picker */}
-          <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <fieldset className='flex flex-col gap-2'>
+            <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
               Icon
-            </label>
+            </legend>
             <div className='grid grid-cols-6 gap-2'>
               {CATEGORY_ICONS.map(({ id, label }) => {
                 const selected = watchedIcon === id;
@@ -335,7 +369,7 @@ export function CategoryFormModal({
                   <Button
                     key={id}
                     type='button'
-                    title={label}
+                    aria-label={label}
                     onClick={() => setValue('icon', id)}
                     pt={{
                       root: {
@@ -354,18 +388,18 @@ export function CategoryFormModal({
                       },
                     }}
                   >
-                    <i className={`pi ${id} text-base`} />
+                    <i className={`pi ${id} text-base`} aria-hidden='true' />
                   </Button>
                 );
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Color picker */}
-          <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <fieldset className='flex flex-col gap-2'>
+            <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
               Color
-            </label>
+            </legend>
             <div className='flex flex-wrap gap-2.5'>
               {CATEGORY_COLORS.map((c) => {
                 const selected = watchedColor === c;
@@ -398,7 +432,7 @@ export function CategoryFormModal({
                 );
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Actions */}
           <div className='flex gap-3 pt-2 mt-auto'>

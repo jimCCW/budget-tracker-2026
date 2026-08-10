@@ -1,5 +1,5 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
@@ -13,6 +13,8 @@ type Props = {
 
 export function CategoryCard({ category, onEdit, onDelete }: Props) {
   const menuRef = useRef<Menu>(null);
+  const menuId = `category-menu-${category.id}`;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const color = category.color ?? '#6366F1';
   const icon = category.icon ?? 'pi-tag';
@@ -32,34 +34,38 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
   ];
 
   return (
-    <div className='bg-surface border border-border rounded-xl p-4 flex flex-col gap-3 hover:shadow-sm transition-shadow'>
+    <article className='bg-surface border border-border rounded-xl p-4 flex flex-col gap-3 hover:shadow-sm transition-shadow'>
       <div className='flex items-center gap-3'>
         <div
           className='w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-white'
           style={{ backgroundColor: color }}
+          aria-hidden='true'
         >
           <i className={`pi ${icon} text-lg`} />
         </div>
 
         <div className='flex-1 min-w-0'>
-          <div className='text-sm font-bold text-text truncate'>
+          <h3 className='text-sm font-bold text-text truncate'>
             {category.name}
-          </div>
-          <div className='text-xs text-text-muted mt-0.5'>
+          </h3>
+          <p className='text-xs text-text-muted mt-0.5'>
             {category.isDefault ? 'Default category' : 'Custom category'}
-          </div>
+          </p>
         </div>
 
         {!category.isDefault && (
           <div className='relative'>
             <Menu
+              id={menuId}
               model={menuItems}
               popup
               ref={menuRef}
+              onShow={() => setMenuOpen(true)}
+              onHide={() => setMenuOpen(false)}
               pt={{
                 root: {
                   className:
-                    'bg-surface border border-border rounded-lg shadow-lg py-1 min-w-[128px]',
+                    'bg-surface border border-border rounded-lg shadow-lg py-1 min-w-32',
                 },
                 menuitem: { className: '' },
                 action: {
@@ -74,6 +80,9 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
               icon='pi pi-ellipsis-v'
               onClick={(e) => menuRef.current?.toggle(e)}
               aria-label='Category options'
+              aria-haspopup='menu'
+              aria-controls={menuId}
+              aria-expanded={menuOpen}
               pt={{
                 root: {
                   className:
@@ -88,9 +97,10 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
 
       {/* Color accent bar */}
       <div
+        aria-hidden='true'
         className='h-1 rounded-full opacity-30'
         style={{ backgroundColor: color }}
       />
-    </div>
+    </article>
   );
 }
