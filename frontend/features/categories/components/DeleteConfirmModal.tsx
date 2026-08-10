@@ -42,7 +42,10 @@ export function DeleteConfirmModal({ open, onClose, category }: Props) {
 
         {/* Text */}
         <div className='text-center'>
-          <h2 id='delete-category-heading' className='text-base font-extrabold text-text'>
+          <h2
+            id='delete-category-heading'
+            className='text-base font-extrabold text-text'
+          >
             Delete category?
           </h2>
           <p className='text-sm text-text-muted mt-1'>

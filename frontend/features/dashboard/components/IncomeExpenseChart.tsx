@@ -31,9 +31,7 @@ export function IncomeExpenseChart() {
           <h2 id='cashflow-heading' className='text-[15px] font-bold'>
             Cashflow
           </h2>
-          <p className='text-xs text-text-muted mt-0.5'>
-            Income vs expenses
-          </p>
+          <p className='text-xs text-text-muted mt-0.5'>Income vs expenses</p>
         </div>
         <RangeToggle value={range} onChange={setRange} />
       </div>
@@ -142,13 +140,19 @@ export function IncomeExpenseChart() {
       </div>
       <ul className='flex items-center gap-4 mt-3'>
         <li className='flex items-center gap-1.5'>
-          <span aria-hidden='true' className='w-3 h-0.5 rounded-full bg-success' />
+          <span
+            aria-hidden='true'
+            className='w-3 h-0.5 rounded-full bg-success'
+          />
           <span className='text-[11px] text-text-muted font-medium'>
             Income
           </span>
         </li>
         <li className='flex items-center gap-1.5'>
-          <span aria-hidden='true' className='w-3 h-0.5 rounded-full bg-danger' />
+          <span
+            aria-hidden='true'
+            className='w-3 h-0.5 rounded-full bg-danger'
+          />
           <span className='text-[11px] text-text-muted font-medium'>
             Expenses
           </span>

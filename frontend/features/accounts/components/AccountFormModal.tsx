@@ -274,7 +274,9 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                 placeholder='e.g. DBS Savings'
                 autoComplete='off'
                 aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? 'account-name-error' : undefined}
+                aria-describedby={
+                  errors.name ? 'account-name-error' : undefined
+                }
                 className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
               />
             </div>

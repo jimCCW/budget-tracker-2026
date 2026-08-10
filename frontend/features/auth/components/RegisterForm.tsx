@@ -48,8 +48,14 @@ export function RegisterForm() {
       className='flex flex-col gap-4'
     >
       {mutation.isError && (
-        <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+        <div
+          role='alert'
+          className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+        >
+          <i
+            className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+            aria-hidden='true'
+          />
           <div>
             <p className='text-sm font-semibold text-danger'>
               Registration failed
@@ -82,7 +88,9 @@ export function RegisterForm() {
           />
         </div>
         {errors.name && (
-          <p id='register-name-error' className='text-xs text-danger'>{errors.name.message}</p>
+          <p id='register-name-error' className='text-xs text-danger'>
+            {errors.name.message}
+          </p>
         )}
       </div>
 
@@ -101,12 +109,16 @@ export function RegisterForm() {
               placeholder='First name'
               autoComplete='given-name'
               aria-invalid={!!errors.firstName}
-              aria-describedby={errors.firstName ? 'register-first-name-error' : undefined}
+              aria-describedby={
+                errors.firstName ? 'register-first-name-error' : undefined
+              }
               className={`${inputBase} ${errors.firstName ? 'border-danger' : 'border-border'}`}
             />
           </div>
           {errors.firstName && (
-            <p id='register-first-name-error' className='text-xs text-danger'>{errors.firstName.message}</p>
+            <p id='register-first-name-error' className='text-xs text-danger'>
+              {errors.firstName.message}
+            </p>
           )}
         </div>
         <div className='flex flex-col gap-1 flex-1'>
@@ -122,12 +134,16 @@ export function RegisterForm() {
               placeholder='Last name'
               autoComplete='family-name'
               aria-invalid={!!errors.lastName}
-              aria-describedby={errors.lastName ? 'register-last-name-error' : undefined}
+              aria-describedby={
+                errors.lastName ? 'register-last-name-error' : undefined
+              }
               className={`${inputBase} ${errors.lastName ? 'border-danger' : 'border-border'}`}
             />
           </div>
           {errors.lastName && (
-            <p id='register-last-name-error' className='text-xs text-danger'>{errors.lastName.message}</p>
+            <p id='register-last-name-error' className='text-xs text-danger'>
+              {errors.lastName.message}
+            </p>
           )}
         </div>
       </div>
@@ -151,7 +167,9 @@ export function RegisterForm() {
           />
         </div>
         {errors.email && (
-          <p id='register-email-error' className='text-xs text-danger'>{errors.email.message}</p>
+          <p id='register-email-error' className='text-xs text-danger'>
+            {errors.email.message}
+          </p>
         )}
       </div>
 
@@ -239,7 +257,10 @@ export function RegisterForm() {
           name='terms'
           control={control}
           render={({ field }) => (
-            <label htmlFor='terms' className='flex items-start gap-2 cursor-pointer'>
+            <label
+              htmlFor='terms'
+              className='flex items-start gap-2 cursor-pointer'
+            >
               <Checkbox
                 inputId='terms'
                 checked={field.value ?? false}

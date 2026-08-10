@@ -95,7 +95,10 @@ export function ActivateForm({ email }: Props) {
               <span className='font-semibold text-text'>{email}</span>.
             </p>
 
-            <form onSubmit={handleSubmit} className='w-full flex flex-col items-center'>
+            <form
+              onSubmit={handleSubmit}
+              className='w-full flex flex-col items-center'
+            >
               <ActivationCodeInput
                 value={code}
                 onChange={setCode}
@@ -103,7 +106,10 @@ export function ActivateForm({ email }: Props) {
               />
 
               {hasError && (
-                <p role='alert' className='text-xs text-danger text-center mt-3'>
+                <p
+                  role='alert'
+                  className='text-xs text-danger text-center mt-3'
+                >
                   Enter all 5 digits and try again.
                 </p>
               )}

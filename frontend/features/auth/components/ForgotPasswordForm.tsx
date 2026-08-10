@@ -34,10 +34,18 @@ export function ForgotPasswordForm() {
   if (mutation.isSuccess) {
     return (
       <div className='flex flex-col gap-4'>
-        <div role='status' className='bg-surface border border-border rounded-md p-4 flex gap-3 items-start'>
-          <i className='pi pi-envelope text-primary mt-px shrink-0 text-lg' aria-hidden='true' />
+        <div
+          role='status'
+          className='bg-surface border border-border rounded-md p-4 flex gap-3 items-start'
+        >
+          <i
+            className='pi pi-envelope text-primary mt-px shrink-0 text-lg'
+            aria-hidden='true'
+          />
           <div>
-            <h2 className='text-sm font-semibold text-text'>Check your email</h2>
+            <h2 className='text-sm font-semibold text-text'>
+              Check your email
+            </h2>
             <p className='text-sm text-text-muted mt-0.5'>
               If an account exists for that address, we&apos;ve sent a password
               reset link. Check your inbox (and spam folder).
@@ -61,8 +69,14 @@ export function ForgotPasswordForm() {
       className='flex flex-col gap-4'
     >
       {mutation.isError && (
-        <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+        <div
+          role='alert'
+          className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+        >
+          <i
+            className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+            aria-hidden='true'
+          />
           <div>
             <p className='text-sm font-semibold text-danger'>
               Something went wrong
@@ -90,12 +104,16 @@ export function ForgotPasswordForm() {
             placeholder='Email address'
             autoComplete='email'
             aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? 'forgot-password-email-error' : undefined}
+            aria-describedby={
+              errors.email ? 'forgot-password-email-error' : undefined
+            }
             className={`${inputBase} ${errors.email ? 'border-danger' : 'border-border'}`}
           />
         </div>
         {errors.email && (
-          <p id='forgot-password-email-error' className='text-xs text-danger'>{errors.email.message}</p>
+          <p id='forgot-password-email-error' className='text-xs text-danger'>
+            {errors.email.message}
+          </p>
         )}
       </div>
 

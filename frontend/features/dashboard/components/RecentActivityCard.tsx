@@ -33,9 +33,7 @@ export function RecentActivityCard() {
           <h2 id='recent-activity-heading' className='text-[15px] font-bold'>
             Recent activity
           </h2>
-          <p className='text-xs text-text-muted mt-0.5'>
-            Latest transactions
-          </p>
+          <p className='text-xs text-text-muted mt-0.5'>Latest transactions</p>
         </div>
         <Link
           href='/activity'

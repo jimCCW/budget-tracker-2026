@@ -6,12 +6,24 @@ export function LoginPage() {
     <div className='flex min-h-screen'>
       {/* Brand panel — desktop only */}
       <aside className='hidden lg:flex lg:w-[46%] flex-col justify-between p-12 relative overflow-hidden bg-linear-to-br from-primary to-primary-strong'>
-        <div aria-hidden='true' className='absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10' />
-        <div aria-hidden='true' className='absolute top-1/3 -left-20 w-80 h-80 rounded-full bg-white/7' />
-        <div aria-hidden='true' className='absolute -bottom-20 right-10 w-56 h-56 rounded-full bg-white/10' />
+        <div
+          aria-hidden='true'
+          className='absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10'
+        />
+        <div
+          aria-hidden='true'
+          className='absolute top-1/3 -left-20 w-80 h-80 rounded-full bg-white/7'
+        />
+        <div
+          aria-hidden='true'
+          className='absolute -bottom-20 right-10 w-56 h-56 rounded-full bg-white/10'
+        />
 
         <div className='relative flex items-center gap-3'>
-          <div aria-hidden='true' className='w-10 h-10 rounded-md bg-white/20 flex items-center justify-center'>
+          <div
+            aria-hidden='true'
+            className='w-10 h-10 rounded-md bg-white/20 flex items-center justify-center'
+          >
             <span className='text-white font-extrabold text-lg leading-none'>
               B
             </span>
@@ -37,7 +49,10 @@ export function LoginPage() {
         <div className='absolute top-4 right-4'>
           <ThemeToggle />
         </div>
-        <div aria-hidden='true' className='lg:hidden mb-6 w-14 h-14 rounded-2xl bg-primary flex items-center justify-center'>
+        <div
+          aria-hidden='true'
+          className='lg:hidden mb-6 w-14 h-14 rounded-2xl bg-primary flex items-center justify-center'
+        >
           <span className='text-white font-extrabold text-2xl leading-none'>
             B
           </span>

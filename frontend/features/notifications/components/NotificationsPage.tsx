@@ -53,9 +53,7 @@ function NotificationCard({
                 className='w-2 h-2 rounded-full bg-primary shrink-0'
               />
             )}
-            {!notification.isRead && (
-              <span className='sr-only'>Unread</span>
-            )}
+            {!notification.isRead && <span className='sr-only'>Unread</span>}
           </div>
           <p className='text-xs text-text-muted mt-1 leading-relaxed line-clamp-2'>
             {notification.body}
@@ -165,24 +163,24 @@ export function NotificationsPage() {
           {GROUP_ORDER.filter((g) => grouped.has(g)).map((group) => {
             const groupId = `notif-group-${group.toLowerCase().replace(/\s+/g, '-')}`;
             return (
-            <section key={group} aria-labelledby={groupId}>
-              <h2
-                id={groupId}
-                className='text-[11px] font-bold uppercase tracking-widest text-text-muted mb-3 px-0.5'
-              >
-                {group}
-              </h2>
-              <ul className='flex flex-col gap-2'>
-                {grouped.get(group)!.map((n) => (
-                  <li key={n.id}>
-                    <NotificationCard
-                      notification={n}
-                      onClick={() => setSelected(n)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
+              <section key={group} aria-labelledby={groupId}>
+                <h2
+                  id={groupId}
+                  className='text-[11px] font-bold uppercase tracking-widest text-text-muted mb-3 px-0.5'
+                >
+                  {group}
+                </h2>
+                <ul className='flex flex-col gap-2'>
+                  {grouped.get(group)!.map((n) => (
+                    <li key={n.id}>
+                      <NotificationCard
+                        notification={n}
+                        onClick={() => setSelected(n)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </section>
             );
           })}
 

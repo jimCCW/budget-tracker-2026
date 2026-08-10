@@ -344,7 +344,9 @@ export function CategoryFormModal({
                 placeholder='e.g. Coffee & cafés'
                 autoComplete='off'
                 aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? 'category-name-error' : undefined}
+                aria-describedby={
+                  errors.name ? 'category-name-error' : undefined
+                }
                 className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
               />
             </div>

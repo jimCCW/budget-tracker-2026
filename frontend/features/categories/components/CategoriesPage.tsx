@@ -96,7 +96,10 @@ export function CategoriesPage() {
           role='alert'
           className='bg-danger-tint border border-danger/30 rounded-lg p-4 flex gap-3 items-center'
         >
-          <i className='pi pi-times-circle text-danger text-lg' aria-hidden='true' />
+          <i
+            className='pi pi-times-circle text-danger text-lg'
+            aria-hidden='true'
+          />
           <p className='text-sm text-text-muted'>
             Failed to load categories. Please refresh.
           </p>

@@ -180,7 +180,10 @@ export function AddTransactionModal({
     >
       {/* Header */}
       <header className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 id='add-transaction-heading' className='text-base font-extrabold text-text tracking-tight'>
+        <h2
+          id='add-transaction-heading'
+          className='text-base font-extrabold text-text tracking-tight'
+        >
           New transaction
         </h2>
         <Button
@@ -272,7 +275,10 @@ export function AddTransactionModal({
                         },
                       }}
                     >
-                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} aria-hidden='true' />
+                      <i
+                        className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`}
+                        aria-hidden='true'
+                      />
                       {cat.name}
                     </Button>
                   );
@@ -372,7 +378,10 @@ export function AddTransactionModal({
                         },
                       }}
                     >
-                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} aria-hidden='true' />
+                      <i
+                        className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`}
+                        aria-hidden='true'
+                      />
                       {cat.name}
                     </Button>
                   );
@@ -432,8 +441,14 @@ function ErrorBanner({
 }) {
   if (!mutation.isError) return null;
   return (
-    <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-      <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+    <div
+      role='alert'
+      className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+    >
+      <i
+        className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+        aria-hidden='true'
+      />
       <p className='text-sm text-text-muted mt-0.5'>
         {mutation.error instanceof Error
           ? mutation.error.message
@@ -454,11 +469,17 @@ function AmountField({
 }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label htmlFor='tx-amount' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+      <label
+        htmlFor='tx-amount'
+        className='text-xs font-bold text-text-muted uppercase tracking-wide'
+      >
         Amount
       </label>
       <div className='relative'>
-        <span aria-hidden='true' className='absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm pointer-events-none font-medium'>
+        <span
+          aria-hidden='true'
+          className='absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm pointer-events-none font-medium'
+        >
           S$
         </span>
         <InputText
@@ -473,7 +494,11 @@ function AmountField({
           className={`${className} ${error ? 'border-danger' : 'border-border'}`}
         />
       </div>
-      {error && <p id='tx-amount-error' className='text-xs text-danger'>{error}</p>}
+      {error && (
+        <p id='tx-amount-error' className='text-xs text-danger'>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -538,11 +563,17 @@ function DateField({
 }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label htmlFor='tx-date' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+      <label
+        htmlFor='tx-date'
+        className='text-xs font-bold text-text-muted uppercase tracking-wide'
+      >
         Date
       </label>
       <div className='relative'>
-        <i className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' aria-hidden='true' />
+        <i
+          className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+          aria-hidden='true'
+        />
         <InputText
           id='tx-date'
           {...(registration as Parameters<typeof InputText>[0])}
@@ -554,7 +585,11 @@ function DateField({
           }`}
         />
       </div>
-      {error && <p id='tx-date-error' className='text-xs text-danger'>{error}</p>}
+      {error && (
+        <p id='tx-date-error' className='text-xs text-danger'>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -568,14 +603,20 @@ function NoteField({
 }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label htmlFor='tx-note' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+      <label
+        htmlFor='tx-note'
+        className='text-xs font-bold text-text-muted uppercase tracking-wide'
+      >
         Note{' '}
         <span className='font-normal normal-case text-text-dim'>
           (optional)
         </span>
       </label>
       <div className='relative'>
-        <i className='pi pi-pencil absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' aria-hidden='true' />
+        <i
+          className='pi pi-pencil absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+          aria-hidden='true'
+        />
         <InputText
           id='tx-note'
           {...(registration as Parameters<typeof InputText>[0])}

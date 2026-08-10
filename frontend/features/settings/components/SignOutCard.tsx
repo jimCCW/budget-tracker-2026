@@ -12,9 +12,14 @@ export function SignOutCard() {
   }
 
   return (
-    <section aria-labelledby='sign-out-heading' className='bg-surface rounded-xl border border-border p-6 flex items-center justify-between'>
+    <section
+      aria-labelledby='sign-out-heading'
+      className='bg-surface rounded-xl border border-border p-6 flex items-center justify-between'
+    >
       <div>
-        <h2 id='sign-out-heading' className='text-sm font-bold text-text'>Sign out</h2>
+        <h2 id='sign-out-heading' className='text-sm font-bold text-text'>
+          Sign out
+        </h2>
         <p className='text-xs text-text-muted mt-0.5'>
           End your session on this device
         </p>

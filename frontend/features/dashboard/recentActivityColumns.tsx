@@ -25,9 +25,7 @@ export const recentActivityColumns: ColumnDef<TxRow>[] = [
           >
             <i className={`pi ${tx.icon} text-sm`} />
           </div>
-          <span className='font-semibold truncate max-w-40'>
-            {tx.name}
-          </span>
+          <span className='font-semibold truncate max-w-40'>{tx.name}</span>
         </div>
       );
     },

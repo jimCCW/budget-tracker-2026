@@ -47,8 +47,14 @@ export function LoginForm() {
       className='flex flex-col gap-4'
     >
       {mutation.isError && (
-        <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+        <div
+          role='alert'
+          className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+        >
+          <i
+            className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+            aria-hidden='true'
+          />
           <div>
             <p className='text-sm font-semibold text-danger'>Sign-in failed</p>
             <p className='text-sm text-text-muted mt-0.5'>
@@ -79,7 +85,9 @@ export function LoginForm() {
           />
         </div>
         {errors.email && (
-          <p id='login-email-error' className='text-xs text-danger'>{errors.email.message}</p>
+          <p id='login-email-error' className='text-xs text-danger'>
+            {errors.email.message}
+          </p>
         )}
       </div>
 

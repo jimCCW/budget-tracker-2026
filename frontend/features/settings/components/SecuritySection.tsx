@@ -13,8 +13,14 @@ export function SecuritySection() {
   const revokeMutation = useRevokeSession();
 
   return (
-    <section aria-labelledby='security-heading' className='bg-surface rounded-xl border border-border p-6'>
-      <h2 id='security-heading' className='text-base font-extrabold text-text tracking-tight mb-1'>
+    <section
+      aria-labelledby='security-heading'
+      className='bg-surface rounded-xl border border-border p-6'
+    >
+      <h2
+        id='security-heading'
+        className='text-base font-extrabold text-text tracking-tight mb-1'
+      >
         Security
       </h2>
       <p className='text-sm text-text-muted mb-5'>
@@ -23,7 +29,10 @@ export function SecuritySection() {
 
       <div className='flex items-center justify-between py-3 border-b border-border'>
         <div className='flex items-center gap-3'>
-          <div className='w-9 h-9 rounded-lg bg-primary-tint text-primary flex items-center justify-center shrink-0' aria-hidden='true'>
+          <div
+            className='w-9 h-9 rounded-lg bg-primary-tint text-primary flex items-center justify-center shrink-0'
+            aria-hidden='true'
+          >
             <i className='pi pi-lock text-base' />
           </div>
           <div>
@@ -69,7 +78,10 @@ export function SecuritySection() {
                 key={session.id}
                 className={`flex items-center gap-3 py-2.5 ${i < (sessions?.length ?? 0) - 1 ? 'border-b border-border' : ''}`}
               >
-                <div className='w-9 h-9 rounded-lg bg-bg border border-border flex items-center justify-center shrink-0' aria-hidden='true'>
+                <div
+                  className='w-9 h-9 rounded-lg bg-bg border border-border flex items-center justify-center shrink-0'
+                  aria-hidden='true'
+                >
                   <i className='pi pi-desktop text-text-muted text-sm' />
                 </div>
                 <div className='flex-1 min-w-0'>

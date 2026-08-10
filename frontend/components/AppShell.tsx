@@ -149,9 +149,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
               {initials}
             </div>
             <div className='flex-1 min-w-0'>
-              <p className='text-[12.5px] font-bold truncate'>
-                {displayName}
-              </p>
+              <p className='text-[12.5px] font-bold truncate'>{displayName}</p>
               <p className='text-[10.5px] text-text-muted truncate'>
                 {userEmail}
               </p>

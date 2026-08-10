@@ -74,8 +74,14 @@ export function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
 
     return (
       <div className='flex flex-col gap-4'>
-        <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+        <div
+          role='alert'
+          className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+        >
+          <i
+            className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+            aria-hidden='true'
+          />
           <div>
             <h2 className='text-sm font-semibold text-danger'>
               {isExpired ? 'Link expired' : 'Reset failed'}

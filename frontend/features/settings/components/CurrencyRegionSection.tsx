@@ -6,8 +6,14 @@ export function CurrencyRegionSection() {
   const { data: profile, isLoading } = useProfile();
 
   return (
-    <section aria-labelledby='currency-region-heading' className='bg-surface rounded-xl border border-border p-6'>
-      <h2 id='currency-region-heading' className='text-base font-extrabold text-text tracking-tight mb-1'>
+    <section
+      aria-labelledby='currency-region-heading'
+      className='bg-surface rounded-xl border border-border p-6'
+    >
+      <h2
+        id='currency-region-heading'
+        className='text-base font-extrabold text-text tracking-tight mb-1'
+      >
         Currency & region
       </h2>
       <p className='text-sm text-text-muted mb-5'>
@@ -36,7 +42,10 @@ export function CurrencyRegionSection() {
                 {profile?.currency}
               </dd>
             </div>
-            <i className='pi pi-check text-primary text-base' aria-hidden='true' />
+            <i
+              className='pi pi-check text-primary text-base'
+              aria-hidden='true'
+            />
           </div>
           <div className='flex items-center justify-between py-2.5'>
             <div>
@@ -45,7 +54,10 @@ export function CurrencyRegionSection() {
                 {profile?.language}
               </dd>
             </div>
-            <i className='pi pi-check text-primary text-base' aria-hidden='true' />
+            <i
+              className='pi pi-check text-primary text-base'
+              aria-hidden='true'
+            />
           </div>
         </dl>
       )}

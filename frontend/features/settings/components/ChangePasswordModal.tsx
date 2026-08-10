@@ -54,9 +54,16 @@ export function ChangePasswordModal({ open, onClose }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} ariaLabelledBy='change-password-heading'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy='change-password-heading'
+    >
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 id='change-password-heading' className='text-base font-extrabold text-text tracking-tight'>
+        <h2
+          id='change-password-heading'
+          className='text-base font-extrabold text-text tracking-tight'
+        >
           Change password
         </h2>
         <Button
@@ -80,8 +87,14 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         className='p-6 flex flex-col gap-4'
       >
         {mutation.isError && (
-          <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+          <div
+            role='alert'
+            className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+          >
+            <i
+              className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+              aria-hidden='true'
+            />
             <p className='text-sm text-text-muted mt-0.5'>
               {mutation.error instanceof Error
                 ? mutation.error.message
@@ -91,7 +104,10 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         )}
 
         <div className='flex flex-col gap-1'>
-          <label htmlFor='current-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='current-password'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             Current password
           </label>
           <div className='relative'>
@@ -130,7 +146,10 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         </div>
 
         <div className='flex flex-col gap-1'>
-          <label htmlFor='new-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='new-password'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             New password
           </label>
           <div className='relative'>
@@ -167,7 +186,10 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         </div>
 
         <div className='flex flex-col gap-1'>
-          <label htmlFor='confirm-new-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='confirm-new-password'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             Confirm new password
           </label>
           <div className='relative'>

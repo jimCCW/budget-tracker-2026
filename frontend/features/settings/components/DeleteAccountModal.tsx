@@ -52,9 +52,16 @@ export function DeleteAccountModal({ open, onClose }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} ariaLabelledBy='settings-delete-account-heading'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy='settings-delete-account-heading'
+    >
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 id='settings-delete-account-heading' className='text-base font-extrabold text-danger tracking-tight'>
+        <h2
+          id='settings-delete-account-heading'
+          className='text-base font-extrabold text-danger tracking-tight'
+        >
           Delete account
         </h2>
         <Button
@@ -84,8 +91,14 @@ export function DeleteAccountModal({ open, onClose }: Props) {
         </p>
 
         {mutation.isError && (
-          <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+          <div
+            role='alert'
+            className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+          >
+            <i
+              className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+              aria-hidden='true'
+            />
             <p className='text-sm text-text-muted mt-0.5'>
               {mutation.error instanceof Error
                 ? mutation.error.message
@@ -95,7 +108,10 @@ export function DeleteAccountModal({ open, onClose }: Props) {
         )}
 
         <div className='flex flex-col gap-1'>
-          <label htmlFor='delete-account-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='delete-account-password'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             Confirm your password
           </label>
           <div className='relative'>

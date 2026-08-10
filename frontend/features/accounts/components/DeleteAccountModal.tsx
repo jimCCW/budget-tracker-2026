@@ -42,7 +42,10 @@ export function DeleteAccountModal({ open, onClose, account }: Props) {
 
         {/* Text */}
         <div className='text-center'>
-          <h2 id='delete-account-heading' className='text-base font-extrabold text-text'>
+          <h2
+            id='delete-account-heading'
+            className='text-base font-extrabold text-text'
+          >
             Delete account?
           </h2>
           <p className='text-sm text-text-muted mt-1'>

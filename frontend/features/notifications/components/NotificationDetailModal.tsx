@@ -58,7 +58,10 @@ export function NotificationDetailModal({ notification, onClose }: Props) {
         </div>
 
         {/* Content */}
-        <h2 id='notification-detail-heading' className='text-base font-bold text-text mb-2'>
+        <h2
+          id='notification-detail-heading'
+          className='text-base font-bold text-text mb-2'
+        >
           {notification.title}
         </h2>
         <p className='text-sm text-text-muted leading-relaxed mb-4'>
