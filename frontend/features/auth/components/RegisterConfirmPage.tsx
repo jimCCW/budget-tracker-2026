@@ -8,8 +8,8 @@ interface Props {
 export function RegisterConfirmPage({ email }: Props) {
   return (
     <main className='min-h-screen flex flex-col items-center justify-center px-5 py-10 bg-bg'>
-      <div className='w-full max-w-[400px] flex flex-col items-center text-center'>
-        <div className='relative mb-8'>
+      <div className='w-full max-w-100 flex flex-col items-center text-center'>
+        <div aria-hidden='true' className='relative mb-8'>
           <div className='w-24 h-24 rounded-full bg-primary-tint flex items-center justify-center'>
             <i className='pi pi-envelope text-primary text-[42px]' />
           </div>
@@ -29,7 +29,7 @@ export function RegisterConfirmPage({ email }: Props) {
 
         <Link
           href={`/register/activate?email=${encodeURIComponent(email)}`}
-          className='w-full h-[50px] bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors flex items-center justify-center mb-3'
+          className='w-full h-12.5 bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors flex items-center justify-center mb-3'
         >
           Enter activation code
         </Link>

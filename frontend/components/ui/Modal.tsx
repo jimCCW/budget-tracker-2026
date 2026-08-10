@@ -7,6 +7,8 @@ type ModalProps = {
   children: React.ReactNode;
   /** Max width class, e.g. 'max-w-lg' or 'max-w-4xl'. Defaults to 'max-w-lg'. */
   maxWidth?: string;
+  /** id of the heading rendered inside `children` — gives the dialog an accessible name. */
+  ariaLabelledBy?: string;
 };
 
 export function Modal({
@@ -14,6 +16,7 @@ export function Modal({
   onClose,
   children,
   maxWidth = 'max-w-lg',
+  ariaLabelledBy,
 }: ModalProps) {
   return (
     <Dialog
@@ -28,6 +31,7 @@ export function Modal({
         },
         root: {
           className: `relative w-full ${maxWidth} bg-surface rounded-xl shadow-lg border border-border`,
+          'aria-labelledby': ariaLabelledBy,
         },
         content: { className: 'max-h-[90vh] overflow-y-auto p-0' },
         header: { className: 'hidden' },

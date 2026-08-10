@@ -25,16 +25,24 @@ export function DeleteAccountModal({ open, onClose, account }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} maxWidth='max-w-sm'>
-      <div className='p-6 flex flex-col gap-4'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      maxWidth='max-w-sm'
+      ariaLabelledBy='delete-account-heading'
+    >
+      <div role='alertdialog' className='p-6 flex flex-col gap-4'>
         {/* Icon */}
-        <div className='w-12 h-12 rounded-full bg-danger-tint flex items-center justify-center mx-auto'>
+        <div
+          aria-hidden='true'
+          className='w-12 h-12 rounded-full bg-danger-tint flex items-center justify-center mx-auto'
+        >
           <i className='pi pi-trash text-danger text-xl' />
         </div>
 
         {/* Text */}
         <div className='text-center'>
-          <h2 className='text-base font-extrabold text-text'>
+          <h2 id='delete-account-heading' className='text-base font-extrabold text-text'>
             Delete account?
           </h2>
           <p className='text-sm text-text-muted mt-1'>
@@ -45,8 +53,14 @@ export function DeleteAccountModal({ open, onClose, account }: Props) {
 
         {/* Error */}
         {mutation.isError && (
-          <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-base' />
+          <div
+            role='alert'
+            className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+          >
+            <i
+              className='pi pi-times-circle text-danger mt-px shrink-0 text-base'
+              aria-hidden='true'
+            />
             <p className='text-sm text-text-muted mt-0.5'>
               {mutation.error instanceof Error
                 ? mutation.error.message

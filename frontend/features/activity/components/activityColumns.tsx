@@ -19,14 +19,17 @@ export const activityColumns: ColumnDef<ActivityItem>[] = [
           <div
             className='w-8 h-8 rounded-[9px] flex items-center justify-center shrink-0'
             style={style}
+            aria-hidden='true'
           >
             <i className={`pi ${item.category.icon ?? 'pi-tag'} text-sm`} />
           </div>
-          <span className='font-semibold truncate max-w-[180px]'>{label}</span>
+          <span className='font-semibold truncate max-w-45'>{label}</span>
           {item.isRecurring && (
             <i
               className='pi pi-refresh text-[11px] text-text-muted shrink-0'
               title='Recurring'
+              aria-label='Recurring'
+              role='img'
             />
           )}
         </div>
@@ -76,6 +79,7 @@ export const activityColumns: ColumnDef<ActivityItem>[] = [
         <span
           className={`font-bold tabular-nums ${signed > 0 ? 'text-success' : 'text-text'}`}
         >
+          <span className='sr-only'>{signed > 0 ? 'Income ' : 'Expense '}</span>
           {signed > 0 ? '+' : '-'}
           {formatCurrency(Math.abs(signed))}
         </span>

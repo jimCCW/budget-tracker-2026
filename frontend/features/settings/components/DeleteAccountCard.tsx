@@ -7,8 +7,8 @@ export function DeleteAccountCard() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className='bg-danger-tint rounded-xl border border-danger/30 p-6'>
-      <h2 className='text-base font-extrabold text-danger tracking-tight mb-1'>
+    <section aria-labelledby='danger-zone-heading' className='bg-danger-tint rounded-xl border border-danger/30 p-6'>
+      <h2 id='danger-zone-heading' className='text-base font-extrabold text-danger tracking-tight mb-1'>
         Danger zone
       </h2>
       <p className='text-sm text-text mb-4'>
@@ -30,6 +30,6 @@ export function DeleteAccountCard() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
       />
-    </div>
+    </section>
   );
 }

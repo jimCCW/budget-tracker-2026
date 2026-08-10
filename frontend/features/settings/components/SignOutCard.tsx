@@ -12,12 +12,12 @@ export function SignOutCard() {
   }
 
   return (
-    <div className='bg-surface rounded-xl border border-border p-6 flex items-center justify-between'>
+    <section aria-labelledby='sign-out-heading' className='bg-surface rounded-xl border border-border p-6 flex items-center justify-between'>
       <div>
-        <div className='text-sm font-bold text-text'>Sign out</div>
-        <div className='text-xs text-text-muted mt-0.5'>
+        <h2 id='sign-out-heading' className='text-sm font-bold text-text'>Sign out</h2>
+        <p className='text-xs text-text-muted mt-0.5'>
           End your session on this device
-        </div>
+        </p>
       </div>
       <Button
         label={signingOut ? 'Signing out…' : 'Sign out'}
@@ -34,6 +34,6 @@ export function SignOutCard() {
           loadingIcon: { className: 'animate-spin text-sm' },
         }}
       />
-    </div>
+    </section>
   );
 }

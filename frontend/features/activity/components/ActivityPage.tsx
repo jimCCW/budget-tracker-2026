@@ -87,7 +87,13 @@ export function ActivityPage({
           onCategoryChange={handleCategoryChange}
           onDatePresetChange={handleDatePresetChange}
         />
-        <div className='bg-surface border border-border rounded-lg p-4 flex flex-col gap-4'>
+        <section
+          aria-labelledby='activity-transactions-heading'
+          className='bg-surface border border-border rounded-lg p-4 flex flex-col gap-4'
+        >
+          <h2 id='activity-transactions-heading' className='sr-only'>
+            Transactions
+          </h2>
           <ActivitySearchExportBar
             onSearchChange={handleSearchChange}
             onExport={() => exportMutation.mutate(filters)}
@@ -103,7 +109,7 @@ export function ActivityPage({
             totalCount={data?.total}
             onPageChange={handlePageChange}
           />
-        </div>
+        </section>
       </div>
     </AppShell>
   );

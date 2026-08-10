@@ -108,8 +108,8 @@ Full tree lives in `docs/ARCHITECTURE.md` under "Frontend — Feature-based Stru
 
 - **Unstyled mode:** `PrimeReactProvider` uses `unstyled: true` — no default styles are applied. Every PrimeReact component must have `pt` passthrough props to apply Tailwind classes. Move existing `className` from native elements into the appropriate `pt` slot (usually `pt={{ root: { className: '...' } }}`).
 - **Exception:** Use Next.js `<Link>` for navigation links (href-based). Only wrap with `Button` if the element triggers an action (no navigation intended).
-- **Menu popup pattern:** Use `const menuRef = useRef<Menu>(null)` + `<Menu model={items} popup ref={menuRef} />` + `<Button onClick={(e) => menuRef.current?.toggle(e)} />`. Items use `{ label, icon, command }` shape (`import type { MenuItem } from 'primereact/menuitem'`).
-- **Dialog pattern:** Use `visible`, `onHide`, `closable={false}`, `dismissableMask`. Apply overlay styles via `pt.mask`, panel styles via `pt.root`, inner scroll via `pt.content`. Suppress the built-in header with `pt={{ header: { className: 'hidden' } }}` when custom header UI is rendered inside `children`.
+- **Menu popup pattern:** Use `const menuRef = useRef<Menu>(null)` + `<Menu model={items} popup ref={menuRef} />` + `<Button onClick={(e) => menuRef.current?.toggle(e)} />`. Items use `{ label, icon, command }` shape (`import type { MenuItem } from 'primereact/menuitem'`). For an accessible trigger, give the `Menu` an `id`, track open state via its `onShow`/`onHide` callbacks, and set `aria-haspopup='menu'`, `aria-controls={id}`, `aria-expanded={open}` on the trigger `Button` (see `AccountCard.tsx` / `CategoryCard.tsx`).
+- **Dialog pattern:** Use `visible`, `onHide`, `closable={false}`, `dismissableMask`. Apply overlay styles via `pt.mask`, panel styles via `pt.root`, inner scroll via `pt.content`. Suppress the built-in header with `pt={{ header: { className: 'hidden' } }}` when custom header UI is rendered inside `children`. IMPORTANT: `Dialog` still defaults `aria-labelledby` to that now-hidden header's id, leaving the dialog with no accessible name — pass `ariaLabelledBy` to the shared `Modal` component (`@/components/ui/Modal`), pointing at the `id` of the heading you render inside `children`.
 
 ### Forms
 
@@ -120,6 +120,7 @@ Full tree lives in `docs/ARCHITECTURE.md` under "Frontend — Feature-based Stru
 - Use `useForm<T>({ resolver: zodResolver(schema) })`
 - PrimeReact `Checkbox` in unstyled mode renders a native `<input>` alongside the custom `pt.box`, causing a double checkbox. Always add `input: { className: 'sr-only' }` to the `pt` prop.
 - PrimeReact `Checkbox`: `data-p-checked` is set on the root, NOT on `pt.box` — `data-[p-checked=true]:bg-primary` in `pt.box` will silently do nothing. Drive checked styles from the React boolean prop directly: `pt={{ box: { className: checked ? 'bg-primary border-primary' : 'bg-surface border-border' } }}`
+- PrimeReact `Password`: associate a `<label>` via `inputId`, not `id` — `id` lands on the wrapper `<div>`, not the underlying `<input>`, so `htmlFor` silently fails to associate.
 
 ### Tailwind v4 Class Patterns
 
@@ -150,7 +151,7 @@ Full tree lives in `docs/ARCHITECTURE.md` under "Frontend — Feature-based Stru
 - Test runner: **Vitest** (not Jest — the backend uses Jest). Tests live in `frontend/__tests__/` mirroring the source tree (`app/`, `components/`, `features/`, `lib/`, plus shared `helpers/`).
 - Run with `pnpm test:run` (or `pnpm test` to watch). If pnpm's dependency check stalls, call the binary directly: `./node_modules/.bin/vitest run`.
 - Environment is `jsdom` with `globals: true`; `@` resolves to the frontend root.
-- Mock the API client wholesale rather than stubbing axios — `vi.mock('@/lib/api', ...)`, the pattern used by 38 of the test files.
+- Mock the API client wholesale rather than stubbing axios — `vi.mock('@/lib/api', ...)`, the pattern used by 45 of the test files.
 - For modules with singleton state (e.g. `lib/authToken.ts`), use `vi.resetModules()` plus a dynamic `await import()` inside `beforeEach` so each test gets a fresh instance.
 - `pnpm tsc --noEmit` currently reports pre-existing errors in `__tests__/` (partial mocks cast to `UseMutationResult`, and stale fixtures). These are not caused by your change — check whether the failing file is one you touched before investigating.
 

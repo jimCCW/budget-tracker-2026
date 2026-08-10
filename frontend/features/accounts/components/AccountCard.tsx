@@ -1,5 +1,5 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
@@ -15,6 +15,8 @@ type Props = {
 
 export function AccountCard({ account, onEdit, onDelete }: Props) {
   const menuRef = useRef<Menu>(null);
+  const menuId = `account-menu-${account.id}`;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const meta = ACCOUNT_TYPE_META[account.type];
   const color = account.color ?? meta.color;
@@ -35,27 +37,31 @@ export function AccountCard({ account, onEdit, onDelete }: Props) {
   ];
 
   return (
-    <div className='bg-surface border border-border rounded-xl p-4 flex flex-col gap-3 hover:shadow-sm transition-shadow'>
+    <article className='bg-surface border border-border rounded-xl p-4 flex flex-col gap-3 hover:shadow-sm transition-shadow'>
       <div className='flex items-center gap-3'>
         <div
           className='w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-white'
           style={{ backgroundColor: color }}
+          aria-hidden='true'
         >
           <i className={`pi ${icon} text-lg`} />
         </div>
 
         <div className='flex-1 min-w-0'>
-          <div className='text-sm font-bold text-text truncate'>
+          <h3 className='text-sm font-bold text-text truncate'>
             {account.name}
-          </div>
-          <div className='text-xs text-text-muted mt-0.5'>{meta.label}</div>
+          </h3>
+          <p className='text-xs text-text-muted mt-0.5'>{meta.label}</p>
         </div>
 
         <div className='relative'>
           <Menu
+            id={menuId}
             model={menuItems}
             popup
             ref={menuRef}
+            onShow={() => setMenuOpen(true)}
+            onHide={() => setMenuOpen(false)}
             pt={{
               root: {
                 className:
@@ -72,6 +78,9 @@ export function AccountCard({ account, onEdit, onDelete }: Props) {
             icon='pi pi-ellipsis-v'
             onClick={(e) => menuRef.current?.toggle(e)}
             aria-label='Account options'
+            aria-haspopup='menu'
+            aria-controls={menuId}
+            aria-expanded={menuOpen}
             pt={{
               root: {
                 className:
@@ -83,17 +92,18 @@ export function AccountCard({ account, onEdit, onDelete }: Props) {
         </div>
       </div>
 
-      <div
+      <p
         className={`text-xl font-extrabold tabular-nums ${account.type === 'CREDIT' ? 'text-danger' : 'text-text'}`}
       >
         {formatCurrency(account.balance)}
-      </div>
+      </p>
 
       {/* Color accent bar */}
       <div
+        aria-hidden='true'
         className='h-1 rounded-full opacity-30'
         style={{ backgroundColor: color }}
       />
-    </div>
+    </article>
   );
 }

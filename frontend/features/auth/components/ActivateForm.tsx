@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from 'primereact/button';
@@ -19,8 +19,9 @@ export function ActivateForm({ email }: Props) {
 
   const hasError = activate.isError;
 
-  async function handleSubmit() {
-    if (code.length < 5) return;
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (code.replace(/\s/g, '').length < 5) return;
     await activate.mutateAsync({ email, code });
     router.push('/login');
   }
@@ -32,14 +33,14 @@ export function ActivateForm({ email }: Props) {
 
   return (
     <main className='min-h-screen flex flex-col items-center justify-center px-5 py-10 bg-bg'>
-      <div className='w-full max-w-[400px] flex flex-col items-center'>
+      <div className='w-full max-w-100 flex flex-col items-center'>
         {activate.isError ? (
           <>
-            <div className='relative mb-8'>
-              <div className='w-[110px] h-[110px] rounded-full bg-danger-tint flex items-center justify-center'>
+            <div className='relative mb-8' aria-hidden='true'>
+              <div className='w-27.5 h-27.5 rounded-full bg-danger-tint flex items-center justify-center'>
                 <i className='pi pi-times text-danger text-[56px]' />
               </div>
-              <div className='absolute inset-[-8px] rounded-full border-2 border-danger/20 pointer-events-none' />
+              <div className='absolute -inset-2 rounded-full border-2 border-danger/20 pointer-events-none' />
             </div>
 
             <h1 className='text-[22px] font-bold text-text tracking-[-0.02em] mb-3 text-center'>
@@ -58,7 +59,7 @@ export function ActivateForm({ email }: Props) {
               pt={{
                 root: {
                   className:
-                    'w-full h-[50px] bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors flex items-center justify-center mb-3',
+                    'w-full h-12.5 bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors flex items-center justify-center mb-3',
                 },
               }}
             />
@@ -78,7 +79,7 @@ export function ActivateForm({ email }: Props) {
               pt={{
                 root: {
                   className:
-                    'w-full h-[50px] border border-border text-text-muted hover:text-text text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 flex items-center justify-center gap-2',
+                    'w-full h-12.5 border border-border text-text-muted hover:text-text text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 flex items-center justify-center gap-2',
                 },
                 loadingIcon: { className: 'animate-spin text-base' },
               }}
@@ -94,34 +95,35 @@ export function ActivateForm({ email }: Props) {
               <span className='font-semibold text-text'>{email}</span>.
             </p>
 
-            <ActivationCodeInput
-              value={code}
-              onChange={setCode}
-              hasError={hasError}
-            />
+            <form onSubmit={handleSubmit} className='w-full flex flex-col items-center'>
+              <ActivationCodeInput
+                value={code}
+                onChange={setCode}
+                hasError={hasError}
+              />
 
-            {hasError && (
-              <p className='text-xs text-danger text-center mt-3'>
-                Enter all 5 digits and try again.
-              </p>
-            )}
+              {hasError && (
+                <p role='alert' className='text-xs text-danger text-center mt-3'>
+                  Enter all 5 digits and try again.
+                </p>
+              )}
 
-            <Button
-              type='button'
-              loading={activate.isPending}
-              disabled={
-                activate.isPending || code.replace(/\s/g, '').length < 5
-              }
-              onClick={handleSubmit}
-              label={activate.isPending ? 'Activating…' : 'Activate account'}
-              pt={{
-                root: {
-                  className:
-                    'w-full h-[50px] bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8',
-                },
-                loadingIcon: { className: 'animate-spin text-base' },
-              }}
-            />
+              <Button
+                type='submit'
+                loading={activate.isPending}
+                disabled={
+                  activate.isPending || code.replace(/\s/g, '').length < 5
+                }
+                label={activate.isPending ? 'Activating…' : 'Activate account'}
+                pt={{
+                  root: {
+                    className:
+                      'w-full h-12.5 bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8',
+                  },
+                  loadingIcon: { className: 'animate-spin text-base' },
+                }}
+              />
+            </form>
 
             <div className='flex items-center gap-4 mt-6 text-xs text-text-dim'>
               <button
@@ -132,7 +134,7 @@ export function ActivateForm({ email }: Props) {
               >
                 {resend.isSuccess ? 'Code sent!' : "Didn't get a code? Resend"}
               </button>
-              <span>·</span>
+              <span aria-hidden='true'>·</span>
               <Link
                 href='/register'
                 className='hover:text-text-muted transition-colors'

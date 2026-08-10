@@ -29,7 +29,7 @@ export type RecurringRuleModalProps = {
 };
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 export function RecurringRuleModal({
   open,
@@ -134,16 +134,25 @@ export function RecurringRuleModal({
     : 'bg-success hover:opacity-90 text-white';
 
   return (
-    <Modal open={open} onClose={onClose} maxWidth='max-w-2xl'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      maxWidth='max-w-2xl'
+      ariaLabelledBy='recurring-rule-heading'
+    >
       {/* Header */}
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 className='text-base font-extrabold text-text tracking-tight'>
+        <h2
+          id='recurring-rule-heading'
+          className='text-base font-extrabold text-text tracking-tight'
+        >
           {isEdit ? 'Edit recurring rule' : 'New recurring rule'}
         </h2>
         <Button
           type='button'
           icon='pi pi-times'
           onClick={onClose}
+          aria-label='Close'
           pt={{
             root: {
               className:
@@ -184,26 +193,37 @@ export function RecurringRuleModal({
 
         {/* Amount */}
         <div className='flex flex-col gap-1'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='rule-amount'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             Amount
           </label>
           <div className='relative'>
-            <span className='absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm pointer-events-none font-medium'>
+            <span
+              aria-hidden='true'
+              className='absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm pointer-events-none font-medium'
+            >
               S$
             </span>
             <InputText
+              id='rule-amount'
               {...register('amount', { valueAsNumber: true })}
               type='number'
               step='0.01'
               min='0'
               placeholder='0.00'
+              aria-invalid={!!errors.amount}
+              aria-describedby={errors.amount ? 'rule-amount-error' : undefined}
               className={`${inputBase} pl-10 tabular-nums ${
                 isExpense ? '' : 'text-success'
               } ${errors.amount ? 'border-danger' : 'border-border'}`}
             />
           </div>
           {errors.amount && (
-            <p className='text-xs text-danger'>{errors.amount.message}</p>
+            <p id='rule-amount-error' className='text-xs text-danger'>
+              {errors.amount.message}
+            </p>
           )}
           {displayAmount > 0 && (
             <p className='text-xs text-text-muted'>
@@ -214,10 +234,10 @@ export function RecurringRuleModal({
         </div>
 
         {/* Frequency */}
-        <div className='flex flex-col gap-2'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+        <fieldset className='flex flex-col gap-2'>
+          <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
             Frequency
-          </label>
+          </legend>
           <div className='flex gap-2'>
             {FREQUENCIES.map(({ value, label, icon }) => (
               <Button
@@ -234,18 +254,18 @@ export function RecurringRuleModal({
                   },
                 }}
               >
-                <i className={`pi ${icon} text-xs`} />
+                <i className={`pi ${icon} text-xs`} aria-hidden='true' />
                 {label}
               </Button>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         {/* Category — expense only */}
-        <div className='flex flex-col gap-2'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+        <fieldset className='flex flex-col gap-2'>
+          <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
             Category
-          </label>
+          </legend>
           <div className='flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1'>
             {visibleCategories.map((cat) => {
               const selected = cat.id === watchedCategoryId;
@@ -273,7 +293,10 @@ export function RecurringRuleModal({
                     },
                   }}
                 >
-                  <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} />
+                  <i
+                    className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`}
+                    aria-hidden='true'
+                  />
                   {cat.name}
                 </Button>
               );
@@ -282,13 +305,13 @@ export function RecurringRuleModal({
           {errors.categoryId && (
             <p className='text-xs text-danger'>{errors.categoryId.message}</p>
           )}
-        </div>
+        </fieldset>
 
         {/* Account */}
-        <div className='flex flex-col gap-2'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+        <fieldset className='flex flex-col gap-2'>
+          <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
             {isExpense ? 'Pay from' : 'Deposit to'}
-          </label>
+          </legend>
           <div className='flex flex-wrap gap-2'>
             {accounts.map((acc) => {
               const selected = acc.id === watchedAccountId;
@@ -309,7 +332,7 @@ export function RecurringRuleModal({
                     },
                   }}
                 >
-                  <i className='pi pi-wallet text-[11px]' />
+                  <i className='pi pi-wallet text-[11px]' aria-hidden='true' />
                   {acc.name}
                 </Button>
               );
@@ -318,36 +341,56 @@ export function RecurringRuleModal({
           {errors.accountId && (
             <p className='text-xs text-danger'>{errors.accountId.message}</p>
           )}
-        </div>
+        </fieldset>
 
         {/* Start + End date */}
         <div className='grid grid-cols-2 gap-4'>
           <div className='flex flex-col gap-1'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <label
+              htmlFor='rule-start-date'
+              className='text-xs font-bold text-text-muted uppercase tracking-wide'
+            >
               Start date
             </label>
             <div className='relative'>
-              <i className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <i
+                className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+                aria-hidden='true'
+              />
               <InputText
+                id='rule-start-date'
                 {...register('startDate')}
                 type='date'
+                aria-invalid={!!errors.startDate}
+                aria-describedby={
+                  errors.startDate ? 'rule-start-date-error' : undefined
+                }
                 className={`${inputBase} pl-10 pr-3 ${errors.startDate ? 'border-danger' : 'border-border'}`}
               />
             </div>
             {errors.startDate && (
-              <p className='text-xs text-danger'>{errors.startDate.message}</p>
+              <p id='rule-start-date-error' className='text-xs text-danger'>
+                {errors.startDate.message}
+              </p>
             )}
           </div>
           <div className='flex flex-col gap-1'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <label
+              htmlFor='rule-end-date'
+              className='text-xs font-bold text-text-muted uppercase tracking-wide'
+            >
               End date{' '}
               <span className='font-normal normal-case text-text-dim'>
                 (optional)
               </span>
             </label>
             <div className='relative'>
-              <i className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <i
+                className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+                aria-hidden='true'
+              />
               <InputText
+                id='rule-end-date'
                 {...register('endDate')}
                 type='date'
                 className={`${inputBase} pl-10 pr-3 border-border`}
@@ -358,15 +401,22 @@ export function RecurringRuleModal({
 
         {/* Note */}
         <div className='flex flex-col gap-1'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label
+            htmlFor='rule-note'
+            className='text-xs font-bold text-text-muted uppercase tracking-wide'
+          >
             Note{' '}
             <span className='font-normal normal-case text-text-dim'>
               (optional)
             </span>
           </label>
           <div className='relative'>
-            <i className='pi pi-pencil absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+            <i
+              className='pi pi-pencil absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+              aria-hidden='true'
+            />
             <InputText
+              id='rule-note'
               {...register('note')}
               placeholder={isExpense ? 'e.g. Monthly rent' : 'e.g. Salary'}
               autoComplete='off'
@@ -377,8 +427,14 @@ export function RecurringRuleModal({
 
         {/* Error banner */}
         {mutation.isError && (
-          <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+          <div
+            role='alert'
+            className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+          >
+            <i
+              className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+              aria-hidden='true'
+            />
             <p className='text-sm text-text-muted mt-0.5'>
               {mutation.error instanceof Error
                 ? mutation.error.message

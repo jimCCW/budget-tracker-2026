@@ -32,7 +32,7 @@ type AddTransactionModalProps = {
 };
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 export function AddTransactionModal({
   open,
@@ -172,16 +172,22 @@ export function AddTransactionModal({
     : 'bg-success hover:opacity-90 text-white';
 
   return (
-    <Modal open={open} onClose={onClose} maxWidth='max-w-xl'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      maxWidth='max-w-xl'
+      ariaLabelledBy='add-transaction-heading'
+    >
       {/* Header */}
-      <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 className='text-base font-extrabold text-text tracking-tight'>
+      <header className='flex items-center justify-between px-6 py-4 border-b border-border'>
+        <h2 id='add-transaction-heading' className='text-base font-extrabold text-text tracking-tight'>
           New transaction
         </h2>
         <Button
           type='button'
           icon='pi pi-times'
           onClick={onClose}
+          aria-label='Close'
           pt={{
             root: {
               className:
@@ -190,7 +196,7 @@ export function AddTransactionModal({
             icon: { className: 'text-sm' },
           }}
         />
-      </div>
+      </header>
 
       {/* Body — two separate forms rendered/hidden by type */}
       <div className='p-6 flex flex-col gap-5'>
@@ -224,6 +230,8 @@ export function AddTransactionModal({
             noValidate
             className='flex flex-col gap-5'
           >
+            <ErrorBanner mutation={activeMutation} />
+
             <AmountField
               registration={expenseForm.register('amount', {
                 valueAsNumber: true,
@@ -233,10 +241,10 @@ export function AddTransactionModal({
             />
 
             {/* Category */}
-            <div className='flex flex-col gap-2'>
-              <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <fieldset className='flex flex-col gap-2'>
+              <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
                 Category
-              </label>
+              </legend>
               <div className='flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1'>
                 {expenseCategories.map((cat) => {
                   const selected = cat.id === watchedCategoryId;
@@ -264,7 +272,7 @@ export function AddTransactionModal({
                         },
                       }}
                     >
-                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} />
+                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} aria-hidden='true' />
                       {cat.name}
                     </Button>
                   );
@@ -275,7 +283,7 @@ export function AddTransactionModal({
                   {expenseForm.formState.errors.categoryId.message}
                 </p>
               )}
-            </div>
+            </fieldset>
 
             <AccountPicker
               accounts={accounts}
@@ -318,6 +326,8 @@ export function AddTransactionModal({
             noValidate
             className='flex flex-col gap-5'
           >
+            <ErrorBanner mutation={activeMutation} />
+
             <AmountField
               registration={incomeForm.register('amount', {
                 valueAsNumber: true,
@@ -327,10 +337,10 @@ export function AddTransactionModal({
             />
 
             {/* Category */}
-            <div className='flex flex-col gap-2'>
-              <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <fieldset className='flex flex-col gap-2'>
+              <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
                 Category
-              </label>
+              </legend>
               <div className='flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1'>
                 {incomeCategories.map((cat) => {
                   const selected = cat.id === watchedIncomeCategoryId;
@@ -362,7 +372,7 @@ export function AddTransactionModal({
                         },
                       }}
                     >
-                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} />
+                      <i className={`pi ${cat.icon ?? 'pi-tag'} text-[11px]`} aria-hidden='true' />
                       {cat.name}
                     </Button>
                   );
@@ -373,7 +383,7 @@ export function AddTransactionModal({
                   {incomeForm.formState.errors.categoryId.message}
                 </p>
               )}
-            </div>
+            </fieldset>
 
             <AccountPicker
               accounts={accounts}
@@ -408,24 +418,30 @@ export function AddTransactionModal({
             />
           </form>
         )}
-
-        {/* Error banner (outside both forms, shown when either has an API error) */}
-        {activeMutation.isError && (
-          <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start -mt-2'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
-            <p className='text-sm text-text-muted mt-0.5'>
-              {activeMutation.error instanceof Error
-                ? activeMutation.error.message
-                : 'Something went wrong.'}
-            </p>
-          </div>
-        )}
       </div>
     </Modal>
   );
 }
 
 /* ── Sub-components (private to this file) ── */
+
+function ErrorBanner({
+  mutation,
+}: {
+  mutation: { isError: boolean; error: unknown };
+}) {
+  if (!mutation.isError) return null;
+  return (
+    <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
+      <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
+      <p className='text-sm text-text-muted mt-0.5'>
+        {mutation.error instanceof Error
+          ? mutation.error.message
+          : 'Something went wrong.'}
+      </p>
+    </div>
+  );
+}
 
 function AmountField({
   registration,
@@ -438,23 +454,26 @@ function AmountField({
 }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+      <label htmlFor='tx-amount' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
         Amount
       </label>
       <div className='relative'>
-        <span className='absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm pointer-events-none font-medium'>
+        <span aria-hidden='true' className='absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm pointer-events-none font-medium'>
           S$
         </span>
         <InputText
+          id='tx-amount'
           {...(registration as Parameters<typeof InputText>[0])}
           type='number'
           step='0.01'
           min='0'
           placeholder='0.00'
+          aria-invalid={!!error}
+          aria-describedby={error ? 'tx-amount-error' : undefined}
           className={`${className} ${error ? 'border-danger' : 'border-border'}`}
         />
       </div>
-      {error && <p className='text-xs text-danger'>{error}</p>}
+      {error && <p id='tx-amount-error' className='text-xs text-danger'>{error}</p>}
     </div>
   );
 }
@@ -480,10 +499,10 @@ function AccountPicker({
       : 'bg-success-tint border-success text-success';
 
   return (
-    <div className='flex flex-col gap-2'>
-      <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+    <fieldset className='flex flex-col gap-2'>
+      <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
         {label}
-      </label>
+      </legend>
       <div className='flex flex-wrap gap-2'>
         {accounts.map((acc) => (
           <Button
@@ -500,13 +519,13 @@ function AccountPicker({
               },
             }}
           >
-            <i className='pi pi-wallet text-[11px]' />
+            <i className='pi pi-wallet text-[11px]' aria-hidden='true' />
             {acc.name}
           </Button>
         ))}
       </div>
       {error && <p className='text-xs text-danger'>{error}</p>}
-    </div>
+    </fieldset>
   );
 }
 
@@ -519,20 +538,23 @@ function DateField({
 }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+      <label htmlFor='tx-date' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
         Date
       </label>
       <div className='relative'>
-        <i className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+        <i className='pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' aria-hidden='true' />
         <InputText
+          id='tx-date'
           {...(registration as Parameters<typeof InputText>[0])}
           type='date'
-          className={`h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-10 pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13 ${
+          aria-invalid={!!error}
+          aria-describedby={error ? 'tx-date-error' : undefined}
+          className={`h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13 ${
             error ? 'border-danger' : 'border-border'
           }`}
         />
       </div>
-      {error && <p className='text-xs text-danger'>{error}</p>}
+      {error && <p id='tx-date-error' className='text-xs text-danger'>{error}</p>}
     </div>
   );
 }
@@ -546,19 +568,20 @@ function NoteField({
 }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+      <label htmlFor='tx-note' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
         Note{' '}
         <span className='font-normal normal-case text-text-dim'>
           (optional)
         </span>
       </label>
       <div className='relative'>
-        <i className='pi pi-pencil absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+        <i className='pi pi-pencil absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' aria-hidden='true' />
         <InputText
+          id='tx-note'
           {...(registration as Parameters<typeof InputText>[0])}
           placeholder={placeholder}
           autoComplete='off'
-          className='h-[46px] w-full rounded-md bg-surface border border-border text-sm text-text pl-10 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/13'
+          className='h-11.5 w-full rounded-md bg-surface border border-border text-sm text-text pl-10 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13'
         />
       </div>
     </div>
@@ -602,7 +625,8 @@ function RepeatSection({
 
       {/* Frequency pills — shown when checked */}
       {repeat && (
-        <div className='flex gap-2 pl-6'>
+        <fieldset className='flex gap-2 pl-6'>
+          <legend className='sr-only'>Repeat frequency</legend>
           {REPEAT_FREQUENCIES.map(({ value, label }) => (
             <Button
               key={value}
@@ -620,7 +644,7 @@ function RepeatSection({
               }}
             />
           ))}
-        </div>
+        </fieldset>
       )}
     </div>
   );

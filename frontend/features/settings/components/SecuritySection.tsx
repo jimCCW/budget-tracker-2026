@@ -13,8 +13,8 @@ export function SecuritySection() {
   const revokeMutation = useRevokeSession();
 
   return (
-    <div className='bg-surface rounded-xl border border-border p-6'>
-      <h2 className='text-base font-extrabold text-text tracking-tight mb-1'>
+    <section aria-labelledby='security-heading' className='bg-surface rounded-xl border border-border p-6'>
+      <h2 id='security-heading' className='text-base font-extrabold text-text tracking-tight mb-1'>
         Security
       </h2>
       <p className='text-sm text-text-muted mb-5'>
@@ -23,14 +23,14 @@ export function SecuritySection() {
 
       <div className='flex items-center justify-between py-3 border-b border-border'>
         <div className='flex items-center gap-3'>
-          <div className='w-9 h-9 rounded-lg bg-primary-tint text-primary flex items-center justify-center shrink-0'>
+          <div className='w-9 h-9 rounded-lg bg-primary-tint text-primary flex items-center justify-center shrink-0' aria-hidden='true'>
             <i className='pi pi-lock text-base' />
           </div>
           <div>
-            <div className='text-sm font-bold text-text'>Password</div>
-            <div className='text-xs text-text-muted mt-0.5'>
+            <h3 className='text-sm font-bold text-text'>Password</h3>
+            <p className='text-xs text-text-muted mt-0.5'>
               Change your account password
-            </div>
+            </p>
           </div>
         </div>
         <Button
@@ -46,12 +46,12 @@ export function SecuritySection() {
       </div>
 
       <div className='pt-4'>
-        <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-3'>
+        <h3 className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-3'>
           Active sessions
-        </p>
+        </h3>
 
         {isLoading && (
-          <div className='flex flex-col gap-3'>
+          <div role='status' aria-busy='true' className='flex flex-col gap-3'>
             {Array.from({ length: 2 }).map((_, i) => (
               <Skeleton
                 key={i}
@@ -63,24 +63,24 @@ export function SecuritySection() {
         )}
 
         {!isLoading && (
-          <div className='flex flex-col'>
+          <ul className='flex flex-col'>
             {(sessions ?? []).map((session, i) => (
-              <div
+              <li
                 key={session.id}
                 className={`flex items-center gap-3 py-2.5 ${i < (sessions?.length ?? 0) - 1 ? 'border-b border-border' : ''}`}
               >
-                <div className='w-9 h-9 rounded-lg bg-bg border border-border flex items-center justify-center shrink-0'>
+                <div className='w-9 h-9 rounded-lg bg-bg border border-border flex items-center justify-center shrink-0' aria-hidden='true'>
                   <i className='pi pi-desktop text-text-muted text-sm' />
                 </div>
                 <div className='flex-1 min-w-0'>
-                  <div className='text-sm font-semibold text-text truncate'>
+                  <p className='text-sm font-semibold text-text truncate'>
                     {session.device}
-                  </div>
-                  <div className='text-xs text-text-muted mt-0.5'>
+                  </p>
+                  <p className='text-xs text-text-muted mt-0.5'>
                     {session.current
                       ? 'This device'
                       : `Signed in ${formatRelativeTime(session.createdAt)}`}
-                  </div>
+                  </p>
                 </div>
                 {session.current ? (
                   <span className='text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-success-tint text-success shrink-0'>
@@ -89,6 +89,7 @@ export function SecuritySection() {
                 ) : (
                   <Button
                     label='Revoke'
+                    aria-label={`Revoke session on ${session.device}`}
                     loading={
                       revokeMutation.isPending &&
                       revokeMutation.variables === session.id
@@ -102,9 +103,9 @@ export function SecuritySection() {
                     }}
                   />
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
 
@@ -112,6 +113,6 @@ export function SecuritySection() {
         open={passwordModalOpen}
         onClose={() => setPasswordModalOpen(false)}
       />
-    </div>
+    </section>
   );
 }

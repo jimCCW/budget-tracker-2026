@@ -28,7 +28,7 @@ type Props = {
 };
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 export function AccountFormModal({ open, onClose, account }: Props) {
   const isEdit = !!account;
@@ -84,10 +84,18 @@ export function AccountFormModal({ open, onClose, account }: Props) {
   const displayName = watchedName.trim() || 'Untitled account';
 
   return (
-    <Modal open={open} onClose={onClose} maxWidth='max-w-4xl'>
+    <Modal
+      open={open}
+      onClose={onClose}
+      maxWidth='max-w-4xl'
+      ariaLabelledBy='account-form-heading'
+    >
       {/* Header */}
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 className='text-base font-extrabold text-text tracking-tight'>
+        <h2
+          id='account-form-heading'
+          className='text-base font-extrabold text-text tracking-tight'
+        >
           {isEdit ? 'Edit account' : 'New account'}
         </h2>
         <Button
@@ -108,10 +116,13 @@ export function AccountFormModal({ open, onClose, account }: Props) {
       {/* Body: 2-col on lg+, stacked on mobile */}
       <div className='flex flex-col lg:flex-row'>
         {/* ── Preview pane ── */}
-        <div className='lg:w-64 lg:shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col gap-4'>
-          <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>
+        <aside
+          aria-label='Preview'
+          className='lg:w-64 lg:shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-border flex flex-col gap-4'
+        >
+          <h3 className='text-[10px] font-bold text-text-dim uppercase tracking-widest'>
             Preview
-          </p>
+          </h3>
 
           {/* Hero stamp */}
           <div className='flex flex-col items-center gap-3 py-2'>
@@ -121,10 +132,11 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                 backgroundColor: watchedColor,
                 boxShadow: `0 10px 24px ${watchedColor}55`,
               }}
+              aria-hidden='true'
             >
               <i className={`pi ${meta.icon} text-3xl`} />
             </div>
-            <div
+            <p
               className='text-base font-extrabold text-center max-w-40 truncate'
               style={{
                 color: watchedName
@@ -133,7 +145,7 @@ export function AccountFormModal({ open, onClose, account }: Props) {
               }}
             >
               {displayName}
-            </div>
+            </p>
             <span
               className='text-[10.5px] font-bold px-2 py-0.5 rounded-full'
               style={{
@@ -147,19 +159,19 @@ export function AccountFormModal({ open, onClose, account }: Props) {
 
           {/* Balance preview */}
           <div>
-            <p className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2'>
+            <h3 className='text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2'>
               Balance
-            </p>
+            </h3>
             <div className='bg-bg rounded-lg p-3 text-center'>
-              <div className='text-xl font-extrabold tabular-nums text-text'>
+              <p className='text-xl font-extrabold tabular-nums text-text'>
                 {formatCurrency(isNaN(watchedBalance) ? 0 : watchedBalance)}
-              </div>
-              <div className='text-xs text-text-muted mt-1'>
+              </p>
+              <p className='text-xs text-text-muted mt-1'>
                 {meta.label} account
-              </div>
+              </p>
             </div>
           </div>
-        </div>
+        </aside>
 
         {/* ── Form pane ── */}
         <form
@@ -169,8 +181,14 @@ export function AccountFormModal({ open, onClose, account }: Props) {
         >
           {/* Error banner */}
           {mutation.isError && (
-            <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-              <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+            <div
+              role='alert'
+              className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'
+            >
+              <i
+                className='pi pi-times-circle text-danger mt-px shrink-0 text-lg'
+                aria-hidden='true'
+              />
               <p className='text-sm text-text-muted mt-0.5'>
                 {mutation.error instanceof Error
                   ? mutation.error.message
@@ -180,10 +198,10 @@ export function AccountFormModal({ open, onClose, account }: Props) {
           )}
 
           {/* Type selector */}
-          <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <fieldset className='flex flex-col gap-2'>
+            <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
               Account type
-            </label>
+            </legend>
             <div className='grid grid-cols-2 gap-3'>
               {ACCOUNT_TYPES.map((type) => {
                 const typeMeta = ACCOUNT_TYPE_META[type];
@@ -219,67 +237,92 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                               color: typeMeta.color,
                             }
                       }
+                      aria-hidden='true'
                     >
                       <i className={`pi ${typeMeta.icon} text-base`} />
                     </div>
-                    <div>
-                      <div className='text-sm font-bold text-text'>
+                    <span>
+                      <span className='block text-sm font-bold text-text'>
                         {typeMeta.label}
-                      </div>
-                      <div className='text-xs text-text-muted mt-0.5 capitalize'>
+                      </span>
+                      <span className='block text-xs text-text-muted mt-0.5 capitalize'>
                         {typeMeta.group}
-                      </div>
-                    </div>
+                      </span>
+                    </span>
                   </Button>
                 );
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Name */}
           <div className='flex flex-col gap-1'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <label
+              htmlFor='account-name'
+              className='text-xs font-bold text-text-muted uppercase tracking-wide'
+            >
               Account name
             </label>
             <div className='relative'>
-              <i className='pi pi-wallet absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <i
+                className='pi pi-wallet absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+                aria-hidden='true'
+              />
               <InputText
+                id='account-name'
                 {...register('name')}
                 placeholder='e.g. DBS Savings'
                 autoComplete='off'
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'account-name-error' : undefined}
                 className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
               />
             </div>
             {errors.name && (
-              <p className='text-xs text-danger'>{errors.name.message}</p>
+              <p id='account-name-error' className='text-xs text-danger'>
+                {errors.name.message}
+              </p>
             )}
           </div>
 
           {/* Balance */}
           <div className='flex flex-col gap-1'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+            <label
+              htmlFor='account-balance'
+              className='text-xs font-bold text-text-muted uppercase tracking-wide'
+            >
               {isEdit ? 'Balance' : 'Initial balance'}
             </label>
             <div className='relative'>
-              <i className='pi pi-dollar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm' />
+              <i
+                className='pi pi-dollar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm'
+                aria-hidden='true'
+              />
               <InputText
+                id='account-balance'
                 {...register('balance', { valueAsNumber: true })}
                 type='number'
                 step='0.01'
                 placeholder='0.00'
+                aria-invalid={!!errors.balance}
+                aria-describedby={
+                  errors.balance ? 'account-balance-error' : undefined
+                }
                 className={`${inputBase} ${errors.balance ? 'border-danger' : 'border-border'}`}
               />
             </div>
             {errors.balance && (
-              <p className='text-xs text-danger'>{errors.balance.message}</p>
+              <p id='account-balance-error' className='text-xs text-danger'>
+                {errors.balance.message}
+              </p>
             )}
           </div>
 
           {/* Color picker */}
-          <div className='flex flex-col gap-2'>
-            <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <fieldset className='flex flex-col gap-2'>
+            <legend className='text-xs font-bold text-text-muted uppercase tracking-wide'>
               Color
-            </label>
+            </legend>
             <div className='flex flex-wrap gap-2.5'>
               {ACCOUNT_COLORS.map((c) => {
                 const selected = watchedColor === c;
@@ -312,7 +355,7 @@ export function AccountFormModal({ open, onClose, account }: Props) {
                 );
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Actions */}
           <div className='flex gap-3 pt-2 mt-auto'>

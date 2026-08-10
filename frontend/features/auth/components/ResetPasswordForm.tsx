@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import {
@@ -13,7 +14,7 @@ import { useResetPassword } from '@/features/auth/hooks/useResetPassword';
 import { apiClient } from '@/lib/api';
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 const iconBase =
   'pi absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm';
@@ -73,21 +74,21 @@ export function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
 
     return (
       <div className='flex flex-col gap-4'>
-        <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+        <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
+          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
           <div>
-            <p className='text-sm font-semibold text-danger'>
+            <h2 className='text-sm font-semibold text-danger'>
               {isExpired ? 'Link expired' : 'Reset failed'}
-            </p>
+            </h2>
             <p className='text-sm text-text-muted mt-0.5'>{message}</p>
           </div>
         </div>
-        <a
+        <Link
           href='/forgot-password'
           className='text-sm text-center text-primary hover:text-primary-strong transition-colors'
         >
           Request a new reset link
-        </a>
+        </Link>
       </div>
     );
   }
@@ -100,13 +101,17 @@ export function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
     >
       {/* Password */}
       <div className='flex flex-col gap-1'>
+        <label htmlFor='reset-password' className='sr-only'>
+          New password
+        </label>
         <div className='relative'>
-          <i className={`${iconBase} pi-lock`} />
+          <i className={`${iconBase} pi-lock`} aria-hidden='true' />
           <Controller
             name='password'
             control={control}
             render={({ field }) => (
               <Password
+                inputId='reset-password'
                 value={field.value ?? ''}
                 onChange={(e) => field.onChange(e.target.value)}
                 onBlur={field.onBlur}
@@ -134,13 +139,17 @@ export function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
 
       {/* Confirm Password */}
       <div className='flex flex-col gap-1'>
+        <label htmlFor='reset-confirm-password' className='sr-only'>
+          Confirm new password
+        </label>
         <div className='relative'>
-          <i className={`${iconBase} pi-lock`} />
+          <i className={`${iconBase} pi-lock`} aria-hidden='true' />
           <Controller
             name='confirmPassword'
             control={control}
             render={({ field }) => (
               <Password
+                inputId='reset-confirm-password'
                 value={field.value ?? ''}
                 onChange={(e) => field.onChange(e.target.value)}
                 onBlur={field.onBlur}
@@ -176,7 +185,7 @@ export function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
         pt={{
           root: {
             className:
-              'w-full h-[50px] bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-1 flex items-center justify-center gap-2',
+              'w-full h-12.5 bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-1 flex items-center justify-center gap-2',
           },
           loadingIcon: { className: 'animate-spin text-base' },
         }}

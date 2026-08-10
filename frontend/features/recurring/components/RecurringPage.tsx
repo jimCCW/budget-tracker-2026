@@ -97,7 +97,7 @@ export function RecurringPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className='flex flex-col gap-3'>
+        <div role='status' aria-busy='true' className='flex flex-col gap-3'>
           {[...Array(3)].map((_, i) => (
             <Skeleton
               key={i}
@@ -120,7 +120,7 @@ export function RecurringPage() {
           }}
         >
           <div className='w-11 h-11 rounded-xl bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
-            <i className='pi pi-refresh text-xl' />
+            <i className='pi pi-refresh text-xl' aria-hidden='true' />
           </div>
           <span className='text-sm font-semibold'>
             Create your first recurring rule
@@ -130,7 +130,7 @@ export function RecurringPage() {
 
       {/* Rule list */}
       {!isLoading && rules && rules.length > 0 && (
-        <div className='flex flex-col gap-3'>
+        <ul className='flex flex-col gap-3'>
           {rules.map((rule) => {
             const isExpense = rule.kind === 'EXPENSE';
             const color =
@@ -141,7 +141,7 @@ export function RecurringPage() {
               (isExpense ? 'pi-arrow-up' : 'pi-arrow-down');
 
             return (
-              <div
+              <li
                 key={rule.id}
                 className={`bg-surface border rounded-xl px-4 py-3 flex items-center gap-3 transition-colors ${
                   rule.isActive ? 'border-border' : 'border-border opacity-60'
@@ -151,6 +151,7 @@ export function RecurringPage() {
                 <div
                   className='w-10 h-10 rounded-xl flex items-center justify-center shrink-0'
                   style={{ background: `${color}22`, color }}
+                  aria-hidden='true'
                 >
                   <i className={`pi ${icon} text-sm`} />
                 </div>
@@ -182,12 +183,17 @@ export function RecurringPage() {
                 </span>
 
                 {/* Actions */}
-                <div className='flex items-center gap-1 shrink-0'>
+                <div
+                  role='group'
+                  aria-label='Rule actions'
+                  className='flex items-center gap-1 shrink-0'
+                >
                   {/* Pause / Resume */}
                   <Button
                     type='button'
                     icon={rule.isActive ? 'pi pi-pause' : 'pi pi-play'}
                     disabled={setActive.isPending}
+                    aria-label={rule.isActive ? 'Pause rule' : 'Resume rule'}
                     onClick={() =>
                       setActive.mutate({
                         id: rule.id,
@@ -206,6 +212,7 @@ export function RecurringPage() {
                   <Button
                     type='button'
                     icon='pi pi-pencil'
+                    aria-label='Edit rule'
                     onClick={() => openEdit(rule)}
                     pt={{
                       root: {
@@ -224,6 +231,7 @@ export function RecurringPage() {
                         : 'pi pi-trash'
                     }
                     disabled={deletingId === rule.id}
+                    aria-label='Delete rule'
                     onClick={() => handleDelete(rule.id)}
                     pt={{
                       root: {
@@ -234,10 +242,10 @@ export function RecurringPage() {
                     }}
                   />
                 </div>
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
 
       <RecurringRuleModal

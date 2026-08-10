@@ -53,13 +53,14 @@ export function ActivationCodeInput({ value, onChange, hasError }: Props) {
     'w-12 h-14 text-center text-[26px] font-bold rounded-md border outline-none transition-shadow bg-surface text-text shadow-sm';
 
   return (
-    <div className='flex  gap-2.5 justify-center'>
+    <fieldset className='flex gap-2.5 justify-center border-0 p-0 m-0'>
+      <legend className='sr-only'>Activation code</legend>
       {digits.map((digit, i) => {
         const hasDigit = digit.trim() !== '';
         const borderClass = hasError
           ? 'border-danger'
           : hasDigit
-            ? 'border-primary ring-[3px] ring-primary/[0.13]'
+            ? 'border-primary ring-3 ring-primary/13'
             : 'border-border-strong';
 
         return (
@@ -75,10 +76,13 @@ export function ActivationCodeInput({ value, onChange, hasError }: Props) {
             onChange={(e) => handleInput(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
+            aria-label={`Digit ${i + 1} of 5`}
+            aria-invalid={hasError}
+            autoComplete={i === 0 ? 'one-time-code' : 'off'}
             className={`${cellBase} ${borderClass}`}
           />
         );
       })}
-    </div>
+    </fieldset>
   );
 }

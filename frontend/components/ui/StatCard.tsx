@@ -26,12 +26,12 @@ export function StatCard({
   trend,
 }: StatCardProps) {
   return (
-    <div className='bg-surface rounded-lg border border-border shadow-sm p-5 flex flex-col gap-2.5'>
+    <article className='bg-surface rounded-lg border border-border shadow-sm p-5 flex flex-col gap-2.5'>
       <div className='flex justify-between items-start'>
         <div
-          className={`w-9 h-9 rounded-[10px] flex items-center justify-center ${tintClass} ${iconColorClass}`}
+          className={`w-9 h-9 rounded-md flex items-center justify-center ${tintClass} ${iconColorClass}`}
         >
-          <i className={`pi ${icon} text-lg`} />
+          <i className={`pi ${icon} text-lg`} aria-hidden='true' />
         </div>
         {trend && (
           <span
@@ -42,14 +42,14 @@ export function StatCard({
         )}
       </div>
       <div>
-        <div className='text-[11.5px] font-semibold text-text-muted uppercase tracking-wider'>
+        <h3 className='text-[11.5px] font-semibold text-text-muted uppercase tracking-wider'>
           {label}
-        </div>
-        <div className='text-[28px] font-extrabold tracking-tight tabular-nums text-text mt-0.5'>
+        </h3>
+        <p className='text-[28px] font-extrabold tracking-tight tabular-nums text-text mt-0.5'>
           {value}
-        </div>
-        {sub && <div className='text-[11.5px] text-text-muted mt-1'>{sub}</div>}
+        </p>
+        {sub && <p className='text-[11.5px] text-text-muted mt-1'>{sub}</p>}
       </div>
-    </div>
+    </article>
   );
 }

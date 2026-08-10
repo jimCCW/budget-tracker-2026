@@ -14,7 +14,7 @@ import {
 import { useRegister } from '@/features/auth/hooks/useRegister';
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 const iconBase =
   'pi absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm';
@@ -48,8 +48,8 @@ export function RegisterForm() {
       className='flex flex-col gap-4'
     >
       {mutation.isError && (
-        <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+        <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
+          <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
           <div>
             <p className='text-sm font-semibold text-danger'>
               Registration failed
@@ -65,81 +65,109 @@ export function RegisterForm() {
 
       {/* Full name */}
       <div className='flex flex-col gap-1'>
+        <label htmlFor='register-name' className='sr-only'>
+          Full name
+        </label>
         <div className='relative'>
-          <i className={`${iconBase} pi-user`} />
+          <i className={`${iconBase} pi-user`} aria-hidden='true' />
           <InputText
+            id='register-name'
             {...register('name')}
             type='text'
             placeholder='Full name'
             autoComplete='name'
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'register-name-error' : undefined}
             className={`${inputBase} ${errors.name ? 'border-danger' : 'border-border'}`}
           />
         </div>
         {errors.name && (
-          <p className='text-xs text-danger'>{errors.name.message}</p>
+          <p id='register-name-error' className='text-xs text-danger'>{errors.name.message}</p>
         )}
       </div>
 
       {/* First / Last name */}
       <div className='flex gap-3'>
         <div className='flex flex-col gap-1 flex-1'>
+          <label htmlFor='register-first-name' className='sr-only'>
+            First name
+          </label>
           <div className='relative'>
-            <i className={`${iconBase} pi-user`} />
+            <i className={`${iconBase} pi-user`} aria-hidden='true' />
             <InputText
+              id='register-first-name'
               {...register('firstName')}
               type='text'
               placeholder='First name'
               autoComplete='given-name'
+              aria-invalid={!!errors.firstName}
+              aria-describedby={errors.firstName ? 'register-first-name-error' : undefined}
               className={`${inputBase} ${errors.firstName ? 'border-danger' : 'border-border'}`}
             />
           </div>
           {errors.firstName && (
-            <p className='text-xs text-danger'>{errors.firstName.message}</p>
+            <p id='register-first-name-error' className='text-xs text-danger'>{errors.firstName.message}</p>
           )}
         </div>
         <div className='flex flex-col gap-1 flex-1'>
+          <label htmlFor='register-last-name' className='sr-only'>
+            Last name
+          </label>
           <div className='relative'>
-            <i className={`${iconBase} pi-user`} />
+            <i className={`${iconBase} pi-user`} aria-hidden='true' />
             <InputText
+              id='register-last-name'
               {...register('lastName')}
               type='text'
               placeholder='Last name'
               autoComplete='family-name'
+              aria-invalid={!!errors.lastName}
+              aria-describedby={errors.lastName ? 'register-last-name-error' : undefined}
               className={`${inputBase} ${errors.lastName ? 'border-danger' : 'border-border'}`}
             />
           </div>
           {errors.lastName && (
-            <p className='text-xs text-danger'>{errors.lastName.message}</p>
+            <p id='register-last-name-error' className='text-xs text-danger'>{errors.lastName.message}</p>
           )}
         </div>
       </div>
 
       {/* Email */}
       <div className='flex flex-col gap-1'>
+        <label htmlFor='register-email' className='sr-only'>
+          Email address
+        </label>
         <div className='relative'>
-          <i className={`${iconBase} pi-envelope`} />
+          <i className={`${iconBase} pi-envelope`} aria-hidden='true' />
           <InputText
+            id='register-email'
             {...register('email')}
             type='email'
             placeholder='Email address'
             autoComplete='email'
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'register-email-error' : undefined}
             className={`${inputBase} ${errors.email ? 'border-danger' : 'border-border'}`}
           />
         </div>
         {errors.email && (
-          <p className='text-xs text-danger'>{errors.email.message}</p>
+          <p id='register-email-error' className='text-xs text-danger'>{errors.email.message}</p>
         )}
       </div>
 
       {/* Password */}
       <div className='flex flex-col gap-1'>
+        <label htmlFor='register-password' className='sr-only'>
+          Password
+        </label>
         <div className='relative'>
-          <i className={`${iconBase} pi-lock`} />
+          <i className={`${iconBase} pi-lock`} aria-hidden='true' />
           <Controller
             name='password'
             control={control}
             render={({ field }) => (
               <Password
+                inputId='register-password'
                 value={field.value ?? ''}
                 onChange={(e) => field.onChange(e.target.value)}
                 onBlur={field.onBlur}
@@ -167,13 +195,17 @@ export function RegisterForm() {
 
       {/* Confirm Password */}
       <div className='flex flex-col gap-1'>
+        <label htmlFor='register-confirm-password' className='sr-only'>
+          Confirm password
+        </label>
         <div className='relative'>
-          <i className={`${iconBase} pi-lock`} />
+          <i className={`${iconBase} pi-lock`} aria-hidden='true' />
           <Controller
             name='confirmPassword'
             control={control}
             render={({ field }) => (
               <Password
+                inputId='register-confirm-password'
                 value={field.value ?? ''}
                 onChange={(e) => field.onChange(e.target.value)}
                 onBlur={field.onBlur}
@@ -207,7 +239,7 @@ export function RegisterForm() {
           name='terms'
           control={control}
           render={({ field }) => (
-            <label className='flex items-start gap-2 cursor-pointer'>
+            <label htmlFor='terms' className='flex items-start gap-2 cursor-pointer'>
               <Checkbox
                 inputId='terms'
                 checked={field.value ?? false}
@@ -247,7 +279,7 @@ export function RegisterForm() {
         pt={{
           root: {
             className:
-              'w-full h-[50px] bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-1 flex items-center justify-center gap-2',
+              'w-full h-12.5 bg-primary hover:bg-primary-strong text-white text-[15px] font-semibold rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-1 flex items-center justify-center gap-2',
           },
           loadingIcon: { className: 'animate-spin text-base' },
         }}
@@ -255,9 +287,9 @@ export function RegisterForm() {
 
       {/* Divider */}
       <div className='flex items-center gap-3 my-1'>
-        <div className='flex-1 h-px bg-border' />
+        <hr className='flex-1 h-px bg-border border-0' />
         <span className='text-xs text-text-dim'>or</span>
-        <div className='flex-1 h-px bg-border' />
+        <hr className='flex-1 h-px bg-border border-0' />
       </div>
 
       <p className='text-sm text-center text-text-muted'>

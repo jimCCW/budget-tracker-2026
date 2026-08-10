@@ -70,8 +70,11 @@ export function AccountsPage() {
 
       {/* Error state */}
       {isError && (
-        <div className='bg-danger-tint border border-danger/30 rounded-lg p-4 flex gap-3 items-center'>
-          <i className='pi pi-times-circle text-danger text-lg' />
+        <div
+          role='alert'
+          className='bg-danger-tint border border-danger/30 rounded-lg p-4 flex gap-3 items-center'
+        >
+          <i className='pi pi-times-circle text-danger text-lg' aria-hidden='true' />
           <p className='text-sm text-text-muted'>
             Failed to load accounts. Please refresh.
           </p>
@@ -113,31 +116,34 @@ export function AccountsPage() {
               </span>
             </Button>
           ) : (
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+            <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
               {accounts.map((account) => (
-                <AccountCard
-                  key={account.id}
-                  account={account}
-                  onEdit={openEdit}
-                  onDelete={setDeletingAccount}
-                />
+                <li key={account.id}>
+                  <AccountCard
+                    account={account}
+                    onEdit={openEdit}
+                    onDelete={setDeletingAccount}
+                  />
+                </li>
               ))}
               {/* Add new card */}
-              <Button
-                onClick={openCreate}
-                pt={{
-                  root: {
-                    className:
-                      'border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-28 group',
-                  },
-                }}
-              >
-                <div className='w-9 h-9 rounded-lg bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
-                  <i className='pi pi-plus text-base' />
-                </div>
-                <span className='text-xs font-semibold'>Add account</span>
-              </Button>
-            </div>
+              <li>
+                <Button
+                  onClick={openCreate}
+                  pt={{
+                    root: {
+                      className:
+                        'w-full border-2 border-dashed border-border-strong rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-primary transition-colors min-h-28 group',
+                    },
+                  }}
+                >
+                  <div className='w-9 h-9 rounded-lg bg-raised flex items-center justify-center group-hover:bg-primary-tint transition-colors'>
+                    <i className='pi pi-plus text-base' aria-hidden='true' />
+                  </div>
+                  <span className='text-xs font-semibold'>Add account</span>
+                </Button>
+              </li>
+            </ul>
           )}
         </>
       )}

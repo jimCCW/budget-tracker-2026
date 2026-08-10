@@ -13,7 +13,7 @@ import { useChangePassword } from '@/features/settings/hooks/useChangePassword';
 import { logout } from '@/lib/logout';
 
 const inputBase =
-  'h-[46px] w-full rounded-md bg-surface border text-sm text-text pl-[42px] pr-3 outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/[0.13]';
+  'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
 
 const iconBase =
   'pi absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm';
@@ -54,9 +54,9 @@ export function ChangePasswordModal({ open, onClose }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} ariaLabelledBy='change-password-heading'>
       <div className='flex items-center justify-between px-6 py-4 border-b border-border'>
-        <h2 className='text-base font-extrabold text-text tracking-tight'>
+        <h2 id='change-password-heading' className='text-base font-extrabold text-text tracking-tight'>
           Change password
         </h2>
         <Button
@@ -80,8 +80,8 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         className='p-6 flex flex-col gap-4'
       >
         {mutation.isError && (
-          <div className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
-            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' />
+          <div role='alert' className='bg-danger-tint border border-danger/30 rounded-md p-3 flex gap-2 items-start'>
+            <i className='pi pi-times-circle text-danger mt-px shrink-0 text-lg' aria-hidden='true' />
             <p className='text-sm text-text-muted mt-0.5'>
               {mutation.error instanceof Error
                 ? mutation.error.message
@@ -91,16 +91,17 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         )}
 
         <div className='flex flex-col gap-1'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label htmlFor='current-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
             Current password
           </label>
           <div className='relative'>
-            <i className={`${iconBase} pi-lock`} />
+            <i className={`${iconBase} pi-lock`} aria-hidden='true' />
             <Controller
               name='currentPassword'
               control={control}
               render={({ field }) => (
                 <Password
+                  inputId='current-password'
                   value={field.value ?? ''}
                   onChange={(e) => field.onChange(e.target.value)}
                   onBlur={field.onBlur}
@@ -129,16 +130,17 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         </div>
 
         <div className='flex flex-col gap-1'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label htmlFor='new-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
             New password
           </label>
           <div className='relative'>
-            <i className={`${iconBase} pi-lock`} />
+            <i className={`${iconBase} pi-lock`} aria-hidden='true' />
             <Controller
               name='password'
               control={control}
               render={({ field }) => (
                 <Password
+                  inputId='new-password'
                   value={field.value ?? ''}
                   onChange={(e) => field.onChange(e.target.value)}
                   onBlur={field.onBlur}
@@ -165,16 +167,17 @@ export function ChangePasswordModal({ open, onClose }: Props) {
         </div>
 
         <div className='flex flex-col gap-1'>
-          <label className='text-xs font-bold text-text-muted uppercase tracking-wide'>
+          <label htmlFor='confirm-new-password' className='text-xs font-bold text-text-muted uppercase tracking-wide'>
             Confirm new password
           </label>
           <div className='relative'>
-            <i className={`${iconBase} pi-lock`} />
+            <i className={`${iconBase} pi-lock`} aria-hidden='true' />
             <Controller
               name='confirmPassword'
               control={control}
               render={({ field }) => (
                 <Password
+                  inputId='confirm-new-password'
                   value={field.value ?? ''}
                   onChange={(e) => field.onChange(e.target.value)}
                   onBlur={field.onBlur}
