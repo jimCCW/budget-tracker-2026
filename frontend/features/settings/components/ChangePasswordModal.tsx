@@ -9,8 +9,8 @@ import {
   changePasswordSchema,
   type ChangePasswordFormValues,
 } from '@/features/settings/schemas/changePasswordSchema';
+import { signOut } from 'next-auth/react';
 import { useChangePassword } from '@/features/settings/hooks/useChangePassword';
-import { logout } from '@/lib/logout';
 
 const inputBase =
   'h-11.5 w-full rounded-md bg-surface border text-sm text-text pl-10.5 pr-3 outline-none transition-shadow focus:border-primary focus:ring-3 focus:ring-primary/13';
@@ -48,9 +48,13 @@ export function ChangePasswordModal({ open, onClose }: Props) {
 
   async function onSubmit(values: ChangePasswordFormValues) {
     await mutation.mutateAsync(values);
-    // Force a fresh login with the new password rather than leaving this
-    // device's now-stale session implicitly still trusted.
-    await logout();
+    // The backend already revoked every session (including this one) as
+    // part of the password change, so this device's JWT is already dead.
+    // Sign out directly instead of the shared logout() helper — that helper
+    // POSTs to /api/auth/logout first, which would now 401 and trip the
+    // apiClient interceptor's own signOut(), racing this one (same reason
+    // DeleteAccountModal calls signOut() directly).
+    await signOut({ callbackUrl: '/login' });
   }
 
   return (

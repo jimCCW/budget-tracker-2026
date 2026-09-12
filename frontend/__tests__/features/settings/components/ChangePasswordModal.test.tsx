@@ -75,14 +75,14 @@ vi.mock('primereact/password', () => ({
 }));
 
 vi.mock('@/features/settings/hooks/useChangePassword');
-vi.mock('@/lib/logout', () => ({
-  logout: vi.fn(),
+vi.mock('next-auth/react', () => ({
+  signOut: vi.fn(),
 }));
 
-import { logout } from '@/lib/logout';
+import { signOut } from 'next-auth/react';
 
 const mockUseChangePassword = vi.mocked(useChangePassword);
-const mockLogout = vi.mocked(logout);
+const mockSignOut = vi.mocked(signOut);
 
 function makeMutation(overrides = {}) {
   return {
@@ -140,7 +140,7 @@ describe('ChangePasswordModal', () => {
     });
   });
 
-  it('calls mutateAsync then logs the user out on successful submit', async () => {
+  it('calls mutateAsync then signs the user out on successful submit', async () => {
     const user = userEvent.setup();
     const mutateAsync = vi.fn().mockResolvedValue({ message: 'ok' });
     mockUseChangePassword.mockReturnValue(makeMutation({ mutateAsync }));
@@ -167,7 +167,7 @@ describe('ChangePasswordModal', () => {
         password: 'NewPassw0rd!23',
         confirmPassword: 'NewPassw0rd!23',
       });
-      expect(mockLogout).toHaveBeenCalledOnce();
+      expect(mockSignOut).toHaveBeenCalledWith({ callbackUrl: '/login' });
     });
   });
 

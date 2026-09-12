@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { appError } from '../utils/appError';
 import { prisma } from '../lib/prisma';
+import { revokeAllSessions } from './sessionService';
 
 const PROFILE_SELECT = {
   id: true,
@@ -51,7 +52,7 @@ export async function updateProfile(
 }
 
 /**
- * Changes the authenticated user's password after verifying their current one.
+ * Changes the authenticated user's password after verifying their current one, then revokes every session on the account.
  * @param userId - The authenticated user's ID.
  * @param data - Object containing the current plain-text password and the new one.
  * @throws NOT_FOUND (404) if the user no longer exists.
@@ -72,8 +73,14 @@ export async function changePassword(
     // and a wrong password here is a business-logic failure, not a dead token.
     throw appError('FORBIDDEN', 'Current password is incorrect.', 403);
 
+  // Hash before opening the transaction — bcrypt at cost 10 is ~100ms of CPU
+  // and doesn't touch the DB, so running it inside the transaction would
+  // hold a pooled connection and row lock open for no benefit.
   const passwordHash = await bcrypt.hash(data.password, 10);
-  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: userId }, data: { passwordHash } });
+    await revokeAllSessions(userId, tx);
+  });
   return { message: 'Password updated successfully.' };
 }
 
