@@ -120,11 +120,19 @@ describe('changePassword', () => {
       changePassword(USER_ID, { currentPassword: 'wrong', password: 'new' })
     ).rejects.toMatchObject({ code: 'FORBIDDEN', status: 403 });
     expect(db.user.update).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
   });
 
-  it('hashes and stores the new password on success', async () => {
+  it('hashes and stores the new password, and revokes all sessions, on success', async () => {
     db.user.findUnique.mockResolvedValue(makeUser());
-    db.user.update.mockResolvedValue(makeUser());
+
+    const mockTx = {
+      user: { update: jest.fn().mockResolvedValue(makeUser()) },
+      userSession: { updateMany: jest.fn().mockResolvedValue({ count: 3 }) },
+    };
+    db.$transaction.mockImplementation(
+      (fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+    );
 
     const result = await changePassword(USER_ID, {
       currentPassword: 'correct',
@@ -132,9 +140,13 @@ describe('changePassword', () => {
     });
 
     expect(mockBcrypt.hash).toHaveBeenCalledWith('NewPassw0rd!23', 10);
-    expect(db.user.update).toHaveBeenCalledWith({
+    expect(mockTx.user.update).toHaveBeenCalledWith({
       where: { id: USER_ID },
       data: { passwordHash: 'new-hashed-pw' },
+    });
+    expect(mockTx.userSession.updateMany).toHaveBeenCalledWith({
+      where: { userId: USER_ID, revokedAt: null },
+      data: { revokedAt: expect.any(Date) },
     });
     expect(result).toMatchObject({ message: 'Password updated successfully.' });
   });

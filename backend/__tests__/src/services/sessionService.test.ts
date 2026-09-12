@@ -11,6 +11,7 @@ import { prisma } from '../../../src/lib/prisma';
 import {
   listSessions,
   revokeSession,
+  revokeAllSessions,
 } from '../../../src/services/sessionService';
 
 const db = prisma as unknown as {
@@ -98,5 +99,37 @@ describe('revokeSession', () => {
       data: { revokedAt: expect.any(Date) },
     });
     expect(result).toEqual({ revoked: true });
+  });
+});
+
+describe('revokeAllSessions', () => {
+  it('revokes every active session for the user, including the current one', async () => {
+    db.userSession.updateMany.mockResolvedValue({ count: 2 });
+
+    const result = await revokeAllSessions(USER_ID);
+
+    expect(db.userSession.updateMany).toHaveBeenCalledWith({
+      where: { userId: USER_ID, revokedAt: null },
+      data: { revokedAt: expect.any(Date) },
+    });
+    expect(result).toBe(2);
+  });
+
+  it('runs on a provided transaction client instead of the default one when given', async () => {
+    const mockTx = {
+      userSession: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+    };
+
+    const result = await revokeAllSessions(
+      USER_ID,
+      mockTx as unknown as Parameters<typeof revokeAllSessions>[1]
+    );
+
+    expect(mockTx.userSession.updateMany).toHaveBeenCalledWith({
+      where: { userId: USER_ID, revokedAt: null },
+      data: { revokedAt: expect.any(Date) },
+    });
+    expect(db.userSession.updateMany).not.toHaveBeenCalled();
+    expect(result).toBe(1);
   });
 });

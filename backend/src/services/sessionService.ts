@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { appError } from '../utils/appError';
 import { prisma } from '../lib/prisma';
 import { describeUserAgent } from '../utils/userAgent';
@@ -54,4 +55,21 @@ export async function revokeSession(
     throw appError('NOT_FOUND', 'Session not found.', 404);
 
   return { revoked: true };
+}
+
+/**
+ * Revokes every active session for a user, used after a password change or reset so old JWTs stop working immediately.
+ * @param userId - The user whose sessions should all be revoked.
+ * @param client - Prisma client or `$transaction` tx to run the write on; defaults to the shared singleton.
+ * @returns The number of sessions revoked.
+ */
+export async function revokeAllSessions(
+  userId: string,
+  client: Prisma.TransactionClient | typeof prisma = prisma
+): Promise<number> {
+  const result = await client.userSession.updateMany({
+    where: { userId, revokedAt: null },
+    data: { revokedAt: new Date() },
+  });
+  return result.count;
 }

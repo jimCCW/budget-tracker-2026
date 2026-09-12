@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { appError } from '../utils/appError';
 import { prisma } from '../lib/prisma';
 import { createDefault as createDefaultAccount } from './accountService';
+import { revokeAllSessions } from './sessionService';
 
 /** Generates a random 5-digit numeric code as a string. */
 function generateCode(): string {
@@ -238,7 +239,7 @@ export async function verifyResetToken(data: {
 }
 
 /**
- * Validates the reset token and updates the user's password.
+ * Validates the reset token, updates the user's password, and revokes every session on the account.
  * @param data - Object containing email, plain-text token, and new plain-text password.
  * @returns A success message string.
  * @throws VALIDATION_ERROR (400) if the token is invalid or expired.
@@ -250,10 +251,16 @@ export async function resetPassword(data: {
 }): Promise<{ message: string }> {
   await verifyResetToken({ email: data.email, token: data.token });
 
+  // Hash before opening the transaction — bcrypt at cost 10 is ~100ms of CPU
+  // and doesn't touch the DB, so running it inside the transaction would
+  // hold a pooled connection and row lock open for no benefit.
   const passwordHash = await bcrypt.hash(data.password, 10);
-  await prisma.user.update({
-    where: { email: data.email },
-    data: { passwordHash, resetToken: null, resetTokenExpiry: null },
+  await prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
+      where: { email: data.email },
+      data: { passwordHash, resetToken: null, resetTokenExpiry: null },
+    });
+    await revokeAllSessions(user.id, tx);
   });
 
   return { message: 'Password updated successfully.' };

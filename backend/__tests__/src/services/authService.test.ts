@@ -432,7 +432,7 @@ describe('resetPassword', () => {
     ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' });
   });
 
-  it('hashes the new password and clears reset token fields', async () => {
+  it('hashes the new password, clears reset token fields, and revokes all sessions', async () => {
     db.user.findUnique.mockResolvedValue(
       makeUser({
         resetToken: 'hash',
@@ -440,7 +440,14 @@ describe('resetPassword', () => {
       })
     );
     (mockBcrypt.compare as jest.Mock).mockResolvedValue(true);
-    db.user.update.mockResolvedValue(makeUser());
+
+    const mockTx = {
+      user: { update: jest.fn().mockResolvedValue(makeUser()) },
+      userSession: { updateMany: jest.fn().mockResolvedValue({ count: 2 }) },
+    };
+    db.$transaction.mockImplementation(
+      (fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+    );
 
     const result = await resetPassword({
       email: EMAIL,
@@ -449,13 +456,17 @@ describe('resetPassword', () => {
     });
 
     expect(mockBcrypt.hash).toHaveBeenCalledWith('newpass', 10);
-    expect(db.user.update).toHaveBeenCalledWith({
+    expect(mockTx.user.update).toHaveBeenCalledWith({
       where: { email: EMAIL },
       data: {
         passwordHash: 'hashed-pw',
         resetToken: null,
         resetTokenExpiry: null,
       },
+    });
+    expect(mockTx.userSession.updateMany).toHaveBeenCalledWith({
+      where: { userId: USER_ID, revokedAt: null },
+      data: { revokedAt: expect.any(Date) },
     });
     expect(result).toMatchObject({ message: 'Password updated successfully.' });
   });
