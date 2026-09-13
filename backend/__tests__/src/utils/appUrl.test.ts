@@ -38,13 +38,15 @@ describe('appUrl', () => {
 
   it('builds a URL with no query string when none is given', () => {
     const { appUrl } = require('../../../src/utils/appUrl');
-    expect(appUrl('/reset-password')).toBe('http://localhost:3000/reset-password');
+    expect(appUrl('/reset-password')).toBe(
+      'http://localhost:3000/reset-password'
+    );
   });
 
   it('encodes query values and preserves insertion order', () => {
     const { appUrl } = require('../../../src/utils/appUrl');
-    expect(
-      appUrl('/reset-password', { token: 'tok', email: 'a@b.com' })
-    ).toBe('http://localhost:3000/reset-password?token=tok&email=a%40b.com');
+    expect(appUrl('/reset-password', { token: 'tok', email: 'a@b.com' })).toBe(
+      'http://localhost:3000/reset-password?token=tok&email=a%40b.com'
+    );
   });
 });
