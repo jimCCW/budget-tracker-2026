@@ -56,13 +56,18 @@ Run these from the `backend/` directory:
 
 Copy `.env.example` to `.env` and fill in the values:
 
-| Variable       | Description                   | Example                                          |
-| -------------- | ----------------------------- | ------------------------------------------------ |
-| `DATABASE_URL` | PostgreSQL connection string  | `postgresql://user:pass@localhost:5432/budgetdb` |
-| `JWT_SECRET`   | Secret for signing JWT tokens | Any strong random string                         |
-| `PORT`         | Port the API listens on       | `4000`                                           |
-| `NODE_ENV`     | Runtime environment           | `development`                                    |
-| `FRONTEND_URL` | Frontend origin (for CORS)    | `http://localhost:3000`                          |
+| Variable       | Description                                                                                                               | Example                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `DATABASE_URL` | PostgreSQL connection string                                                                                              | `postgresql://user:pass@localhost:5432/budgetdb` |
+| `JWT_SECRET`   | Secret for signing JWT tokens                                                                                             | Any strong random string                         |
+| `PORT`         | Port the API listens on                                                                                                   | `4000`                                           |
+| `NODE_ENV`     | Runtime environment                                                                                                       | `development`                                    |
+| `FRONTEND_URL` | Frontend origin (for CORS)                                                                                                | `http://localhost:3000`                          |
+| `SMTP_HOST`    | Optional — SMTP host for real email delivery. Unset = activation codes and reset links are logged to the console instead. | `smtp.resend.com`                                |
+| `SMTP_PORT`    | Optional — SMTP port (465 = implicit TLS, 587 = STARTTLS)                                                                 | `465`                                            |
+| `SMTP_USER`    | Optional — SMTP auth username                                                                                             | `resend`                                         |
+| `SMTP_PASS`    | Optional — SMTP auth password / API key                                                                                   | `re_xxxxxxxxxxxxxxxxxxxx`                        |
+| `MAIL_FROM`    | Required when `SMTP_HOST` is set — the `From` address                                                                     | `Budget Tracker <onboarding@resend.dev>`         |
 
 ## API Endpoints
 

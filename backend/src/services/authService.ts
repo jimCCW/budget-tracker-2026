@@ -5,30 +5,35 @@ import { appError } from '../utils/appError';
 import { prisma } from '../lib/prisma';
 import { createDefault as createDefaultAccount } from './accountService';
 import { revokeAllSessions } from './sessionService';
+import { sendActivationEmail, sendPasswordResetEmail } from './emailService';
+
+/** How long an activation code or password-reset token stays valid, in minutes. */
+const CODE_TTL_MINUTES = 15;
 
 /** Generates a random 5-digit numeric code as a string. */
 function generateCode(): string {
   return Math.floor(10000 + Math.random() * 90000).toString();
 }
 
-/** Returns a Date 15 minutes from now, used as the activation code expiry. */
+/** Returns a Date `CODE_TTL_MINUTES` from now, used as the activation code / reset token expiry. */
 function codeExpiry(): Date {
-  return new Date(Date.now() + 15 * 60 * 1000);
+  return new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000);
 }
 
 /**
- * Logs the activation code and clickable activation URL to the console (dev only).
- * @param email - The user's email address.
- * @param code - The generated 5-digit activation code.
+ * Returns a `.catch` handler that logs a failed email send without rethrowing — delivery failures must never fail the request.
+ * @param kind - Short label for the email type, used in the log line.
+ * @param email - Recipient address, for the log line.
+ * @returns A rejection handler suitable for `.catch(...)`.
  */
-function logActivation(email: string, code: string): void {
-  const url = `${process.env.FRONTEND_URL ?? 'http://localhost:3000'}/register/activate?email=${encodeURIComponent(email)}&code=${code}`;
-  console.log(`[DEV] Activation code for ${email}: ${code}`);
-  console.log(`[DEV] Activation URL: ${url}`);
+function logMailFailure(kind: string, email: string) {
+  return (err: unknown) => {
+    console.error(`[mail] Failed to send ${kind} to ${email}:`, err);
+  };
 }
 
 /**
- * Creates a new inactive user account, hashes the password, and sends a 5-digit activation code.
+ * Creates a new inactive user account, hashes the password, and emails a 5-digit activation code.
  * @param data - Registration payload containing email, plain-text password, full name, first name, and last name.
  * @returns The email address of the newly created account.
  * @throws CONFLICT (409) if the email is already registered.
@@ -69,7 +74,9 @@ export async function register(data: {
     await createDefaultAccount(user.id, tx);
   });
 
-  logActivation(data.email, code);
+  await sendActivationEmail(data.email, code, CODE_TTL_MINUTES).catch(
+    logMailFailure('activation email', data.email)
+  );
   return { email: data.email };
 }
 
@@ -101,7 +108,7 @@ export async function activateAccount(data: { email: string; code: string }) {
 }
 
 /**
- * Generates and stores a fresh 5-digit activation code for an inactive account.
+ * Generates, stores, and emails a fresh 5-digit activation code for an inactive account.
  * @param data - Object containing the user's email.
  * @returns The email address the new code was sent to.
  * @throws NOT_FOUND (404) if no account exists for the email.
@@ -119,7 +126,9 @@ export async function resendActivation(data: { email: string }) {
     data: { activationCode: code, activationCodeExpiry: codeExpiry() },
   });
 
-  logActivation(data.email, code);
+  await sendActivationEmail(data.email, code, CODE_TTL_MINUTES).catch(
+    logMailFailure('activation email', data.email)
+  );
   return { email: data.email };
 }
 
@@ -183,8 +192,7 @@ export async function logout(sessionId: string): Promise<void> {
 }
 
 /**
- * Generates a password reset token, stores its hash in the DB, and logs the reset link to console.
- * Silently no-ops if no account exists for the email (avoids user enumeration).
+ * Generates a password reset token, stores its hash, and emails the reset link (fire-and-forget, so response timing never reveals whether the email exists). Silently no-ops if no account exists for the email (avoids user enumeration).
  * @param data - Object containing the email address to reset.
  */
 export async function forgotPassword(data: { email: string }): Promise<void> {
@@ -199,8 +207,9 @@ export async function forgotPassword(data: { email: string }): Promise<void> {
     data: { resetToken: tokenHash, resetTokenExpiry: codeExpiry() },
   });
 
-  const url = `${process.env.FRONTEND_URL ?? 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(data.email)}`;
-  console.log(`[DEV] Password reset link for ${data.email}: ${url}`);
+  sendPasswordResetEmail(data.email, token, CODE_TTL_MINUTES).catch(
+    logMailFailure('password reset email', data.email)
+  );
 }
 
 /**

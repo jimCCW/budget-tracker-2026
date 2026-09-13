@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "build": "tsc && cp -r src/templates dist/templates",
     "start": "node dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -20,7 +20,9 @@
     "dotenv": "^16.4.5",
     "exceljs": "^4.4.0",
     "express": "^4.21.0",
+    "handlebars": "^4.7.9",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^10.0.8",
     "zod": "^3.23.8"
   },
   "pnpm": {

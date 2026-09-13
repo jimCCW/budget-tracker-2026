@@ -34,7 +34,7 @@ pnpm dev              # http://localhost:3000
 
 ### Environment Variables
 
-Copy `backend/.env.example` to `backend/.env` and fill in `JWT_SECRET`.
+Copy `backend/.env.example` to `backend/.env` and fill in `JWT_SECRET`. The `SMTP_*` vars are optional — leave them unset locally and activation codes / password-reset links print to the backend console instead of being emailed.
 
 The frontend needs its own `frontend/.env.local` (no example file is checked in yet — never commit it):
 
