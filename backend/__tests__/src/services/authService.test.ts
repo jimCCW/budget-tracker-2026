@@ -166,7 +166,9 @@ describe('register', () => {
   it('emails the activation code after the transaction commits', async () => {
     db.user.findUnique.mockResolvedValue(null);
     const mockTx = {
-      user: { create: jest.fn().mockResolvedValue(makeUser({ isActive: false })) },
+      user: {
+        create: jest.fn().mockResolvedValue(makeUser({ isActive: false })),
+      },
       account: { create: jest.fn().mockResolvedValue({}) },
     };
     db.$transaction.mockImplementation(
@@ -183,13 +185,19 @@ describe('register', () => {
 
     const createdCode = mockTx.user.create.mock.calls[0][0].data.activationCode;
     expect(createdCode).toMatch(/^\d{5}$/);
-    expect(mockSendActivationEmail).toHaveBeenCalledWith(EMAIL, createdCode, 15);
+    expect(mockSendActivationEmail).toHaveBeenCalledWith(
+      EMAIL,
+      createdCode,
+      15
+    );
   });
 
   it('still resolves when the activation email fails to send', async () => {
     db.user.findUnique.mockResolvedValue(null);
     const mockTx = {
-      user: { create: jest.fn().mockResolvedValue(makeUser({ isActive: false })) },
+      user: {
+        create: jest.fn().mockResolvedValue(makeUser({ isActive: false })),
+      },
       account: { create: jest.fn().mockResolvedValue({}) },
     };
     db.$transaction.mockImplementation(
