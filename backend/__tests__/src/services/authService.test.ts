@@ -15,10 +15,18 @@ jest.mock('../../../src/lib/prisma', () => ({
 
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
+jest.mock('../../../src/services/emailService', () => ({
+  sendActivationEmail: jest.fn(),
+  sendPasswordResetEmail: jest.fn(),
+}));
 
 import { prisma } from '../../../src/lib/prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import {
+  sendActivationEmail,
+  sendPasswordResetEmail,
+} from '../../../src/services/emailService';
 import {
   register,
   activateAccount,
@@ -45,13 +53,22 @@ const db = prisma as unknown as {
 
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 const mockJwt = jwt as jest.Mocked<typeof jwt>;
+const mockSendActivationEmail = sendActivationEmail as jest.Mock;
+const mockSendPasswordResetEmail = sendPasswordResetEmail as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest.spyOn(console, 'error').mockImplementation(() => {});
   process.env.JWT_SECRET = 'test-secret';
   (mockBcrypt.hash as jest.Mock).mockResolvedValue('hashed-pw');
   (mockBcrypt.compare as jest.Mock).mockResolvedValue(true);
   (mockJwt.sign as jest.Mock).mockReturnValue('mock-token');
+  mockSendActivationEmail.mockResolvedValue(undefined);
+  mockSendPasswordResetEmail.mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 const USER_ID = 'user-1';
@@ -144,6 +161,52 @@ describe('register', () => {
       lastName: 'User',
     });
     expect(result).toEqual({ email: EMAIL });
+  });
+
+  it('emails the activation code after the transaction commits', async () => {
+    db.user.findUnique.mockResolvedValue(null);
+    const mockTx = {
+      user: { create: jest.fn().mockResolvedValue(makeUser({ isActive: false })) },
+      account: { create: jest.fn().mockResolvedValue({}) },
+    };
+    db.$transaction.mockImplementation(
+      (fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+    );
+
+    await register({
+      email: EMAIL,
+      password: 'pass',
+      name: 'Test',
+      firstName: 'Test',
+      lastName: 'User',
+    });
+
+    const createdCode = mockTx.user.create.mock.calls[0][0].data.activationCode;
+    expect(createdCode).toMatch(/^\d{5}$/);
+    expect(mockSendActivationEmail).toHaveBeenCalledWith(EMAIL, createdCode, 15);
+  });
+
+  it('still resolves when the activation email fails to send', async () => {
+    db.user.findUnique.mockResolvedValue(null);
+    const mockTx = {
+      user: { create: jest.fn().mockResolvedValue(makeUser({ isActive: false })) },
+      account: { create: jest.fn().mockResolvedValue({}) },
+    };
+    db.$transaction.mockImplementation(
+      (fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)
+    );
+    mockSendActivationEmail.mockRejectedValue(new Error('smtp down'));
+
+    await expect(
+      register({
+        email: EMAIL,
+        password: 'pass',
+        name: 'Test',
+        firstName: 'Test',
+        lastName: 'User',
+      })
+    ).resolves.toEqual({ email: EMAIL });
+    expect(console.error).toHaveBeenCalled();
   });
 });
 
@@ -256,6 +319,16 @@ describe('resendActivation', () => {
     );
     expect(result).toEqual({ email: EMAIL });
   });
+
+  it('emails the newly generated code', async () => {
+    db.user.findUnique.mockResolvedValue(makeUser({ isActive: false }));
+    db.user.update.mockResolvedValue(makeUser());
+
+    await resendActivation({ email: EMAIL });
+
+    const newCode = db.user.update.mock.calls[0][0].data.activationCode;
+    expect(mockSendActivationEmail).toHaveBeenCalledWith(EMAIL, newCode, 15);
+  });
 });
 
 describe('login', () => {
@@ -367,6 +440,46 @@ describe('forgotPassword', () => {
         }),
       })
     );
+  });
+
+  it('does not email when the account does not exist', async () => {
+    db.user.findUnique.mockResolvedValue(null);
+
+    await forgotPassword({ email: EMAIL });
+
+    expect(mockSendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  it('emails the plain-text reset token (not the stored hash) when user is found', async () => {
+    db.user.findUnique.mockResolvedValue(makeUser());
+    db.user.update.mockResolvedValue(makeUser());
+
+    await forgotPassword({ email: EMAIL });
+
+    const plainTextToken = mockBcrypt.hash.mock.calls[0][0];
+    expect(mockSendPasswordResetEmail).toHaveBeenCalledWith(
+      EMAIL,
+      plainTextToken,
+      15
+    );
+  });
+
+  it('does not await the email send (resolves even if the send never settles)', async () => {
+    db.user.findUnique.mockResolvedValue(makeUser());
+    db.user.update.mockResolvedValue(makeUser());
+    mockSendPasswordResetEmail.mockReturnValue(new Promise(() => {}));
+
+    await expect(forgotPassword({ email: EMAIL })).resolves.toBeUndefined();
+  });
+
+  it('logs, but does not throw, when the email send rejects', async () => {
+    db.user.findUnique.mockResolvedValue(makeUser());
+    db.user.update.mockResolvedValue(makeUser());
+    mockSendPasswordResetEmail.mockRejectedValue(new Error('smtp down'));
+
+    await expect(forgotPassword({ email: EMAIL })).resolves.toBeUndefined();
+    await new Promise(process.nextTick);
+    expect(console.error).toHaveBeenCalled();
   });
 });
 

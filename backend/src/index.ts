@@ -2,11 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
+import { frontendUrl } from './utils/appUrl';
 
 const app = express();
 const PORT = process.env.PORT ?? 4000;
 
-app.use(cors({ origin: process.env.FRONTEND_URL ?? 'http://localhost:3000' }));
+if (!process.env.SMTP_HOST) {
+  console.warn(
+    '[mail] SMTP_HOST is not set — activation codes and reset links will be logged to the console instead of emailed.'
+  );
+}
+
+app.use(cors({ origin: frontendUrl() }));
 app.use(express.json());
 
 import authRoutes from './routes/authRoutes';

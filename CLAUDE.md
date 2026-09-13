@@ -213,6 +213,13 @@ IMPORTANT: Use `401` only for actual JWT/session problems. A route that re-verif
 - `break` / `continue` cannot cross an async callback boundary (e.g. inside `prisma.$transaction(async tx => {...})`). Hoist early-exit guards **before** the `await prisma.$transaction(...)` call.
 - Prisma defaults required (non-optional) relations to `RESTRICT` on delete, not `CASCADE`, unless `onDelete` is set explicitly in the schema. When hard-deleting a row with dependents (e.g. deleting a `User`), delete the referencing rows first, in FK-safe order, inside one `$transaction` — see `userService.deleteAccount` for the pattern (Income/Expense/RecurringRule → Account/Category → the row itself).
 
+### Email
+
+- Real delivery goes `services/emailService.ts` (composes the URL + renders the template + sends) → `utils/emailTemplates.ts` (Handlebars renderer) → `lib/mailer.ts` (Nodemailer/SMTP transport). Provider is env-only (`SMTP_HOST/PORT/USER/PASS`, `MAIL_FROM`) — switching providers is a `.env` edit, never a code change.
+- When `SMTP_HOST` is unset (local dev, tests), `lib/mailer.ts` logs the email to the console with a `[DEV]` prefix instead of sending — this is the same behavior the old `logActivation`/`forgotPassword` console logging had.
+- Email HTML/text content lives in `src/templates/emails/*.hbs` (Handlebars), not inline TS strings. Use `{{var}}` (auto-escaped) for interpolated values; only `layout.hbs`'s `{{{body}}}` is raw. Each HTML template has a `.txt.hbs` plain-text sibling. `pnpm build` copies the folder into `dist/` (`"build": "tsc && cp -r src/templates dist/templates"`) — editing or adding a template needs no build-script change.
+- Sends from `authService.ts` must never fail the request: `.catch(logMailFailure(...))`, log-only. `forgotPassword`'s reset email is deliberately **not awaited** so a known vs. unknown email responds in the same time (anti-enumeration) — awaiting it would leak the answer via an added SMTP round-trip.
+
 ### Testing
 
 - Test runner: **Jest** (not Vitest). Tests live in `backend/__tests__/src/` mirroring the source tree.
@@ -226,6 +233,7 @@ IMPORTANT: Use `401` only for actual JWT/session problems. A route that re-verif
 - `$transaction` mock: `db.$transaction.mockImplementation((fn) => fn(mockTx))` where `mockTx` mirrors the model methods used inside the callback.
 - Services with module-level state (e.g. `catchupService`'s throttle Map): use `jest.resetModules()` + `jest.doMock()` + synchronous `require()` inside `beforeEach` so each test gets a fresh module instance.
 - Set `process.env.JWT_SECRET = 'test-secret'` in `beforeEach` when testing `authService` — env var is undefined in test context, causing `jwt.sign` to receive `undefined` as the secret.
+- `authService.test.ts` mocks `services/emailService` (`jest.mock('../../../src/services/emailService', ...)`) — no test should send real mail. `lib/mailer.test.ts` instead uses `jest.resetModules()` + `jest.doMock('nodemailer', ...)` + `require()` per test to exercise the transport-selection logic itself.
 
 ---
 
@@ -248,6 +256,14 @@ DATABASE_URL=postgresql://budgetuser:budgetpass@localhost:5432/budgetdb
 JWT_SECRET=
 PORT=4000
 NODE_ENV=development
+FRONTEND_URL=http://localhost:3000
+
+# Email — optional. Unset locally = activation codes / reset links log to console.
+# SMTP_HOST=smtp.resend.com
+# SMTP_PORT=465
+# SMTP_USER=resend
+# SMTP_PASS=
+# MAIL_FROM="Budget Tracker <onboarding@resend.dev>"
 ```
 
 **`frontend/.env.local`**

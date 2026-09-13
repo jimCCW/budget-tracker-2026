@@ -168,16 +168,22 @@ backend/
 │   │   ├── validate.ts          # validate(zodSchema) — reusable request body validator
 │   │   └── errorHandler.ts      # Global error handler → standard response format
 │   ├── controllers/     # Request/response only — calls service, returns response
-│   ├── services/        # All business logic lives here
+│   ├── services/        # All business logic lives here, incl. emailService.ts (activation/reset emails)
 │   ├── schemas/          # Zod schemas for request validation
-│   ├── utils/             # appError.ts, authorizationUtils.ts, recurrence.ts, userAgent.ts, activityExport.ts
-│   ├── lib/prisma.ts       # Shared Prisma singleton — always import from here, never `new PrismaClient()`
+│   ├── utils/             # appError.ts, authorizationUtils.ts, recurrence.ts, userAgent.ts, activityExport.ts,
+│   │                       # appUrl.ts (frontend URL builder), emailTemplates.ts (Handlebars renderer)
+│   ├── templates/emails/   # layout.hbs + activation/password-reset .hbs + .txt.hbs — email HTML/text content
+│   ├── lib/
+│   │   ├── prisma.ts       # Shared Prisma singleton — always import from here, never `new PrismaClient()`
+│   │   └── mailer.ts       # Nodemailer/SMTP transport — [DEV] console fallback when SMTP_HOST is unset
 │   └── index.ts
 ├── prisma/
 │   ├── schema.prisma
 │   └── seed.ts
 └── Dockerfile
 ```
+
+`pnpm build` (`tsc && cp -r src/templates dist/templates`) copies the non-TS `templates/` folder into `dist/` alongside the compiled JS — `tsc` alone would otherwise drop it.
 
 ### Middleware Chain
 
@@ -470,6 +476,8 @@ Full request/response shapes live in each feature's `docs/features/<name>.md` �
 | Backend  | ECS Fargate               | Cloud Run      | Container Apps          |
 | Database | RDS (PostgreSQL)          | Cloud SQL      | Azure DB for PostgreSQL |
 | Secrets  | Secrets Manager           | Secret Manager | Key Vault               |
+
+`SMTP_PASS` (and `SMTP_USER`) are secrets — store them in the platform's secret manager, not plain env vars in source control. `MAIL_FROM` must be on a domain verified with the SMTP provider (Resend/Brevo/SES/etc.) — an unverified sandbox sender (e.g. Resend's `onboarding@resend.dev`) only delivers to the provider account's own address, not to real users.
 
 Backend ships as a Docker container — see `backend/Dockerfile`.
 
