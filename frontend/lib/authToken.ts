@@ -1,8 +1,7 @@
 import { getSession } from 'next-auth/react';
 
 type TokenState =
-  | { status: 'pending' }
-  | { status: 'ready'; token: string | null };
+  { status: 'pending' } | { status: 'ready'; token: string | null };
 
 /**
  * How long a request waits for <SessionTokenSync /> to report the session
