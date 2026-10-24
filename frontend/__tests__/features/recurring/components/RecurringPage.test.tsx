@@ -130,17 +130,17 @@ function setupMocks({
   mockUseSetActive.mockReturnValue({
     mutate: vi.fn(),
     isPending: false,
-  } as ReturnType<typeof useSetRuleActive>);
+  } as unknown as ReturnType<typeof useSetRuleActive>);
 
   mockUseDeleteRule.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue({}),
     isPending: false,
-  } as ReturnType<typeof useDeleteRule>);
+  } as unknown as ReturnType<typeof useDeleteRule>);
 
   mockUseRunCatchup.mockReturnValue({
     mutate: vi.fn(),
     isPending: runCatchupPending,
-  } as ReturnType<typeof useRunCatchup>);
+  } as unknown as ReturnType<typeof useRunCatchup>);
 }
 
 describe('RecurringPage', () => {
@@ -273,12 +273,12 @@ describe('RecurringPage', () => {
       mockUseSetActive.mockReturnValue({
         mutate,
         isPending: false,
-      } as ReturnType<typeof useSetRuleActive>);
+      } as unknown as ReturnType<typeof useSetRuleActive>);
       setupMocks({ rules: [makeRule({ isActive: true })] });
       mockUseSetActive.mockReturnValue({
         mutate,
         isPending: false,
-      } as ReturnType<typeof useSetRuleActive>);
+      } as unknown as ReturnType<typeof useSetRuleActive>);
 
       const { container } = render(<RecurringPage />);
       const pauseBtn = container.querySelector('.pi-pause')!.closest('button')!;
@@ -306,12 +306,12 @@ describe('RecurringPage', () => {
       mockUseDeleteRule.mockReturnValue({
         mutateAsync,
         isPending: false,
-      } as ReturnType<typeof useDeleteRule>);
+      } as unknown as ReturnType<typeof useDeleteRule>);
       setupMocks({ rules: [makeRule()] });
       mockUseDeleteRule.mockReturnValue({
         mutateAsync,
         isPending: false,
-      } as ReturnType<typeof useDeleteRule>);
+      } as unknown as ReturnType<typeof useDeleteRule>);
 
       const { container } = render(<RecurringPage />);
       const deleteBtn = container
@@ -357,7 +357,7 @@ describe('RecurringPage', () => {
       mockUseRunCatchup.mockReturnValue({
         mutate,
         isPending: false,
-      } as ReturnType<typeof useRunCatchup>);
+      } as unknown as ReturnType<typeof useRunCatchup>);
 
       render(<RecurringPage />);
       await user.click(screen.getByRole('button', { name: /Run now/ }));

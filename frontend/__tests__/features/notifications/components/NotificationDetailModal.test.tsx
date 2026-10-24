@@ -67,7 +67,7 @@ describe('NotificationDetailModal', () => {
     vi.clearAllMocks();
     mockUseMarkAsRead.mockReturnValue({
       mutate: vi.fn(),
-    } as ReturnType<typeof useMarkAsRead>);
+    } as unknown as ReturnType<typeof useMarkAsRead>);
   });
 
   it('returns null when notification is null', () => {
@@ -115,7 +115,7 @@ describe('NotificationDetailModal', () => {
     const mutate = vi.fn();
     mockUseMarkAsRead.mockReturnValue({
       mutate,
-    } as ReturnType<typeof useMarkAsRead>);
+    } as unknown as ReturnType<typeof useMarkAsRead>);
 
     render(
       <NotificationDetailModal
@@ -133,7 +133,7 @@ describe('NotificationDetailModal', () => {
     const mutate = vi.fn();
     mockUseMarkAsRead.mockReturnValue({
       mutate,
-    } as ReturnType<typeof useMarkAsRead>);
+    } as unknown as ReturnType<typeof useMarkAsRead>);
 
     render(
       <NotificationDetailModal

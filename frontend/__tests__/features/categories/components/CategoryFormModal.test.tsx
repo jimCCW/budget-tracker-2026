@@ -81,7 +81,7 @@ function makeCreateMock(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useCreateCategory>;
+  } as unknown as ReturnType<typeof useCreateCategory>;
 }
 
 function makeUpdateMock(overrides = {}) {
@@ -92,7 +92,7 @@ function makeUpdateMock(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useUpdateCategory>;
+  } as unknown as ReturnType<typeof useUpdateCategory>;
 }
 
 describe('CategoryFormModal', () => {

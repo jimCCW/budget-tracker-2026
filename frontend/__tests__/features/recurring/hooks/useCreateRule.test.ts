@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCreateRule } from '@/features/recurring/hooks/useCreateRule';
+import type { RecurringFormValues } from '@/features/recurring/schemas/recurringSchema';
 import { createWrapper } from '../../../helpers/createWrapper';
 
 vi.mock('@/lib/api', () => ({
@@ -21,14 +22,14 @@ const stubRule = {
 };
 
 const validInput = {
-  name: 'Monthly Salary',
+  kind: 'INCOME',
   amount: 5000,
-  frequency: 'MONTHLY' as const,
+  frequency: 'MONTHLY',
   categoryId: 'cat-1',
   accountId: 'acc-1',
   startDate: '2026-01-01',
-  type: 'INCOME' as const,
-};
+  note: 'Monthly Salary',
+} satisfies RecurringFormValues;
 
 describe('useCreateRule', () => {
   beforeEach(() => {

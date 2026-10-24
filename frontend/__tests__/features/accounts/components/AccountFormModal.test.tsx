@@ -83,7 +83,7 @@ function makeCreateMock(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useCreateAccount>;
+  } as unknown as ReturnType<typeof useCreateAccount>;
 }
 
 function makeUpdateMock(overrides = {}) {
@@ -94,7 +94,7 @@ function makeUpdateMock(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useUpdateAccount>;
+  } as unknown as ReturnType<typeof useUpdateAccount>;
 }
 
 describe('AccountFormModal', () => {

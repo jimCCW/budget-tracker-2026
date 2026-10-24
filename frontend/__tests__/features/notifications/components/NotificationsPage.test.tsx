@@ -86,7 +86,7 @@ function setupMocks({
     isFetchingNextPage: false,
     hasNextPage,
     fetchNextPage: vi.fn(),
-  } as ReturnType<typeof useNotifications>);
+  } as unknown as ReturnType<typeof useNotifications>);
 
   mockUseUnreadCount.mockReturnValue({
     data: unreadCount,
@@ -95,7 +95,7 @@ function setupMocks({
   mockUseMarkAllAsRead.mockReturnValue({
     mutate: vi.fn(),
     isPending: false,
-  } as ReturnType<typeof useMarkAllAsRead>);
+  } as unknown as ReturnType<typeof useMarkAllAsRead>);
 }
 
 describe('NotificationsPage', () => {
@@ -103,13 +103,11 @@ describe('NotificationsPage', () => {
     vi.clearAllMocks();
     vi.stubGlobal(
       'IntersectionObserver',
-      vi.fn().mockImplementation(
-        class {
-          observe = vi.fn();
-          disconnect = vi.fn();
-          unobserve = vi.fn();
-        }
-      )
+      class {
+        observe = vi.fn();
+        disconnect = vi.fn();
+        unobserve = vi.fn();
+      }
     );
   });
 
@@ -222,13 +220,13 @@ describe('NotificationsPage', () => {
       mockUseMarkAllAsRead.mockReturnValue({
         mutate,
         isPending: false,
-      } as ReturnType<typeof useMarkAllAsRead>);
+      } as unknown as ReturnType<typeof useMarkAllAsRead>);
       setupMocks({ notifications: [makeNotification()], unreadCount: 1 });
       // re-set after setupMocks
       mockUseMarkAllAsRead.mockReturnValue({
         mutate,
         isPending: false,
-      } as ReturnType<typeof useMarkAllAsRead>);
+      } as unknown as ReturnType<typeof useMarkAllAsRead>);
 
       render(<NotificationsPage />);
       await user.click(screen.getByRole('button', { name: /Mark all read/ }));

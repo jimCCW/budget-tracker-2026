@@ -58,7 +58,7 @@ describe('DeleteConfirmModal', () => {
       isError: false,
       error: null,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteCategory>);
+    } as unknown as ReturnType<typeof useDeleteCategory>);
   });
 
   it('renders nothing when open is false', () => {
@@ -104,7 +104,7 @@ describe('DeleteConfirmModal', () => {
       isError: false,
       error: null,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteCategory>);
+    } as unknown as ReturnType<typeof useDeleteCategory>);
 
     render(
       <DeleteConfirmModal open={true} onClose={onClose} category={category} />
@@ -124,7 +124,7 @@ describe('DeleteConfirmModal', () => {
       isError: false,
       error: null,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteCategory>);
+    } as unknown as ReturnType<typeof useDeleteCategory>);
 
     render(
       <DeleteConfirmModal open={true} onClose={vi.fn()} category={category} />
@@ -139,7 +139,7 @@ describe('DeleteConfirmModal', () => {
       isError: true,
       error: new Error('Delete failed'),
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteCategory>);
+    } as unknown as ReturnType<typeof useDeleteCategory>);
 
     render(
       <DeleteConfirmModal open={true} onClose={vi.fn()} category={category} />
@@ -154,7 +154,7 @@ describe('DeleteConfirmModal', () => {
       isError: true,
       error: 'unknown' as unknown as Error,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteCategory>);
+    } as unknown as ReturnType<typeof useDeleteCategory>);
 
     render(
       <DeleteConfirmModal open={true} onClose={vi.fn()} category={category} />

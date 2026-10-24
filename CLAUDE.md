@@ -153,7 +153,9 @@ Full tree lives in `docs/ARCHITECTURE.md` under "Frontend — Feature-based Stru
 - Environment is `jsdom` with `globals: true`; `@` resolves to the frontend root.
 - Mock the API client wholesale rather than stubbing axios — `vi.mock('@/lib/api', ...)`, the pattern used by 45 of the test files.
 - For modules with singleton state (e.g. `lib/authToken.ts`), use `vi.resetModules()` plus a dynamic `await import()` inside `beforeEach` so each test gets a fresh instance.
-- `pnpm tsc --noEmit` currently reports pre-existing errors in `__tests__/` (partial mocks cast to `UseMutationResult`, and stale fixtures). These are not caused by your change — check whether the failing file is one you touched before investigating.
+- `pnpm tsc --noEmit` must be clean, tests included — `next build` (Next 16.4+) type-checks everything `tsconfig.json` includes, so a type error in `__tests__/` fails the production build.
+- Partial hook mocks need a double cast: `{ mutateAsync, isPending } as unknown as ReturnType<typeof useX>`. A direct `as ReturnType<...>` fails (TS2352) whenever the partial object doesn't overlap the full `UseMutationResult` union enough.
+- Type form-value fixtures with `satisfies <FormValues>` (e.g. `satisfies RegisterFormValues`) so they break at compile time when the Zod schema changes, instead of silently drifting.
 
 ### General
 
