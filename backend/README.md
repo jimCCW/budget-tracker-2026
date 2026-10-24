@@ -4,7 +4,7 @@ Express.js REST API for the Budget Tracker app. Handles authentication, and will
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 24 (≥ 24.22.1 — see `.nvmrc`)
 - pnpm
 - PostgreSQL 16 (Docker recommended — see docker-compose.yml in the repo root)
 
@@ -118,7 +118,7 @@ All responses follow a consistent envelope format:
 
 | Layer      | Technology                  |
 | ---------- | --------------------------- |
-| Runtime    | Node.js 20                  |
+| Runtime    | Node.js 24                  |
 | Framework  | Express.js                  |
 | Language   | TypeScript (strict mode)    |
 | ORM        | Prisma                      |

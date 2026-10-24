@@ -1,12 +1,15 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN apk add --no-cache openssl
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY prisma ./prisma
+RUN npm install -g pnpm@11.1.3 && pnpm install --frozen-lockfile
 COPY . .
-RUN pnpm build
+RUN npx prisma generate && pnpm build
 
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
+RUN apk add --no-cache openssl
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma

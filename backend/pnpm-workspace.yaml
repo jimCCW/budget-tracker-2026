@@ -1,8 +1,8 @@
 allowBuilds:
-  '@prisma/client': set this to true or false
-  '@prisma/engines': set this to true or false
+  '@prisma/client': true
+  '@prisma/engines': true
   bcrypt: true
-  prisma: set this to true or false
+  prisma: true
   unrs-resolver: true
 onlyBuiltDependencies:
   - "@prisma/client"
