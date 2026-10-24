@@ -92,7 +92,7 @@ function makeMutation(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useChangePassword>;
+  } as unknown as ReturnType<typeof useChangePassword>;
 }
 
 describe('ChangePasswordModal', () => {

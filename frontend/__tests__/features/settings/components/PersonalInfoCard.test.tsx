@@ -65,7 +65,7 @@ function makeMutation(overrides = {}) {
     isSuccess: false,
     error: null,
     ...overrides,
-  } as ReturnType<typeof useUpdateProfile>;
+  } as unknown as ReturnType<typeof useUpdateProfile>;
 }
 
 describe('PersonalInfoCard', () => {

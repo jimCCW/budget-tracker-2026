@@ -60,7 +60,7 @@ describe('DeleteAccountModal', () => {
       isError: false,
       error: null,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteAccount>);
+    } as unknown as ReturnType<typeof useDeleteAccount>);
   });
 
   it('renders nothing when open is false', () => {
@@ -106,7 +106,7 @@ describe('DeleteAccountModal', () => {
       isError: false,
       error: null,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteAccount>);
+    } as unknown as ReturnType<typeof useDeleteAccount>);
 
     render(
       <DeleteAccountModal open={true} onClose={onClose} account={account} />
@@ -126,7 +126,7 @@ describe('DeleteAccountModal', () => {
       isError: false,
       error: null,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteAccount>);
+    } as unknown as ReturnType<typeof useDeleteAccount>);
 
     render(
       <DeleteAccountModal open={true} onClose={vi.fn()} account={account} />
@@ -141,7 +141,7 @@ describe('DeleteAccountModal', () => {
       isError: true,
       error: new Error('Network error'),
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteAccount>);
+    } as unknown as ReturnType<typeof useDeleteAccount>);
 
     render(
       <DeleteAccountModal open={true} onClose={vi.fn()} account={account} />
@@ -156,7 +156,7 @@ describe('DeleteAccountModal', () => {
       isError: true,
       error: 'unknown' as unknown as Error,
       reset: vi.fn(),
-    } as ReturnType<typeof useDeleteAccount>);
+    } as unknown as ReturnType<typeof useDeleteAccount>);
 
     render(
       <DeleteAccountModal open={true} onClose={vi.fn()} account={account} />

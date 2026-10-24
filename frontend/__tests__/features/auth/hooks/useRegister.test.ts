@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useRegister } from '@/features/auth/hooks/useRegister';
+import type { RegisterFormValues } from '@/features/auth/schemas/registerSchema';
 import { createWrapper } from '../../../helpers/createWrapper';
 
 vi.mock('@/lib/api', () => ({
@@ -16,7 +17,9 @@ const validInput = {
   lastName: 'Doe',
   email: 'jane@example.com',
   password: 'Secure1!',
-};
+  confirmPassword: 'Secure1!',
+  terms: true,
+} satisfies RegisterFormValues;
 
 describe('useRegister', () => {
   beforeEach(() => {

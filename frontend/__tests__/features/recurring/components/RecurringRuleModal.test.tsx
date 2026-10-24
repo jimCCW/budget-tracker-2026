@@ -154,7 +154,7 @@ function makeCreateMock(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useCreateRule>;
+  } as unknown as ReturnType<typeof useCreateRule>;
 }
 
 function makeUpdateMock(overrides = {}) {
@@ -165,7 +165,7 @@ function makeUpdateMock(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useUpdateRule>;
+  } as unknown as ReturnType<typeof useUpdateRule>;
 }
 
 describe('RecurringRuleModal', () => {

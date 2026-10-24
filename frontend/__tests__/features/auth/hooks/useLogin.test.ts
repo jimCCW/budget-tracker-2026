@@ -71,8 +71,8 @@ describe('useLogin', () => {
     );
   });
 
-  it('throws when signIn returns null', async () => {
-    mockSignIn.mockResolvedValue(null);
+  it('throws when signIn returns undefined', async () => {
+    mockSignIn.mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useLogin(), {
       wrapper: createWrapper(),

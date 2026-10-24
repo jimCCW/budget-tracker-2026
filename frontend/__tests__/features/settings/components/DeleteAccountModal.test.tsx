@@ -91,7 +91,7 @@ function makeMutation(overrides = {}) {
     error: null,
     reset: vi.fn(),
     ...overrides,
-  } as ReturnType<typeof useDeleteAccount>;
+  } as unknown as ReturnType<typeof useDeleteAccount>;
 }
 
 describe('DeleteAccountModal', () => {

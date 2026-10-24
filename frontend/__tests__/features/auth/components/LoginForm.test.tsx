@@ -85,7 +85,9 @@ function makeMutation(overrides = {}) {
 
 describe('LoginForm', () => {
   beforeEach(() => {
-    mockUseLogin.mockReturnValue(makeMutation() as ReturnType<typeof useLogin>);
+    mockUseLogin.mockReturnValue(
+      makeMutation() as unknown as ReturnType<typeof useLogin>
+    );
   });
 
   it('renders email and password inputs', () => {
@@ -124,7 +126,7 @@ describe('LoginForm', () => {
       makeMutation({
         isError: true,
         error: new Error('Invalid email or password. Please try again.'),
-      }) as ReturnType<typeof useLogin>
+      }) as unknown as ReturnType<typeof useLogin>
     );
 
     render(<LoginForm />, { wrapper: createWrapper() });
@@ -137,9 +139,10 @@ describe('LoginForm', () => {
 
   it('disables the submit button while pending', () => {
     mockUseLogin.mockReturnValue(
-      makeMutation({ isPending: true, label: 'Signing in…' }) as ReturnType<
-        typeof useLogin
-      >
+      makeMutation({
+        isPending: true,
+        label: 'Signing in…',
+      }) as unknown as ReturnType<typeof useLogin>
     );
 
     render(<LoginForm />, { wrapper: createWrapper() });

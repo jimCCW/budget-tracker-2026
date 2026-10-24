@@ -105,7 +105,7 @@ function makeMutation(overrides = {}) {
 describe('RegisterForm', () => {
   beforeEach(() => {
     mockUseRegister.mockReturnValue(
-      makeMutation() as ReturnType<typeof useRegister>
+      makeMutation() as unknown as ReturnType<typeof useRegister>
     );
   });
 
@@ -215,7 +215,7 @@ describe('RegisterForm', () => {
       makeMutation({
         isError: true,
         error: new Error('Email already in use.'),
-      }) as ReturnType<typeof useRegister>
+      }) as unknown as ReturnType<typeof useRegister>
     );
 
     render(<RegisterForm />, { wrapper: createWrapper() });
@@ -226,7 +226,9 @@ describe('RegisterForm', () => {
 
   it('disables the submit button while pending', () => {
     mockUseRegister.mockReturnValue(
-      makeMutation({ isPending: true }) as ReturnType<typeof useRegister>
+      makeMutation({ isPending: true }) as unknown as ReturnType<
+        typeof useRegister
+      >
     );
 
     render(<RegisterForm />, { wrapper: createWrapper() });
