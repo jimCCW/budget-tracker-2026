@@ -247,8 +247,9 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           </div>
         </header>
 
-        {/* Scrollable content */}
-        <main className='flex-1 overflow-y-auto overflow-x-hidden bg-bg p-4 lg:p-7 pb-24 lg:pb-7'>
+        {/* Scrollable content — `relative` makes <main> the containing block for
+            absolutely positioned descendants (e.g. `sr-only` labels) so its overflow clips them */}
+        <main className='relative flex-1 overflow-y-auto overflow-x-hidden bg-bg p-4 lg:p-7 pb-24 lg:pb-7'>
           <div className='flex flex-col gap-4'>{children}</div>
         </main>
 
