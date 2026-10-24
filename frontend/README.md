@@ -4,7 +4,7 @@ Next.js 16 App Router frontend for the Budget Tracker app. Handles authenticatio
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 24 (≥ 24.22.1 — see `.nvmrc`)
 - pnpm
 - Backend API running on port 4000 (see `../backend/README.md`)
 
